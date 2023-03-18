@@ -34,19 +34,6 @@ public class MapGrid
         for (int z = 1; z < this.mapHeight; z++) {
             AddCell(mapWidth, z);
         }
-
-        # region TestCode-1
-        foreach (var item in vertexDict.Values) {
-            GameObject temp = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            temp.transform.position = item.position;
-            temp.transform.localScale = Vector3.one * 0.25f;
-        }
-        foreach (var item in cellDict.Values) {
-            GameObject temp = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            temp.transform.position = item.position - new Vector3(0, 0.49f, 0);
-            temp.transform.localScale = new Vector3(cellSize, 1, cellSize);
-        }
-        # endregion 
     }
 
     # region MapVertextCode
@@ -74,9 +61,37 @@ public class MapGrid
         int z = Mathf.Clamp(Mathf.RoundToInt(position.z / cellSize), 1, mapHeight);
         return GetVertex(x, z);
     }
+
+    private void SetVertexType(Vector2Int index, MapVertexType vertexType) {
+        MapVertex vertex = GetVertex(index);
+        if (vertex.vertexType != vertexType) {
+            vertex.vertexType = vertexType;
+            // 计算附近的贴图权重
+            if (vertex.vertexType == MapVertexType.Marsh) {
+                MapCell tempCell = GetLeftBottomMapCell(index);
+                if (tempCell != null) tempCell.textureIndex += 1; 
+
+                tempCell = GetRightBottomMapCell(index);
+                if (tempCell != null) tempCell.textureIndex += 2;
+
+                tempCell = GetLeftTopMapCell(index);
+                if (tempCell != null) tempCell.textureIndex += 4; 
+
+                tempCell = GetRightTopMapCell(index);
+                if (tempCell != null) tempCell.textureIndex += 8; 
+            } else {
+                // TODO: 由于森林不需要计算贴图或者是随机从后面选择贴图, 所以暂时忽略
+            }
+        }
+    }
+
+    private void SetVertexType(int x, int z, MapVertexType vertexType) {
+        SetVertexType(new Vector2Int(x, z), vertexType);
+    }
     # endregion
 
     # region MapCellCode
+    // 为顶点添加一个格子
     private void AddCell(int x, int z) {
         float offset = cellSize / 2;
         cellDict.Add(
@@ -97,37 +112,56 @@ public class MapGrid
     }
 
     public MapCell GetLeftTopMapCell(Vector2Int vertexIndex) {
-        Vector2Int lt_index = new Vector2Int(vertexIndex.x, vertexIndex.y + 1);
-        return cellDict[lt_index];
+        return GetCell(vertexIndex.x, vertexIndex.y + 1);
     }
 
     public MapCell GetLeftBottomMapCell(Vector2Int vertexIndex) {
-        Vector2Int lb_index = vertexIndex;
-        return cellDict[lb_index];
+        return GetCell(vertexIndex.x, vertexIndex.y);
     }
 
     public MapCell GetRightTopMapCell(Vector2Int vertexIndex) {
-        Vector2Int rt_index = new Vector2Int(vertexIndex.x + 1, vertexIndex.y + 1);
-        return cellDict[rt_index];
+        return GetCell(vertexIndex.x + 1, vertexIndex.y + 1);
     }
 
     public MapCell GetRightBottomMapCell(Vector2Int vertexIndex) {
-        Vector2Int rb_index = new Vector2Int(vertexIndex.x + 1, vertexIndex.y);
-        return cellDict[rb_index];
+        return GetCell(vertexIndex.x + 1, vertexIndex.y);
     }
-
     # endregion
+
+    // 计算格子贴图的索引数字
+    public void CalculateMapVertexType(float[,] noiseMap, float limit) {
+        int width = noiseMap.GetLength(0);
+        int height = noiseMap.GetLength(1);
+        for (int x = 1; x <= width; x++) {
+            for (int z = 1; z <= height; z++) {
+                // 根据噪声图的值确认网格类型, 大于边界是沼泽
+                // noiseMap是从0开始的
+                if (noiseMap[x - 1, z - 1] >= limit) {
+                    SetVertexType(x, z, MapVertexType.Marsh);
+                } else {
+                    SetVertexType(x, z, MapVertexType.Forest);
+                }
+            }
+        }
+    }
 }
 
+// 顶点类型
+public enum MapVertexType {
+    Forest, // 森林
+    Marsh,  // 沼泽
+}
 
 // 地图顶点
 public class MapVertex
 {
     public Vector3 position;
+    public MapVertexType vertexType;
 }
 
 // 地图格子
 public class MapCell
 {
     public Vector3 position;
+    public int textureIndex;
 }
