@@ -1,9 +1,11 @@
+using System.Collections;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using JKFrame;
 
-public class MapGenerator : MonoBehaviour
+public class MapGenerator
 {   
     // 层级: 地图 -> 地图块 -> 网格 -> 像素
     // 约定: 地图/地图块/网格/像素均为正方形
@@ -15,10 +17,12 @@ public class MapGenerator : MonoBehaviour
     private int spawnSeed;           // 地图对象种子
 
     private float marshLimit;        // 沼泽高度阈值
-    private MapGrid mapGrid;         // 地图逻辑网格/顶点数据       
-    private Texture2D groundTexture;
-    private Texture2D[] marshTextures;
-    private MapConfig mapConfig;     // 地图配置数据
+    private MapGrid mapGrid;         // 地图逻辑网格/顶点数据    
+
+    private Texture2D forestTexture;    // 森林贴图    
+    private Texture2D[] marshTextures;  // 沼泽贴图
+    private MapConfig mapConfig;        // 地图配置数据
+    private Material mapMaterial;       // 地图材质
 
     // 生成通用地图块数据
     public void GenerateMapData() {
@@ -37,10 +41,20 @@ public class MapGenerator : MonoBehaviour
         MapChunkController mapChunk = mapChunkObj.AddComponent<MapChunkController>();
         // 生成mesh
         mapChunkObj.AddComponent<MeshFilter>().mesh = GenerateMapMesh(mapChunkSize, mapChunkSize, cellSize);
-        // 生成地图块的贴图
-        // TODO: 性能优化-分帧执行
-        Texture2D mapTexture = GenerateMapTexture(cellTextureIndexMap, groundTexture, marshTextures);
-        mapChunkObj.AddComponent<MeshRenderer>().sharedMaterial.mainTexture = mapTexture;
+        // 生成地图块的贴图, 性能优化-分帧执行
+        Texture2D mapTexture;
+        this.StartCoroutine(GenerateMapTexture(chunkIndex, (texture, isAllForset) => {
+            mapTexture = texture;
+            // 如果当前地图块全部是森林, 则不需要实例化一个材质球
+            if (isAllForset == true) {
+                mapChunkObj.AddComponent<MeshRenderer>().sharedMaterial = mapMaterial;
+            } else {
+                mapTexture = texture;
+                Material material = new Material(mapMaterial);
+                // mapChunkObj.AddComponent<MeshRenderer>().sharedMaterial = material;
+            }
+            
+        }));
         // 确定坐标
         Vector3 position = new Vector3(
             chunkIndex.x * mapChunkSize * cellSize, 
@@ -99,52 +113,74 @@ public class MapGenerator : MonoBehaviour
         return noiseMap;
     }
 
-    // 生成地图贴图
-    private Texture2D GenerateMapTexture(int[,] cellTextureIndexMap, Texture2D groundTexture, Texture2D[] marshTextures) {
-        // 地图宽高
-        int mapWidth = cellTextureIndexMap.GetLength(0);
-        int mapHeight = cellTextureIndexMap.GetLength(1);
-        // 约定好贴图都是矩形
-        int textureCellSize = groundTexture.width;
-        Texture2D mapTexture = new Texture2D(mapWidth * textureCellSize, mapHeight * textureCellSize, TextureFormat.RGB24, false);
-        // 遍历格子
-        for (int z = 0; z < mapHeight; z++) {
-            int offsetZ = z * textureCellSize;
-            for (int x = 0; x < mapWidth; x++) {
-                int offsetX = x * textureCellSize;
-                int textureIndex = cellTextureIndexMap[x, z] - 1; // -1代表groundTexture, >=0代表marshTextures
-                // 绘制每一个格子内的像素
-                for (int z1 = 0; z1 < textureCellSize; z1++) {
-                    for (int x1 = 0; x1 < textureCellSize; x1++) {
-                        // 设置像素点颜色
-                        // 格子是森林 || 格子是沼泽但是像素点是透明的也需要绘制groundTexture同位置的像素颜色
-                        if (textureIndex == -1 || marshTextures[textureIndex].GetPixel(x1, z1).a == 0) {
-                            Color color = groundTexture.GetPixel(x1, z1);
-                            mapTexture.SetPixel(x1 + offsetX, z1 + offsetZ, color);
-                        } else {
-                            Color color = marshTextures[textureIndex].GetPixel(x1, z1);
-                            mapTexture.SetPixel(x1 + offsetX, z1 + offsetZ, color);
+    // 分帧生成地图块贴图
+    // Returns: 如果贴图块全是森林则直接返回森林
+    private IEnumerator GenerateMapTexture(Vector2Int chunkIndex, System.Action<Texture2D, bool> callBack) {
+        // 当前地图块的偏移量, 找到这个地图块每块具体的格子位置
+        int cellOffsetX = chunkIndex.x * mapChunkSize + 1;
+        int cellOffsetZ = chunkIndex.y * mapChunkSize + 1;
+        // 确定是否都为森林, 如果都为森林则不进行重复渲染
+        bool isAllForest = true;
+        for (int z = 0; z < mapChunkSize; z++) {
+            for (int x = 0; x < mapChunkSize; x++) {
+                MapCell cell = mapGrid.GetCell(x + cellOffsetX, z + cellOffsetZ);
+                if (cell != null && cell.textureIndex != 0) {
+                    isAllForest = false;
+                    break;
+                }
+            }
+            if (isAllForest == false) break;
+        }
+        Texture2D mapTexture = null;
+        if (isAllForest == true) {
+            mapTexture = forestTexture;
+        } else {
+            // 约定好贴图都是矩形, 计算整个地图块texture的宽高
+            int textureCellSize = forestTexture.width;
+            int textureSize = mapChunkSize * textureCellSize;
+            mapTexture = new Texture2D(textureSize, textureSize, TextureFormat.RGB24, false);
+            // 遍历格子并绘制格子中的每个像素点
+            for (int z = 0; z < mapChunkSize; z++) {
+                // 利用协程实现分帧绘制像素, 一帧只绘制一列像素, 利用多帧时间完成整个格子内的像素绘制
+                yield return null;
+                int pixelOffsetZ = z * textureCellSize;
+                for (int x = 0; x < mapChunkSize; x++) {
+                    int pixelOffsetX = x * textureCellSize;
+                    int textureIndex = mapGrid.GetCell(x + cellOffsetX, z + cellOffsetZ).textureIndex - 1; // -1代表forestTexture, >=0代表marshTextures
+                    // 绘制每一个格子内的像素
+                    for (int z1 = 0; z1 < textureCellSize; z1++) {
+                        for (int x1 = 0; x1 < textureCellSize; x1++) {
+                            // 设置像素点颜色
+                            // 格子是森林 || 格子是沼泽但是像素点是透明的也需要绘制forestTexture同位置的像素颜色
+                            if (textureIndex == -1 || marshTextures[textureIndex].GetPixel(x1, z1).a == 0) {
+                                Color color = forestTexture.GetPixel(x1, z1);
+                                mapTexture.SetPixel(x1 + pixelOffsetX, z1 + pixelOffsetZ, color);
+                            } else {
+                                Color color = marshTextures[textureIndex].GetPixel(x1, z1);
+                                mapTexture.SetPixel(x1 + pixelOffsetX, z1 + pixelOffsetZ, color);
+                            }
                         }
                     }
                 }
             }
+            mapTexture.filterMode = FilterMode.Point;
+            mapTexture.wrapMode = TextureWrapMode.Clamp;
+            // 必须进行apply
+            mapTexture.Apply();
         }
-        mapTexture.filterMode = FilterMode.Point;
-        mapTexture.wrapMode = TextureWrapMode.Clamp;
-        // 必须进行apply
-        mapTexture.Apply();
-        return mapTexture;
+        // 回调: 如果结果不等于Null则执行
+        callBack?.Invoke(mapTexture, isAllForest);
     }
 
     // 生成各种地图对象, 需要根据配置和地图网格信息确定生成对象位置
     private void SpawnMapObject(MapGrid mapGrid, MapConfig spawnConfig, int spawnSeed) {
-        # region 
-        // 移除生成的游戏对象
-        for (int i = 0; i < mapObjects.Count; i++) {
-            DestroyImmediate(mapObjects[i]);
-        }
-        mapObjects.Clear();
-        # endregion 
+        // # region 
+        // // 移除生成的游戏对象
+        // for (int i = 0; i < mapObjects.Count; i++) {
+        //     DestroyImmediate(mapObjects[i]);
+        // }
+        // mapObjects.Clear();
+        // # endregion 
         // 设定随机种子进行随机生成
         UnityEngine.Random.InitState(spawnSeed);
         int mapHeight = mapGrid.mapHeight;
@@ -176,8 +212,8 @@ public class MapGenerator : MonoBehaviour
                         0,
                         UnityEngine.Random.Range(-cellSize/2, cellSize/2)
                     );
-                    GameObject temp = GameObject.Instantiate(spawnModel.prefab, mapVertex.position + offset, Quaternion.identity, transform);
-                    mapObjects.Add(temp);   
+                    // GameObject temp = GameObject.Instantiate(spawnModel.prefab, mapVertex.position + offset, Quaternion.identity, transform);
+                    // mapObjects.Add(temp);   
                 }
             }
         }
