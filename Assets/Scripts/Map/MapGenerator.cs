@@ -12,18 +12,41 @@ public class MapGenerator
     private int mapSize;             // 地图大小
     private int mapChunkSize;        // 地图块大小
     private float cellSize;          // 网格大小
+
     private float noiseLacunarity;   // 噪声图采样间隔大小
     private int mapSeed;             // 地图随机种子
     private int spawnSeed;           // 地图对象种子
-
     private float marshLimit;        // 沼泽高度阈值
     private MapGrid mapGrid;         // 地图逻辑网格/顶点数据    
 
     private Texture2D forestTexture;    // 森林贴图    
     private Texture2D[] marshTextures;  // 沼泽贴图
     private MapConfig mapConfig;        // 地图配置数据
-    private Material mapMaterial;       // 地图材质
+    private Material mapMaterial;       // 森林材质(默认)
+    private Material marshMaterial;     // 沼泽材质
 
+    public MapGenerator(
+        int mapSize, int mapChunkSize, float cellSize, 
+        float noiseLacunarity, int mapSeed, int spawnSeed, float marshLimit, 
+        Texture2D forestTexture, Texture2D[] marshTextures,  MapConfig mapConfig, Material mapMaterial
+    ) {
+        this.mapSize = mapSize;
+        this.mapChunkSize = mapChunkSize; 
+        this.cellSize = cellSize;
+
+        this.noiseLacunarity = noiseLacunarity;
+        this.mapSeed = mapSeed;
+        this.spawnSeed = spawnSeed;
+        this.marshLimit = marshLimit;
+
+        this.forestTexture = forestTexture;
+        this.marshTextures = marshTextures;
+        this.mapConfig = mapConfig;
+        this.mapMaterial = mapMaterial;
+
+        this.GenerateMapData();
+    }
+    
     // 生成通用地图块数据
     public void GenerateMapData() {
         // 生成网格/顶点数据
@@ -32,10 +55,19 @@ public class MapGenerator
         float[,] noiseMap = GenerateNoiseMap(mapSize * mapChunkSize, mapSize * mapChunkSize, noiseLacunarity, mapSeed);
         // 确定各个顶点的类型以及计算周围网格贴图的索引数字
         mapGrid.CalculateMapVertexType(noiseMap, marshLimit);
+        // 实例化森林默认材质尺寸
+        mapMaterial.mainTexture = forestTexture;
+        mapMaterial.SetTextureScale("_MainTex", new Vector2(cellSize * mapChunkSize, cellSize * mapChunkSize));
+        // 实例化一个沼泽材质
+        marshMaterial = new Material(mapMaterial);
+        marshMaterial.SetTextureScale("_MainTex", Vector2.one);
     }
 
     // 在指定位置生成地图块
     public MapChunkController GenerateMapChunk(Vector2Int chunkIndex, Transform parent) {
+        // 检查坐标是否合法
+        if (chunkIndex.x > mapSize || chunkIndex.x < 0) return null;
+        if (chunkIndex.y > mapSize || chunkIndex.y < 0) return null;
         // 生成地图块物体
         GameObject mapChunkObj = new GameObject("Chunk_" + chunkIndex.ToString());
         MapChunkController mapChunk = mapChunkObj.AddComponent<MapChunkController>();
@@ -50,8 +82,9 @@ public class MapGenerator
                 mapChunkObj.AddComponent<MeshRenderer>().sharedMaterial = mapMaterial;
             } else {
                 mapTexture = texture;
-                Material material = new Material(mapMaterial);
-                // mapChunkObj.AddComponent<MeshRenderer>().sharedMaterial = material;
+                Material material = new Material(marshMaterial);
+                material.mainTexture = texture;
+                mapChunkObj.AddComponent<MeshRenderer>().material = material;
             }
             
         }));
@@ -63,10 +96,13 @@ public class MapGenerator
         );
         mapChunk.transform.position = position;
         mapChunkObj.transform.SetParent(parent);
-        mapChunk.Init(position + new Vector3((mapChunkSize * cellSize) / 2, 0, (mapChunkSize * cellSize) / 2));
+        mapChunk.Init(
+            chunkIndex,
+            position + new Vector3((mapChunkSize * cellSize) / 2, 0, (mapChunkSize * cellSize) / 2)
+        );
         // 生成游戏场景物体
         // TODO: 后续处理
-        SpawnMapObject(mapGrid, mapConfig, spawnSeed);
+        // SpawnMapObject(mapGrid, mapConfig, spawnSeed);
         return mapChunk;
     }
     public Mesh GenerateMapMesh(int height, int width, float cellSize) {
