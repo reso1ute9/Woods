@@ -96,13 +96,14 @@ public class MapGenerator
         );
         mapChunk.transform.position = position;
         mapChunkObj.transform.SetParent(parent);
+        // 生成场景物体数据
+        // TODO: 后续处理
+        List<MapChunkMapObjectModel> mapObjectList = SpawnMapObject(mapGrid, mapConfig, spawnSeed);
         mapChunk.Init(
             chunkIndex,
-            position + new Vector3((mapChunkSize * cellSize) / 2, 0, (mapChunkSize * cellSize) / 2)
+            position + new Vector3((mapChunkSize * cellSize) / 2, 0, (mapChunkSize * cellSize) / 2),
+            mapObjectList
         );
-        // 生成游戏场景物体
-        // TODO: 后续处理
-        // SpawnMapObject(mapGrid, mapConfig, spawnSeed);
         return mapChunk;
     }
     public Mesh GenerateMapMesh(int height, int width, float cellSize) {
@@ -209,22 +210,16 @@ public class MapGenerator
     }
 
     // 生成各种地图对象, 需要根据配置和地图网格信息确定生成对象位置
-    private void SpawnMapObject(MapGrid mapGrid, MapConfig spawnConfig, int spawnSeed) {
-        // # region 
-        // // 移除生成的游戏对象
-        // for (int i = 0; i < mapObjects.Count; i++) {
-        //     DestroyImmediate(mapObjects[i]);
-        // }
-        // mapObjects.Clear();
-        // # endregion 
+    private List<MapChunkMapObjectModel> SpawnMapObject(MapGrid mapGrid, MapConfig spawnConfig, int spawnSeed) {
         // 设定随机种子进行随机生成
         UnityEngine.Random.InitState(spawnSeed);
+        List<MapChunkMapObjectModel> mapObjectList = new List<MapChunkMapObjectModel>();
         int mapHeight = mapGrid.mapHeight;
         int mapWidth = mapGrid.mapWidth;
         for (int x = 0; x < mapWidth; x++) {
             for (int z = 0; z < mapHeight; z++) {
                 MapVertex mapVertex = mapGrid.GetVertex(x, z);
-                Debug.Log("x:" + x + " z:" + z + " mapVertex.vertexType:" + mapVertex.vertexType);
+                // Debug.Log("x:" + x + " z:" + z + " mapVertex.vertexType:" + mapVertex.vertexType);
                 // 根据概率配置随机
                 List<MapObjectSpawnConfigModel> configModels = spawnConfig.mapObjectConfig[mapVertex.vertexType];
                 int randValue = UnityEngine.Random.Range(1, 101);
@@ -238,7 +233,7 @@ public class MapGenerator
                         break;
                     }
                 }
-                Debug.Log("x:" + x + " z:" + z + " spawnConfigIndex:" + spawnConfigIndex);
+                // Debug.Log("x:" + x + " z:" + z + " spawnConfigIndex:" + spawnConfigIndex);
                 // 确定到底生成什么物品
                 MapObjectSpawnConfigModel spawnModel = configModels[spawnConfigIndex];
                 if (spawnModel.isEmpty == false) {
@@ -248,10 +243,12 @@ public class MapGenerator
                         0,
                         UnityEngine.Random.Range(-cellSize/2, cellSize/2)
                     );
-                    // GameObject temp = GameObject.Instantiate(spawnModel.prefab, mapVertex.position + offset, Quaternion.identity, transform);
-                    // mapObjects.Add(temp);   
-                }
+                    Vector3 position = mapVertex.position + offset;
+                    // GameObject temp = GameObject.Instantiate(spawnModel.prefab, position, Quaternion.identity, transform);
+                    // mapObjects.Add(temp);
+                    mapObjectList.Add(new MapChunkMapObjectModel { prefab = spawnModel.prefab, position = position});                }
             }
         }
+        return mapObjectList;
     }
 }

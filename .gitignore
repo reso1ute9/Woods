@@ -60,6 +60,10 @@ crashlytics-build.properties
 
 # personal setting 
 /Assets/JKFrame/*
+/Assets/Res/*
+/Assets/Prefabs/*
+/Assets/Scenes/*
+/Assets/Config/*
 /ProjectSettings/*
 /.vscode/
 /Packages/
