@@ -47,7 +47,8 @@ public class MapChunkController : MonoBehaviour
                 }
             } else {
                 // 注意放回的时候放的时mapObjectList中的对象
-                for (int i = 0; i < mapObjectList.Count; i++) {
+                // for (int i = 0; i < mapObjectList.Count; i++) {
+                for (int i = 0; i < mapChunkData.mapObjectList.Count; i++) {
                     PoolManager.Instance.PushGameObject(mapObjectList[i]);
                 }
                 mapObjectList.Clear();

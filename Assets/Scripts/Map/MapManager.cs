@@ -54,8 +54,8 @@ public class MapManager : MonoBehaviour
         }
         // 当前观察者所在地图块
         Vector2Int currChunkIndex = GetMapChunkIndexByWorldPosition(viewer.position);
-        // Debug.Log("viewer.position:" + viewer.position);
-        // Debug.Log("currChunkIndex:" + currChunkIndex);
+        Debug.Log("viewer.position:" + viewer.position);
+        Debug.Log("currChunkIndex:" + currChunkIndex);
         // 关闭不需要显示的地图块
         for (int i = lastVisibleChunkList.Count - 1; i >= 0; i--) {
             Vector2Int chunkIndex = lastVisibleChunkList[i].chunkIndex;

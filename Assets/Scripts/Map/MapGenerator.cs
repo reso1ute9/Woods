@@ -65,9 +65,9 @@ public class MapGenerator
 
     // 在指定位置生成地图块
     public MapChunkController GenerateMapChunk(Vector2Int chunkIndex, Transform parent) {
-        // 检查坐标是否合法
-        if (chunkIndex.x > mapSize || chunkIndex.x < 0) return null;
-        if (chunkIndex.y > mapSize || chunkIndex.y < 0) return null;
+        // // 检查坐标是否合法
+        // if (chunkIndex.x > mapSize || chunkIndex.x < 0) return null;
+        // if (chunkIndex.y > mapSize || chunkIndex.y < 0) return null;
         // 生成地图块物体
         GameObject mapChunkObj = new GameObject("Chunk_" + chunkIndex.ToString());
         MapChunkController mapChunk = mapChunkObj.AddComponent<MapChunkController>();
@@ -76,7 +76,7 @@ public class MapGenerator
         // 生成地图块的贴图, 性能优化-分帧执行
         Texture2D mapTexture;
         this.StartCoroutine(GenerateMapTexture(chunkIndex, (texture, isAllForset) => {
-            mapTexture = texture;
+            // mapTexture = texture;
             // 如果当前地图块全部是森林, 则不需要实例化一个材质球
             if (isAllForset == true) {
                 mapChunkObj.AddComponent<MeshRenderer>().sharedMaterial = mapMaterial;
@@ -106,6 +106,7 @@ public class MapGenerator
         );
         return mapChunk;
     }
+
     public Mesh GenerateMapMesh(int height, int width, float cellSize) {
         Mesh mesh = new Mesh();
         // 确定顶点在哪里
@@ -169,9 +170,7 @@ public class MapGenerator
             if (isAllForest == false) break;
         }
         Texture2D mapTexture = null;
-        if (isAllForest == true) {
-            mapTexture = forestTexture;
-        } else {
+        if (isAllForest == false) {
             // 约定好贴图都是矩形, 计算整个地图块texture的宽高
             int textureCellSize = forestTexture.width;
             int textureSize = mapChunkSize * textureCellSize;
@@ -221,11 +220,7 @@ public class MapGenerator
         for (int x = 1; x < mapChunkSize; x++) {
             for (int z = 1; z < mapChunkSize; z++) {
                 MapVertex mapVertex = mapGrid.GetVertex(x + offsetX, z + offsetZ);
-                // Debug.Log("mapVertex is null?" + (mapVertex == null));
-                // Debug.Log("mapGrid cellSize:" + (mapGrid.cellSize));
-                // Debug.Log("mapGrid H:" + (mapGrid.mapHeight));
-                // Debug.Log("mapGrid W:" + (mapGrid.mapWidth));
-                // Debug.Log("x:" + x + " z:" + z + " mapVertex.vertexType:" + mapVertex.vertexType);
+                Debug.Log("x:" + x + " z:" + z + " mapVertex.vertexType:" + mapVertex.vertexType);
                 // 根据概率配置随机
                 List<MapObjectSpawnConfigModel> configModels = mapConfig.mapObjectConfig[mapVertex.vertexType];
                 int randValue = UnityEngine.Random.Range(1, 101);
@@ -239,7 +234,8 @@ public class MapGenerator
                         break;
                     }
                 }
-                // Debug.Log("x:" + x + " z:" + z + " spawnConfigIndex:" + spawnConfigIndex);
+                Debug.Log("randValue" + randValue);
+                Debug.Log("spawnConfigIndex:" + spawnConfigIndex);
                 // 确定到底生成什么物品
                 MapObjectSpawnConfigModel spawnModel = configModels[spawnConfigIndex];
                 if (spawnModel.isEmpty == false) {
@@ -250,9 +246,10 @@ public class MapGenerator
                         UnityEngine.Random.Range(-cellSize/2, cellSize/2)
                     );
                     Vector3 position = mapVertex.position + offset;
-                    // GameObject temp = GameObject.Instantiate(spawnModel.prefab, position, Quaternion.identity, transform);
-                    // mapObjects.Add(temp);
-                    mapObjectList.Add(new MapChunkMapObjectModel { prefab = spawnModel.prefab, position = position});                }
+                    Debug.Log("position:" + position);
+                    Debug.Log("prefab:" + spawnModel.prefab);
+                    mapObjectList.Add(new MapChunkMapObjectModel { prefab = spawnModel.prefab, position = position });                
+                }
             }
         }
         return mapObjectList;
