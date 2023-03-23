@@ -98,7 +98,7 @@ public class MapGenerator
         mapChunkObj.transform.SetParent(parent);
         // 生成场景物体数据
         // TODO: 后续处理
-        List<MapChunkMapObjectModel> mapObjectList = SpawnMapObject(mapGrid, mapConfig, spawnSeed);
+        List<MapChunkMapObjectModel> mapObjectList = SpawnMapObject(chunkIndex);
         mapChunk.Init(
             chunkIndex,
             position + new Vector3((mapChunkSize * cellSize) / 2, 0, (mapChunkSize * cellSize) / 2),
@@ -210,18 +210,24 @@ public class MapGenerator
     }
 
     // 生成各种地图对象, 需要根据配置和地图网格信息确定生成对象位置
-    private List<MapChunkMapObjectModel> SpawnMapObject(MapGrid mapGrid, MapConfig spawnConfig, int spawnSeed) {
+    private List<MapChunkMapObjectModel> SpawnMapObject(Vector2Int chunkIndex) {
         // 设定随机种子进行随机生成
         UnityEngine.Random.InitState(spawnSeed);
         List<MapChunkMapObjectModel> mapObjectList = new List<MapChunkMapObjectModel>();
-        int mapHeight = mapGrid.mapHeight;
-        int mapWidth = mapGrid.mapWidth;
-        for (int x = 0; x < mapWidth; x++) {
-            for (int z = 0; z < mapHeight; z++) {
-                MapVertex mapVertex = mapGrid.GetVertex(x, z);
+        
+        int offsetX = chunkIndex.x * mapChunkSize;
+        int offsetZ = chunkIndex.y * mapChunkSize;
+
+        for (int x = 1; x < mapChunkSize; x++) {
+            for (int z = 1; z < mapChunkSize; z++) {
+                MapVertex mapVertex = mapGrid.GetVertex(x + offsetX, z + offsetZ);
+                // Debug.Log("mapVertex is null?" + (mapVertex == null));
+                // Debug.Log("mapGrid cellSize:" + (mapGrid.cellSize));
+                // Debug.Log("mapGrid H:" + (mapGrid.mapHeight));
+                // Debug.Log("mapGrid W:" + (mapGrid.mapWidth));
                 // Debug.Log("x:" + x + " z:" + z + " mapVertex.vertexType:" + mapVertex.vertexType);
                 // 根据概率配置随机
-                List<MapObjectSpawnConfigModel> configModels = spawnConfig.mapObjectConfig[mapVertex.vertexType];
+                List<MapObjectSpawnConfigModel> configModels = mapConfig.mapObjectConfig[mapVertex.vertexType];
                 int randValue = UnityEngine.Random.Range(1, 101);
                 // 前提是在配置文件中所有物品出现的可能性之和为100
                 float prob_sum = 0.0f;

@@ -37,12 +37,13 @@ public class MapManager : MonoBehaviour
             noiseLacunarity, mapSeed, spawnSeed, marshLimit, 
             forestTexture, marshTextures, mapConfig, mapMaterial
         );
+        mapGenerator.GenerateMapData();
         mapChunkDict = new Dictionary<Vector2Int, MapChunkController>();
         chunkSizeOnWorld = mapChunkSize * cellSize;
     }
 
     private void Update() {
-        
+        UpdateVisibleChunk();
     }
 
     // 根据观察者的位置去刷新地图块
@@ -53,6 +54,8 @@ public class MapManager : MonoBehaviour
         }
         // 当前观察者所在地图块
         Vector2Int currChunkIndex = GetMapChunkIndexByWorldPosition(viewer.position);
+        // Debug.Log("viewer.position:" + viewer.position);
+        // Debug.Log("currChunkIndex:" + currChunkIndex);
         // 关闭不需要显示的地图块
         for (int i = lastVisibleChunkList.Count - 1; i >= 0; i--) {
             Vector2Int chunkIndex = lastVisibleChunkList[i].chunkIndex;
@@ -64,12 +67,14 @@ public class MapManager : MonoBehaviour
             }
         }
         // 开启需要显示的地图块
-        for (int x = -viewDistance; x <= viewDistance; x++) {
-            for (int z = -viewDistance; z <= viewDistance; z++) {
+        int startX = currChunkIndex.x - viewDistance;
+        int startY = currChunkIndex.y - viewDistance;
+        for (int x = 0; x < 2 * viewDistance + 1; x++) {
+            for (int y = 0; y < 2 * viewDistance + 1; y++) {
                 // 控制地图块刷新时间, 当时间间隔>=UpdateVisibleChunkTime时才可进行刷新
                 canUpdateChunk = false;
                 Invoke("ResetCanUpdateChunkFlag", UpdateVisibleChunkTime);
-                Vector2Int chunkIndex = new Vector2Int(currChunkIndex.x + x, currChunkIndex.y + z);
+                Vector2Int chunkIndex = new Vector2Int(startX + x, startY + y);
                 // 之前加载过则直接使用dict中cache的结果, 否则需要重新绘制
                 if (mapChunkDict.TryGetValue(chunkIndex, out MapChunkController chunk)) {
                     // 是否在显示列表中
@@ -78,9 +83,8 @@ public class MapManager : MonoBehaviour
                         lastVisibleChunkList.Add(chunk);
                     }
                 } else {
-                    chunk = mapGenerator.GenerateMapChunk(chunkIndex, transform);
+                    chunk = GenerateMapChunk(chunkIndex);
                     if (chunk != null) {
-                        mapChunkDict.Add(chunkIndex, chunk);
                         chunk.SetActive(true);
                         lastVisibleChunkList.Add(chunk);
                     }
@@ -92,8 +96,16 @@ public class MapManager : MonoBehaviour
     // 通过世界坐标去获取地图块索引
     private Vector2Int GetMapChunkIndexByWorldPosition(Vector3 worldIndex) {
         int x = Mathf.Clamp(Mathf.RoundToInt(worldIndex.x / chunkSizeOnWorld), 1, mapSize);
-        int y = Mathf.Clamp(Mathf.RoundToInt(worldIndex.y / chunkSizeOnWorld), 1, mapSize);
-        return new Vector2Int(x, y);
+        int z = Mathf.Clamp(Mathf.RoundToInt(worldIndex.z / chunkSizeOnWorld), 1, mapSize);
+        return new Vector2Int(x, z);
+    }
+
+    private MapChunkController GenerateMapChunk(Vector2Int index) {
+        if (index.x > mapSize-1 || index.y > mapSize-1) return null;
+        if (index.x < 0 || index.y < 0) return null;
+        MapChunkController chunk = mapGenerator.GenerateMapChunk(index, transform);
+        mapChunkDict.Add(index, chunk);
+        return chunk;
     }
 
     // 重置更新chunk的标志
