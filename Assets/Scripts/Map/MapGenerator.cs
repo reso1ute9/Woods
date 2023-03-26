@@ -24,6 +24,7 @@ public class MapGenerator
     private MapConfig mapConfig;        // 地图配置数据
     private Material mapMaterial;       // 森林材质(默认)
     private Material marshMaterial;     // 沼泽材质
+    private Mesh mapChunkMesh;          // 地图块mesh
 
     public MapGenerator(
         int mapSize, int mapChunkSize, float cellSize, 
@@ -61,18 +62,21 @@ public class MapGenerator
         // 实例化一个沼泽材质
         marshMaterial = new Material(mapMaterial);
         marshMaterial.SetTextureScale("_MainTex", Vector2.one);
+        // 生成地图块mesh
+        mapChunkMesh = GenerateMapMesh(mapChunkSize, mapChunkSize, cellSize);
     }
 
     // 在指定位置生成地图块
     public MapChunkController GenerateMapChunk(Vector2Int chunkIndex, Transform parent) {
-        // // 检查坐标是否合法
-        // if (chunkIndex.x > mapSize || chunkIndex.x < 0) return null;
-        // if (chunkIndex.y > mapSize || chunkIndex.y < 0) return null;
         // 生成地图块物体
         GameObject mapChunkObj = new GameObject("Chunk_" + chunkIndex.ToString());
         MapChunkController mapChunk = mapChunkObj.AddComponent<MapChunkController>();
+        
         // 生成mesh
-        mapChunkObj.AddComponent<MeshFilter>().mesh = GenerateMapMesh(mapChunkSize, mapChunkSize, cellSize);
+        mapChunkObj.AddComponent<MeshFilter>().mesh = mapChunkMesh;
+        // 添加碰撞体: 会自动将过滤器的网格碰撞体抓过来作为mapChunkObj的MeshCollider
+        mapChunkObj.AddComponent<MeshCollider>();
+
         // 生成地图块的贴图, 性能优化-分帧执行
         Texture2D mapTexture;
         this.StartCoroutine(GenerateMapTexture(chunkIndex, (texture, isAllForset) => {
