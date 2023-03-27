@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using JKFrame;
 
 
 // 地图管理器需要调用MapGenerator去生成地图上的信息
@@ -19,7 +20,6 @@ public class MapManager : MonoBehaviour
     // 地图美术资源
     public Texture2D forestTexture;    // 森林贴图    
     public Texture2D[] marshTextures;  // 沼泽贴图
-    public MapConfig mapConfig;        // 地图配置数据
     public Material mapMaterial;       // 地图材质
     // 地图生成器
     private MapGenerator mapGenerator;  // 地图生成器
@@ -31,11 +31,24 @@ public class MapManager : MonoBehaviour
     public Dictionary<Vector2Int, MapChunkController> mapChunkDict; // 全部已有的地图块
     private List<MapChunkController> lastVisibleChunkList = new List<MapChunkController>();
 
+    private Dictionary<MapVertexType, List<int>> spawnConfigDict;   // 地图配置数据
+
     private void Start() {
+        // 确定配置
+        Dictionary<int, ConfigBase> temp_dict = ConfigManager.Instance.GetConfigs(ConfigName.mapObject);
+        spawnConfigDict = new Dictionary<MapVertexType, List<int>>();
+        spawnConfigDict.Add(MapVertexType.Forest, new List<int>());
+        spawnConfigDict.Add(MapVertexType.Marsh, new List<int>());
+        foreach (var item in temp_dict) {
+            MapVertexType mapVertexType = (item.Value as MapObjectConfig).mapVertexType;
+            spawnConfigDict[mapVertexType].Add(item.Key);
+        }
+
+        // 初始化地图生成器
         mapGenerator = new MapGenerator(
             mapSize, mapChunkSize, cellSize, 
             noiseLacunarity, mapSeed, spawnSeed, marshLimit, 
-            forestTexture, marshTextures, mapConfig, mapMaterial
+            forestTexture, marshTextures, mapMaterial, spawnConfigDict
         );
         mapGenerator.GenerateMapData();
         mapChunkDict = new Dictionary<Vector2Int, MapChunkController>();
@@ -54,8 +67,6 @@ public class MapManager : MonoBehaviour
         }
         // 当前观察者所在地图块
         Vector2Int currChunkIndex = GetMapChunkIndexByWorldPosition(viewer.position);
-        Debug.Log("viewer.position:" + viewer.position);
-        Debug.Log("currChunkIndex:" + currChunkIndex);
         // 关闭不需要显示的地图块
         for (int i = lastVisibleChunkList.Count - 1; i >= 0; i--) {
             Vector2Int chunkIndex = lastVisibleChunkList[i].chunkIndex;

@@ -21,15 +21,19 @@ public class MapGenerator
 
     private Texture2D forestTexture;    // 森林贴图    
     private Texture2D[] marshTextures;  // 沼泽贴图
-    private MapConfig mapConfig;        // 地图配置数据
     private Material mapMaterial;       // 森林材质(默认)
     private Material marshMaterial;     // 沼泽材质
     private Mesh mapChunkMesh;          // 地图块mesh
 
+    private Dictionary<MapVertexType, List<int>> spawnConfigDict;   // 地图配置数据
+    private int forestSpawnWeightTotal;
+    private int marshSpawnWeightTotal;
+
     public MapGenerator(
         int mapSize, int mapChunkSize, float cellSize, 
         float noiseLacunarity, int mapSeed, int spawnSeed, float marshLimit, 
-        Texture2D forestTexture, Texture2D[] marshTextures,  MapConfig mapConfig, Material mapMaterial
+        Texture2D forestTexture, Texture2D[] marshTextures, Material mapMaterial,
+        Dictionary<MapVertexType, List<int>> spawnConfigDict
     ) {
         this.mapSize = mapSize;
         this.mapChunkSize = mapChunkSize; 
@@ -42,8 +46,9 @@ public class MapGenerator
 
         this.forestTexture = forestTexture;
         this.marshTextures = marshTextures;
-        this.mapConfig = mapConfig;
         this.mapMaterial = mapMaterial;
+
+        this.spawnConfigDict = spawnConfigDict;
 
         this.GenerateMapData();
     }
@@ -52,8 +57,9 @@ public class MapGenerator
     public void GenerateMapData() {
         // 生成网格/顶点数据
         mapGrid = new MapGrid(mapSize * mapChunkSize, mapSize * mapChunkSize, cellSize);
-        // 生成perlin噪声图
-        float[,] noiseMap = GenerateNoiseMap(mapSize * mapChunkSize, mapSize * mapChunkSize, noiseLacunarity, mapSeed);
+        // 生成perlin噪声图, 需要提前设定地图noise生成种子
+        UnityEngine.Random.InitState(mapSeed);
+        float[,] noiseMap = GenerateNoiseMap(mapSize * mapChunkSize, mapSize * mapChunkSize, noiseLacunarity);
         // 确定各个顶点的类型以及计算周围网格贴图的索引数字
         mapGrid.CalculateMapVertexType(noiseMap, marshLimit);
         // 实例化森林默认材质尺寸
@@ -64,6 +70,19 @@ public class MapGenerator
         marshMaterial.SetTextureScale("_MainTex", Vector2.one);
         // 生成地图块mesh
         mapChunkMesh = GenerateMapMesh(mapChunkSize, mapChunkSize, cellSize);
+        // 设定地图物品随机种子
+        UnityEngine.Random.InitState(spawnSeed);
+        // 计算地图物品配置总权重
+        this.forestSpawnWeightTotal = 0;
+        List<int> temp = spawnConfigDict[MapVertexType.Forest];
+        for (int i = 0; i < temp.Count; i++) {
+            this.forestSpawnWeightTotal += ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, temp[i]).probability;   
+        }
+        this.marshSpawnWeightTotal = 0;
+        temp = spawnConfigDict[MapVertexType.Forest];
+        for (int i = 0; i < temp.Count; i++) {
+            this.marshSpawnWeightTotal += ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, temp[i]).probability;   
+        }
     }
 
     // 在指定位置生成地图块
@@ -101,7 +120,6 @@ public class MapGenerator
         mapChunk.transform.position = position;
         mapChunkObj.transform.SetParent(parent);
         // 生成场景物体数据
-        // TODO: 后续处理
         List<MapChunkMapObjectModel> mapObjectList = SpawnMapObject(chunkIndex);
         mapChunk.Init(
             chunkIndex,
@@ -137,8 +155,7 @@ public class MapGenerator
     }
 
     // 生成perlin噪声图, 该噪声图是为确定顶点对应的位置是否为森林/沼泽
-    public float[,] GenerateNoiseMap(int width, int height, float lacunarity, int mapSeed) {
-        UnityEngine.Random.InitState(mapSeed);
+    public float[,] GenerateNoiseMap(int width, int height, float lacunarity) {
         lacunarity += 0.1f;
         float[,] noiseMap = new float[width - 1, height - 1];
         
@@ -192,7 +209,8 @@ public class MapGenerator
                         for (int x1 = 0; x1 < textureCellSize; x1++) {
                             // 设置像素点颜色
                             // 格子是森林 || 格子是沼泽但是像素点是透明的也需要绘制forestTexture同位置的像素颜色
-                            if (textureIndex == -1 || marshTextures[textureIndex].GetPixel(x1, z1).a == 0) {
+                            // 需要注意半透明也需要重新绘制地图
+                            if (textureIndex == -1 || marshTextures[textureIndex].GetPixel(x1, z1).a < 1) {
                                 Color color = forestTexture.GetPixel(x1, z1);
                                 mapTexture.SetPixel(x1 + pixelOffsetX, z1 + pixelOffsetZ, color);
                             } else {
@@ -214,8 +232,6 @@ public class MapGenerator
 
     // 生成各种地图对象, 需要根据配置和地图网格信息确定生成对象位置
     private List<MapChunkMapObjectModel> SpawnMapObject(Vector2Int chunkIndex) {
-        // 设定随机种子进行随机生成
-        UnityEngine.Random.InitState(spawnSeed);
         List<MapChunkMapObjectModel> mapObjectList = new List<MapChunkMapObjectModel>();
         
         int offsetX = chunkIndex.x * mapChunkSize;
@@ -224,24 +240,23 @@ public class MapGenerator
         for (int x = 1; x < mapChunkSize; x++) {
             for (int z = 1; z < mapChunkSize; z++) {
                 MapVertex mapVertex = mapGrid.GetVertex(x + offsetX, z + offsetZ);
-                Debug.Log("x:" + x + " z:" + z + " mapVertex.vertexType:" + mapVertex.vertexType);
-                // 根据概率配置随机
-                List<MapObjectSpawnConfigModel> configModels = mapConfig.mapObjectConfig[mapVertex.vertexType];
-                int randValue = UnityEngine.Random.Range(1, 101);
-                // 前提是在配置文件中所有物品出现的可能性之和为100
+                // 根据权重配置随机生成物品
+                List<int> configIds = spawnConfigDict[mapVertex.vertexType];
+                // 确定权重总和
+                int weightTotal = mapVertex.vertexType == MapVertexType.Forest ? forestSpawnWeightTotal : marshSpawnWeightTotal;
+                // 确定生成物品索引
+                int randValue = UnityEngine.Random.Range(1, weightTotal + 1);
                 float prob_sum = 0.0f;
                 int spawnConfigIndex = 0;
-                for (int i = 0; i < configModels.Count; i++) {
-                    prob_sum += configModels[i].probability;
+                for (int i = 0; i < configIds.Count; i++) {
+                    prob_sum += ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, configIds[i]).probability;
                     if (prob_sum > randValue) {
                         spawnConfigIndex = i;
                         break;
                     }
                 }
-                Debug.Log("randValue" + randValue);
-                Debug.Log("spawnConfigIndex:" + spawnConfigIndex);
-                // 确定到底生成什么物品
-                MapObjectSpawnConfigModel spawnModel = configModels[spawnConfigIndex];
+                // 确定生成物品
+                MapObjectConfig spawnModel = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, configIds[spawnConfigIndex]);
                 if (spawnModel.isEmpty == false) {
                     // 实例化物品
                     Vector3 offset = new Vector3(
@@ -250,8 +265,6 @@ public class MapGenerator
                         UnityEngine.Random.Range(-cellSize/2, cellSize/2)
                     );
                     Vector3 position = mapVertex.position + offset;
-                    Debug.Log("position:" + position);
-                    Debug.Log("prefab:" + spawnModel.prefab);
                     mapObjectList.Add(new MapChunkMapObjectModel { prefab = spawnModel.prefab, position = position });                
                 }
             }
