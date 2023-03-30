@@ -8,9 +8,10 @@ using JKFrame;
 public class MapManager : MonoBehaviour
 {
     // 地图尺寸
-    public int mapSize;             // 地图大小
+    public int mapSize;             // 地图大小(地图块数量)
     public int mapChunkSize;        // 地图块大小
     public float cellSize;          // 网格大小
+    private float mapSizeOnWorld;   // 在世界中世界的地图尺寸
     private float chunkSizeOnWorld; // 在世界中实际的地图块尺寸
     // 地图随机参数
     public float noiseLacunarity;   // 噪声图采样间隔大小
@@ -53,6 +54,7 @@ public class MapManager : MonoBehaviour
         mapGenerator.GenerateMapData();
         mapChunkDict = new Dictionary<Vector2Int, MapChunkController>();
         chunkSizeOnWorld = mapChunkSize * cellSize;
+        mapSizeOnWorld = chunkSizeOnWorld * mapSize;
     }
 
     private void Update() {
@@ -123,4 +125,31 @@ public class MapManager : MonoBehaviour
     private void ResetCanUpdateChunkFlag() {
         canUpdateChunk = true;
     }
+
+    #region 地图UI相关
+    private bool mapUIInitialized = false;
+    private bool isShowMaping = false;
+    private List<Vector2Int> mapUIUpdateChunkIndex = new List<Vector2Int>();        // 地图UI待更新列表
+    private UI_MapWindow mapUI;
+
+    // 显示地图UI
+    private void ShowMapUI() {
+        mapUI = UIManager.Instance.Show<UI_MapWindow>();
+        // 初始化地图UI
+        if (!mapUIInitialized) {
+            mapUI.InitMap(mapSize, mapSizeOnWorld, forestTexture);
+            mapUIInitialized = true;
+        }
+        UpdateMapUI();
+    }
+
+    private void UpdateMapUI() {
+
+    }
+
+    // 关闭地图UI
+    private void CloseMapUI() {
+
+    }
+    #endregion
 }

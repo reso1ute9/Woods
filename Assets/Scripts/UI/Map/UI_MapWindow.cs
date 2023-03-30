@@ -17,7 +17,7 @@ public class UI_MapWindow : UI_WindowBase
 
     private Dictionary<Vector2Int, Image> mapImageDict = new Dictionary<Vector2Int, Image>();   // 地图图片字典
     private float mapItemSize;      // UI地图块的尺寸
-    private float mapSizeOnWorld;   // 3D地图在世界地图中的坐标
+    private float mapSizeOnWorld;   // 游戏内3D地图大小
     private Sprite forestSprite;    // 森林地块的精灵
 
     private float minScale;         // 地图最小放大倍数
@@ -36,7 +36,15 @@ public class UI_MapWindow : UI_WindowBase
         content.sizeDelta = new Vector2(contentSize, contentSize);
 
         // 一个UI地图块尺寸
-        // mapItemSize = 
+        mapItemSize = contentSize / mapSize;
+        minScale = 1050f / contentSize;
+    }
+
+    // 更新中心点, 保证鼠标缩放的时候中心点是玩家
+    public void UpdatePivot(Vector3 viewerPosition) {
+        float x = viewerPosition.x / mapSizeOnWorld;
+        float y = viewerPosition.z / mapSizeOnWorld;
+        content.pivot = new Vector2(x, y);
     }
 
     // 生成地图块的Sprite
