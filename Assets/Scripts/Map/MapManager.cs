@@ -74,6 +74,10 @@ public class MapManager : MonoBehaviour
             }
             isShowMaping = !isShowMaping;
         }
+
+        if (isShowMaping) {
+            UpdateMapUI();
+        }
     }
 
     // 根据观察者的位置去刷新地图块
@@ -162,8 +166,11 @@ public class MapManager : MonoBehaviour
             if (mapChunk.isAllForest == false) {
                 texture = (Texture2D)mapChunk.GetComponent<MeshRenderer>().material.mainTexture;
             }
-
+            mapUI.AddMapChunk(chunkIndex, mapChunk.mapChunkData.mapObjectList, texture);
         }
+        // 当更新到UI中后就不需要当前存储的index了
+        mapUIUpdateChunkIndexList.Clear();
+        // TODO: 玩家icon/content坐标
     }
 
     // 关闭地图UI

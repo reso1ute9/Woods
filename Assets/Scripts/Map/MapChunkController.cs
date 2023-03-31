@@ -18,7 +18,7 @@ public class MapChunkMapObjectModel
 public class MapChunkController : MonoBehaviour
 {
     private List<GameObject> mapObjectList;         // 记录当前数据块中的对象
-    public MapChunkData mapChunkData;
+    public MapChunkData mapChunkData { get; private set; }
 
     public Vector3 centrePosition { get; private set; }
     public Vector2Int chunkIndex { get; private set; }
