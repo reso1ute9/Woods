@@ -86,7 +86,7 @@ public class MapGenerator
     }
 
     // 在指定位置生成地图块
-    public MapChunkController GenerateMapChunk(Vector2Int chunkIndex, Transform parent) {
+    public MapChunkController GenerateMapChunk(Vector2Int chunkIndex, Transform parent, Action callBackForMapTexture) {
         // 生成地图块物体
         GameObject mapChunkObj = new GameObject("Chunk_" + chunkIndex.ToString());
         MapChunkController mapChunk = mapChunkObj.AddComponent<MapChunkController>();
@@ -99,7 +99,6 @@ public class MapGenerator
         // 生成地图块的贴图, 性能优化-分帧执行
         Texture2D mapTexture;
         this.StartCoroutine(GenerateMapTexture(chunkIndex, (texture, isAllForset) => {
-            // mapTexture = texture;
             // 如果当前地图块全部是森林, 则不需要实例化一个材质球
             if (isAllForset == true) {
                 mapChunkObj.AddComponent<MeshRenderer>().sharedMaterial = mapMaterial;
@@ -109,23 +108,23 @@ public class MapGenerator
                 material.mainTexture = texture;
                 mapChunkObj.AddComponent<MeshRenderer>().material = material;
             }
-            
+            callBackForMapTexture?.Invoke();
+            // 确定坐标
+            Vector3 position = new Vector3(
+                chunkIndex.x * mapChunkSize * cellSize, 
+                0, 
+                chunkIndex.y * mapChunkSize * cellSize
+            );
+            mapChunk.transform.position = position;
+            mapChunkObj.transform.SetParent(parent);
+            // 生成场景物体数据
+            List<MapChunkMapObjectModel> mapObjectList = SpawnMapObject(chunkIndex);
+            mapChunk.Init(
+                chunkIndex,
+                position + new Vector3((mapChunkSize * cellSize) / 2, 0, (mapChunkSize * cellSize) / 2),
+                isAllForset, mapObjectList
+            );
         }));
-        // 确定坐标
-        Vector3 position = new Vector3(
-            chunkIndex.x * mapChunkSize * cellSize, 
-            0, 
-            chunkIndex.y * mapChunkSize * cellSize
-        );
-        mapChunk.transform.position = position;
-        mapChunkObj.transform.SetParent(parent);
-        // 生成场景物体数据
-        List<MapChunkMapObjectModel> mapObjectList = SpawnMapObject(chunkIndex);
-        mapChunk.Init(
-            chunkIndex,
-            position + new Vector3((mapChunkSize * cellSize) / 2, 0, (mapChunkSize * cellSize) / 2),
-            mapObjectList
-        );
         return mapChunk;
     }
 
@@ -256,7 +255,8 @@ public class MapGenerator
                     }
                 }
                 // 确定生成物品
-                MapObjectConfig spawnModel = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, configIds[spawnConfigIndex]);
+                int configId = configIds[spawnConfigIndex];
+                MapObjectConfig spawnModel = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, configId);
                 if (spawnModel.isEmpty == false) {
                     // 实例化物品
                     Vector3 offset = new Vector3(
@@ -265,7 +265,7 @@ public class MapGenerator
                         UnityEngine.Random.Range(-cellSize/2, cellSize/2)
                     );
                     Vector3 position = mapVertex.position + offset;
-                    mapObjectList.Add(new MapChunkMapObjectModel { prefab = spawnModel.prefab, position = position });                
+                    mapObjectList.Add(new MapChunkMapObjectModel { configId = configId, position = position });                
                 }
             }
         }
