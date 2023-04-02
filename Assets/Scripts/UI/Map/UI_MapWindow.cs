@@ -22,13 +22,23 @@ public class UI_MapWindow : UI_WindowBase
     private Sprite forestSprite;        // 森林地块的精灵
 
     private float minScale;             // 地图最小放大倍数
-    private float maxScale;             // 地图最大放大倍数
+    private float maxScale = 10;        // 地图最大放大倍数
+    private float mapScaleFactorNum = 10;   // 预设值: UI地图content与原始地图的比例系数
 
 
     public override void Init()
     {
         // 当修改值时与修改值重合
         transform.Find("Scroll View").GetComponent<ScrollRect>().onValueChanged.AddListener(UpdatePlayerIconPosition);
+    }
+
+    public void Update() {
+        // 得到鼠标滚轮滚动数值
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        if (scroll != 0) {
+            float newScale = Mathf.Clamp(content.localScale.x + scroll, minScale, maxScale);
+            content.localScale = new Vector3(newScale, newScale, 0);
+        }
     }
 
     // 初始化地图
@@ -41,7 +51,7 @@ public class UI_MapWindow : UI_WindowBase
         this.forestSprite = CreateMapSprite(forestTexture);
 
         // content尺寸: 默认content尺寸要大于地图尺寸
-        contentSize = mapSizeOnWorld * 10;
+        contentSize = mapSizeOnWorld * mapScaleFactorNum;
         this.content.sizeDelta = new Vector2(contentSize, contentSize);
 
         // 一个UI地图块尺寸
@@ -90,6 +100,21 @@ public class UI_MapWindow : UI_WindowBase
             mapChunkImage.sprite = CreateMapSprite(texture);
         }
         // TODO: 添加物体icon
+        for (int i = 0; i < mapObjectList.Count; i++) {
+            MapObjectConfig config = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, mapObjectList[i].configId);
+            // 按照id一定能查到物体, 但是物体不一定具有地图icon
+            if (config.mapIconSprite == null) {
+                continue;
+            }
+            GameObject tempObject = PoolManager.Instance.GetGameObject(mapIconPrefab, content);
+            tempObject.GetComponent<Image>().sprite = config.mapIconSprite;
+            // 因为整个content的尺寸在初始化的时候已经乘上mapScaleFactorNum了, 所以在计算icon位置时
+            // 也需要乘上相同的系数
+            float x = mapObjectList[i].position.x * mapScaleFactorNum;
+            float y = mapObjectList[i].position.z * mapScaleFactorNum;
+            tempObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(x, y);
+
+        }
 
         // TODO: 待重构, 后续需要保存icon信息, icon信息可能会移除(树、花被销毁)
         mapImageDict.Add(chunkIndex, mapChunkImage);

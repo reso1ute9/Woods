@@ -14,6 +14,8 @@ public class MapObjectConfig : ConfigBase
     public MapVertexType mapVertexType;
     [LabelText("预制体")]
     public GameObject prefab;
+    [LabelText("UI地图中的icon")]
+    public Sprite mapIconSprite;
     [LabelText("生成概率(百分比类型)")]
     public int probability;
 }
