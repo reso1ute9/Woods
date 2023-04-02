@@ -69,3 +69,5 @@ crashlytics-build.properties
 /Packages/
 /UserSettings/*
 *.meta
+*.prefab
+*.unity
