@@ -24,6 +24,7 @@ public class MapChunkController : MonoBehaviour
     public Vector2Int chunkIndex { get; private set; }
     public bool isAllForest { get; private set; }   
     private bool isActive = false;
+    public bool isInitialized = false;              // 标记地图UI是否已经初始化
 
     public void Init(Vector2Int chunkIndex, Vector3 centrePosition, bool isAllForest, List<MapChunkMapObjectModel> mapObjectList) {
         this.centrePosition = centrePosition;
@@ -33,6 +34,7 @@ public class MapChunkController : MonoBehaviour
         this.mapChunkData.mapObjectList = mapObjectList;
         this.mapObjectList = new List<GameObject>(mapObjectList.Count);
         this.isAllForest = isAllForest;
+        this.isInitialized = true;
     }
 
     // 当前chunk设置为可显示时需要显示出地图+地图中的对象(树, 石头...)

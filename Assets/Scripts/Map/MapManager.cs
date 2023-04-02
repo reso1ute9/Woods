@@ -86,6 +86,11 @@ public class MapManager : MonoBehaviour
         if (viewer.position == lastViewerPosition || canUpdateChunk == false) {
             return;
         }
+        // 更新地图UI坐标
+        if (isShowMaping) {
+            mapUI.UpdatePivot(viewer.position);
+        }
+
         // 当前观察者所在地图块
         Vector2Int currChunkIndex = GetMapChunkIndexByWorldPosition(viewer.position);
         // 关闭不需要显示的地图块
@@ -107,19 +112,20 @@ public class MapManager : MonoBehaviour
                 canUpdateChunk = false;
                 Invoke("ResetCanUpdateChunkFlag", UpdateVisibleChunkTime);
                 Vector2Int chunkIndex = new Vector2Int(startX + x, startY + y);
-                // 之前加载过则直接使用dict中cache的结果, 否则需要重新绘制
+                // 之前加载过则直接使用dict中cache的结果, 否则需要重新绘制, 需要注意由于
+                // 贴图是在协程中进行生成, 所以执行完毕后才算初始化完毕
                 if (mapChunkDict.TryGetValue(chunkIndex, out MapChunkController chunk)) {
-                    // 是否在显示列表中
-                    if (lastVisibleChunkList.Contains(chunk) == false) {
+                    // 是否在显示列表中, 需要检查是否完成初始化
+                    if (!lastVisibleChunkList.Contains(chunk) && chunk.isInitialized) {
                         chunk.SetActive(true);
                         lastVisibleChunkList.Add(chunk);
                     }
                 } else {
                     chunk = GenerateMapChunk(chunkIndex);
-                    if (chunk != null) {
-                        chunk.SetActive(true);
-                        lastVisibleChunkList.Add(chunk);
-                    }
+                    // if (chunk != null) {
+                    //     chunk.SetActive(true);
+                    //     lastVisibleChunkList.Add(chunk);
+                    // }
                 }
             }
         }
@@ -152,6 +158,11 @@ public class MapManager : MonoBehaviour
         mapUI = UIManager.Instance.Show<UI_MapWindow>();
         // 初始化地图UI
         if (!mapUIInitialized) {
+            Debug.Log("mapSize:" + mapSize);
+            Debug.Log("mapChunkSize:" + mapChunkSize);
+            Debug.Log("mapSizeOnWorld:" + mapSizeOnWorld);
+            Debug.Log("forestTexture:" + forestTexture);
+            Debug.Log("forestTexture:" + (forestTexture == null));
             mapUI.InitMap(mapSize, mapChunkSize, mapSizeOnWorld, forestTexture);
             mapUIInitialized = true;
         }
@@ -170,7 +181,8 @@ public class MapManager : MonoBehaviour
         }
         // 当更新到UI中后就不需要当前存储的index了
         mapUIUpdateChunkIndexList.Clear();
-        // TODO: 玩家icon/content坐标
+        // 更新玩家UI坐标
+        mapUI.UpdatePivot(viewer.position);
     }
 
     // 关闭地图UI

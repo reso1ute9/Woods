@@ -24,6 +24,13 @@ public class UI_MapWindow : UI_WindowBase
     private float minScale;             // 地图最小放大倍数
     private float maxScale;             // 地图最大放大倍数
 
+
+    public override void Init()
+    {
+        // 当修改值时与修改值重合
+        transform.Find("Scroll View").GetComponent<ScrollRect>().onValueChanged.AddListener(UpdatePlayerIconPosition);
+    }
+
     // 初始化地图
     // mapSize: 一行或者一列有多少个image/chunk
     // mapSizeOnWorld: 地图在世界中一行或者一列有多大
@@ -35,7 +42,7 @@ public class UI_MapWindow : UI_WindowBase
 
         // content尺寸: 默认content尺寸要大于地图尺寸
         contentSize = mapSizeOnWorld * 10;
-        content.sizeDelta = new Vector2(contentSize, contentSize);
+        this.content.sizeDelta = new Vector2(contentSize, contentSize);
 
         // 一个UI地图块尺寸
         mapChunkImageSize = contentSize / mapSize;
@@ -46,10 +53,16 @@ public class UI_MapWindow : UI_WindowBase
     public void UpdatePivot(Vector3 viewerPosition) {
         float x = viewerPosition.x / mapSizeOnWorld;
         float y = viewerPosition.z / mapSizeOnWorld;
+        // 修改content后会导致Scroll Rect组件的当值修改时间=>UpdatePlayerIconPosition
         content.pivot = new Vector2(x, y);
     }
 
-    // 生成地图块的Sprite
+    public void UpdatePlayerIconPosition(Vector2 value) {
+        // 玩家icon完全放在content中心点
+        playerIcon.anchoredPosition3D = content.anchoredPosition3D;
+    }
+
+    // 生成地图块的Sprite 
     private Sprite CreateMapSprite(Texture2D texture) {
         return Sprite.Create(
             texture, new Rect(0, 0, texture.width, texture.height),
@@ -72,6 +85,7 @@ public class UI_MapWindow : UI_WindowBase
             // 计算森林贴图与当前地图块贴图尺寸比例
             float ratio = forestSprite.texture.width / mapChunkImageSize;
             mapChunkImage.pixelsPerUnitMultiplier = mapChunkSize * ratio;
+            mapChunkImage.sprite = forestSprite;
         } else {
             mapChunkImage.sprite = CreateMapSprite(texture);
         }
