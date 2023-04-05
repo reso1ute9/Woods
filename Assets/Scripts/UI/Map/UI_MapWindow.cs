@@ -53,6 +53,7 @@ public class UI_MapWindow : UI_WindowBase
         // content尺寸: 默认content尺寸要大于地图尺寸
         contentSize = mapSizeOnWorld * mapScaleFactorNum;
         this.content.sizeDelta = new Vector2(contentSize, contentSize);
+        Debug.Log("contentSize:" + contentSize);
 
         // 一个UI地图块尺寸
         mapChunkImageSize = contentSize / mapSize;
