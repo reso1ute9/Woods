@@ -5,13 +5,13 @@ using JKFrame;
 
 
 // 地图管理器需要调用MapGenerator去生成地图上的信息
-public class MapManager : MonoBehaviour
+public class MapManager : SingletonMono<MapManager>
 {
     // 地图尺寸
     public int mapSize;             // 地图大小(地图块数量)
     public int mapChunkSize;        // 地图块大小
     public float cellSize;          // 网格大小
-    private float mapSizeOnWorld;   // 在世界中世界的地图尺寸
+    public float mapSizeOnWorld;   // 在世界中世界的地图尺寸
     private float chunkSizeOnWorld; // 在世界中实际的地图块尺寸
     // 地图随机参数
     public float noiseLacunarity;   // 噪声图采样间隔大小
@@ -40,7 +40,14 @@ public class MapManager : MonoBehaviour
     private List<Vector2Int> mapUIUpdateChunkIndexList = new List<Vector2Int>();        // 地图UI待更新列表
     private UI_MapWindow mapUI;
 
-    private void Start() {
+    // 需要注意: 使用单例方式的时候需要在awke中进行初始化, 否则后续用到单例instance时
+    // 可能会报错
+    protected override void Awake() {
+        base.Awake();
+        Init();
+    }
+
+    private void Init() {
         // 确定配置
         Dictionary<int, ConfigBase> temp_dict = ConfigManager.Instance.GetConfigs(ConfigName.mapObject);
         spawnConfigDict = new Dictionary<MapVertexType, List<int>>();
@@ -158,11 +165,6 @@ public class MapManager : MonoBehaviour
         mapUI = UIManager.Instance.Show<UI_MapWindow>();
         // 初始化地图UI
         if (!mapUIInitialized) {
-            Debug.Log("mapSize:" + mapSize);
-            Debug.Log("mapChunkSize:" + mapChunkSize);
-            Debug.Log("mapSizeOnWorld:" + mapSizeOnWorld);
-            Debug.Log("forestTexture:" + forestTexture);
-            Debug.Log("forestTexture:" + (forestTexture == null));
             mapUI.InitMap(mapSize, mapChunkSize, mapSizeOnWorld, forestTexture);
             mapUIInitialized = true;
         }
