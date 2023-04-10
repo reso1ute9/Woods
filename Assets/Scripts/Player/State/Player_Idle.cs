@@ -6,8 +6,7 @@ using UnityEngine;
 public class Player_Idle : PlayerStateBase
 {
     public override void Enter() {
-        base.Enter();
-        // this.PlayAnimation("Idle");
+        PlayAnimation("Idle");
     }
 
     public override void Exit() {
@@ -15,6 +14,11 @@ public class Player_Idle : PlayerStateBase
     }
 
     public override void Update() {
-        base.Update();
+        // 玩家有任何移动相关的按键就切换到Move状态
+        float h = Input.GetAxis("Horizontal");
+        float v = Input.GetAxis("Vertical");
+        if (h != 0 || v != 0) {
+            this.ChangeState(PlayerState.Move);
+        }
     }
 }

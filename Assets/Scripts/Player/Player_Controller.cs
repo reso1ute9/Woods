@@ -20,7 +20,11 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
     private StateMachine stateMachine;
     public Transform playerTransform { get; private set; }
 
-    void Update() {
+    private void Start() {
+        Init();
+    }
+
+    private void Update() {
         // transform.Translate(new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")) * Time.deltaTime * 3.5f);
     }
 

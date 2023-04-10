@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,5 +17,26 @@ public class PlayerStateBase : StateBase
     // 播放动画
     protected void PlayAnimation(string animationName, float fixedTime = 0.25f) {
         player.animator.CrossFadeInFixedTime(animationName, fixedTime);
+    }
+
+    // 修改状态
+    protected void ChangeState(PlayerState playerState) {
+        switch (playerState) {
+            case PlayerState.Idle:
+                stateMachine.ChangeState<Player_Idle>(0);
+                break;
+            case PlayerState.Move:
+                stateMachine.ChangeState<Player_Move>(1);
+                break;
+            case PlayerState.Attack:
+                stateMachine.ChangeState<Player_Move>(2);
+                break;
+            case PlayerState.BeAttack:
+                stateMachine.ChangeState<Player_Move>(3);
+                break;
+            case PlayerState.Dead:
+                stateMachine.ChangeState<Player_Move>(4);
+                break;
+        }
     }
 }
