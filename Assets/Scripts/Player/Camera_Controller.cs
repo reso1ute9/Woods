@@ -32,7 +32,7 @@ public class Camera_Controller : SingletonMono<Camera_Controller>
     // 范围需要适当的缩小, 可通过提前在scene中测量得到合适的值
     private void InitPositionScope(float mapSizeOnWorld) {
         positionXScope = new Vector2(5, mapSizeOnWorld - 5);
-        positionZScope = new Vector2(-1, mapSizeOnWorld - 10);
+        positionZScope = new Vector2(-1, mapSizeOnWorld - 5);
     }
 
     // Update是立即触发, LateUpdate是随后触发
