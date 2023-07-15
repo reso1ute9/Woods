@@ -525,7 +525,7 @@ Camera:
   m_GameObject: {fileID: 963194225}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 2
+  m_ClearFlags: 1
   m_BackGroundColor: {r: 0.41568628, g: 0.5019608, b: 0.2901961, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
@@ -701,26 +701,36 @@ MonoBehaviour:
     sunColor: {r: 0.9339623, g: 0.7696235, b: 0.16300285, a: 0}
     sunRotation: {x: 30, y: 15, z: 0}
     sunQuaternion: {x: 0.25660482, y: 0.12607862, z: -0.033782665, w: 0.9576622}
+    fog: 1
+    bgAudioClip: {fileID: 8300000, guid: d87b5b3f06f4784468306a3a46b61f1f, type: 3}
   - durationTime: 200
     sunIntensity: 1.2
     sunColor: {r: 0.9528302, g: 0.9462655, b: 0.7505785, a: 0}
     sunRotation: {x: 60, y: 0, z: 0}
     sunQuaternion: {x: 0.5, y: 0, z: 0, w: 0.8660254}
+    fog: 0
+    bgAudioClip: {fileID: 0}
   - durationTime: 150
     sunIntensity: 0.3
     sunColor: {r: 0.8490566, g: 0.4202937, b: 0.04405483, a: 0}
     sunRotation: {x: 180, y: 90, z: 0}
     sunQuaternion: {x: 0.70710677, y: -0.00000003090862, z: -0.70710677, w: -0.00000003090862}
+    fog: 0
+    bgAudioClip: {fileID: 8300000, guid: 21538f6160ff48040a8488deb4ed6d5e, type: 3}
   - durationTime: 60
     sunIntensity: 0
     sunColor: {r: 0, g: 0, b: 0, a: 0}
     sunRotation: {x: 180, y: 90, z: 0}
     sunQuaternion: {x: 0.70710677, y: -0.00000003090862, z: -0.70710677, w: -0.00000003090862}
+    fog: 0
+    bgAudioClip: {fileID: 0}
   - durationTime: 30
     sunIntensity: 0
     sunColor: {r: 0, g: 0, b: 0, a: 0}
     sunRotation: {x: 180, y: 90, z: 0}
     sunQuaternion: {x: 0.70710677, y: -0.00000003090862, z: -0.70710677, w: -0.00000003090862}
+    fog: 0
+    bgAudioClip: {fileID: 0}
   timeScale: 1
 --- !u!114 &975980639
 MonoBehaviour:
@@ -821,6 +831,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 370990776, guid: 35592af50a118a347aef20848bfd00b8, type: 3}
+      propertyPath: bgVolume
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1833776902, guid: 35592af50a118a347aef20848bfd00b8, type: 3}
+      propertyPath: m_Volume
+      value: 0.3
+      objectReference: {fileID: 0}
     - target: {fileID: 3304632367700951240, guid: 35592af50a118a347aef20848bfd00b8, type: 3}
       propertyPath: m_Name
       value: GameRoot

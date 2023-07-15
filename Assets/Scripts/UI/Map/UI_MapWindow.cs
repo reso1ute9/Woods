@@ -50,10 +50,10 @@ public class UI_MapWindow : UI_WindowBase
         this.mapSizeOnWorld = mapSizeOnWorld;
         this.forestSprite = CreateMapSprite(forestTexture);
 
-        // content尺寸: 默认content尺寸要大于地图尺寸
+        // content尺寸: 默认content尺寸要大于地图尺寸, 需要设置默认缩放尺寸
         contentSize = mapSizeOnWorld * mapScaleFactorNum;
         this.content.sizeDelta = new Vector2(contentSize, contentSize);
-        Debug.Log("contentSize:" + contentSize);
+        this.content.localScale = new Vector3(maxScale, maxScale, 1);
 
         // 一个UI地图块尺寸
         mapChunkImageSize = contentSize / mapSize;

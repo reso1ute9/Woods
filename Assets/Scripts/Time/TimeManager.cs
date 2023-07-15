@@ -16,6 +16,9 @@ public class TimeStateData
     [HideInInspector]
     public Quaternion sunQuaternion;    // 阳光角度-四元数
 
+    public bool fog;                    // 迷雾
+    public AudioClip bgAudioClip;       // 背景音乐
+
     // 当阳光角度发生变化, 需要计算出四元数
     private void SetRotation() {
         sunQuaternion = Quaternion.Euler(sunRotation);
@@ -27,6 +30,10 @@ public class TimeStateData
         rotation = Quaternion.Lerp(this.sunQuaternion, nextState.sunQuaternion, ratio);
         color = Color.Lerp(this.sunColor, nextState.sunColor, ratio);
         sunIntensity = UnityEngine.Mathf.Lerp(this.sunIntensity, nextState.sunIntensity, ratio);
+        if (fog == true) {
+            // 迷雾强度随时间递减, 没有考虑多个时间点都有雾的情况(无过渡状态)
+            RenderSettings.fogDensity = 0.1f * (1 - ratio);
+        }
         return currTime > 0;
     }
 }
@@ -54,7 +61,14 @@ public class TimeManager : LogicManagerBase<TimeManager>
 
     private IEnumerator UpdateTime()
     {
+        // 默认一开始是早上
         currentStateIndex = 0;
+        // 早晨则需要显示迷雾
+        RenderSettings.fog = timeStateDatas[currentStateIndex].fog; 
+        // 播放背景音乐
+        if (timeStateDatas[currentStateIndex].bgAudioClip != null) {
+            StartCoroutine(ChangeBGAudio(timeStateDatas[currentStateIndex].bgAudioClip));
+        }
         int nextIndex = currentStateIndex + 1;
         currentTime = timeStateDatas[currentStateIndex].durationTime;
         dayNum = 0;
@@ -74,6 +88,12 @@ public class TimeManager : LogicManagerBase<TimeManager>
                     dayNum += 1;
                 }
                 currentTime = timeStateDatas[currentStateIndex].durationTime;
+                // 迷雾效果: 直接使用配置中fog的值
+                RenderSettings.fog = timeStateDatas[currentStateIndex].fog; 
+                // 背景音乐:
+                if (timeStateDatas[currentStateIndex].bgAudioClip != null) {
+                    StartCoroutine(ChangeBGAudio(timeStateDatas[currentStateIndex].bgAudioClip));
+                }
             }
             // 设置阳光强度/角度/颜色
             mainLight.transform.rotation = rotation;
@@ -87,5 +107,29 @@ public class TimeManager : LogicManagerBase<TimeManager>
         mainLight.intensity = intensity;
         // 设置环境光亮度
         RenderSettings.ambientIntensity = intensity;
+    }
+
+    // 使用协程去切换背景音乐
+    private IEnumerator ChangeBGAudio(AudioClip audioClip) {
+        float old_volume = AudioManager.Instance.BGVolume;
+        // 音量<=0则不需要播放声音
+        if (old_volume <= 0) {
+            yield break;
+        }
+        // 降低之前曲子的音量
+        float current_volume = old_volume;
+        while (current_volume > 0) {
+            yield return null;
+            current_volume -= Time.deltaTime / 2;
+            AudioManager.Instance.BGVolume = current_volume;
+        }
+        AudioManager.Instance.PlayBGAudio(audioClip);
+        // 恢复到之前的音量
+        while (current_volume < old_volume) {
+            yield return null;
+            current_volume += Time.deltaTime / 2;
+            AudioManager.Instance.BGVolume = current_volume;
+        }
+        AudioManager.Instance.BGVolume = old_volume;
     }
 }
