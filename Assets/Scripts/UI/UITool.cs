@@ -30,9 +30,14 @@ public static class UITool
     }
 
     public static void RemoveMosueEffect(this Component component) {
+        // 手动触发一次退出
+        JKEventListener listener = component.GetComponent<JKEventListener>();
+        if (listener != null) {
+            listener.OnPointerExit(null);
+        }
         component.RemoveMouseEnter(MouseEffect);
         component.RemoveMouseExit(MouseEffect);
-        component.StopAllCoroutines();
+        // component.StopAllCoroutines();
         // 强制将指针改成默认形状
         GameManager.Instance.SetCursorState(CursorState.Normal);
     }
@@ -48,6 +53,7 @@ public static class UITool
             while (transform.localScale.x > targetScale.x) {
                 // 停留一帧
                 yield return null;  
+                if (transform == null) yield break;
                 currentScale -= Time.deltaTime * 2 * Vector3.one;
                 transform.localScale = currentScale;
             }
@@ -57,7 +63,8 @@ public static class UITool
             Vector3 targetScale = normalScale * 1.2f;
             while (transform.localScale.x < targetScale.x) {
                 // 停留一帧
-                yield return null;  
+                yield return null;
+                if (transform == null) yield break;
                 currentScale += Time.deltaTime * 2 * Vector3.one;
                 transform.localScale = currentScale;
             }
