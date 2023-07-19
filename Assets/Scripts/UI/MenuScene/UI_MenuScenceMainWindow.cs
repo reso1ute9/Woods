@@ -16,6 +16,18 @@ public class UI_MenuScenceMainWindow : UI_WindowBase
         new_Button.onClick.AddListener(NewGame);
         continue_Button.onClick.AddListener(ContinueGame);
         quit_Button.onClick.AddListener(QuitGame);
+
+        new_Button.BindMouseEffect();
+        continue_Button.BindMouseEffect();
+        quit_Button.BindMouseEffect();
+    }
+
+    public override void OnClose()
+    {
+        base.OnClose();
+        new_Button.RemoveMosueEffect();
+        continue_Button.RemoveMosueEffect();
+        quit_Button.RemoveMosueEffect();    
     }
 
     public override void OnShow() {
@@ -25,6 +37,8 @@ public class UI_MenuScenceMainWindow : UI_WindowBase
 
     private void NewGame() {
         // 打开新游戏窗口
+        UIManager.Instance.Show<UI_NewGameWindow>();
+        Close();
     }
 
     private void ContinueGame() {

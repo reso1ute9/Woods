@@ -21,6 +21,17 @@ public class UI_NewGameWindow : UI_WindowBase
         // 框架中的Close函数
         backMenu_Button.onClick.AddListener(Close);
         startGame_Button.onClick.AddListener(StartGame);
+
+        backMenu_Button.BindMouseEffect();
+        startGame_Button.BindMouseEffect();
+    }
+
+    public override void OnClose()
+    {
+        base.OnClose();
+        backMenu_Button.RemoveMosueEffect();
+        startGame_Button.RemoveMosueEffect();
+        UIManager.Instance.Show<UI_MenuScenceMainWindow>();
     }
 
     private void StartGame() {
