@@ -9,69 +9,62 @@ public class MapGenerator
 {   
     // 层级: 地图 -> 地图块 -> 网格 -> 像素
     // 约定: 地图/地图块/网格/像素均为正方形
-    private int mapSize;             // 地图大小
-    private int mapChunkSize;        // 地图块大小
-    private float cellSize;          // 网格大小
-
-    private float noiseLacunarity;   // 噪声图采样间隔大小
-    private int mapSeed;             // 地图随机种子
-    private int spawnSeed;           // 地图对象种子
-    private float marshLimit;        // 沼泽高度阈值
-    private MapGrid mapGrid;         // 地图逻辑网格/顶点数据    
-
-    private Texture2D forestTexture;    // 森林贴图    
-    private Texture2D[] marshTextures;  // 沼泽贴图
-    private Material mapMaterial;       // 森林材质(默认)
-    private Material marshMaterial;     // 沼泽材质
+    #region 运行时的逻辑
+    private MapGrid mapGrid;            // 地图逻辑网格/顶点数据   
+    private Material marshMaterial;     // 沼泽材质(非配置材质)
     private Mesh mapChunkMesh;          // 地图块mesh
-
-    private Dictionary<MapVertexType, List<int>> spawnConfigDict;   // 地图配置数据
     private int forestSpawnWeightTotal;
     private int marshSpawnWeightTotal;
+    #endregion    
+
+    #region 配置
+    private Dictionary<MapVertexType, List<int>> spawnConfigDict;   // 地图配置数据
+    private MapConfig mapConfig;
+    
+    #endregion
+    
+    #region 存档
+    private MapInitData mapInitData;
+    #endregion
 
     public MapGenerator(
-        int mapSize, int mapChunkSize, float cellSize, 
-        float noiseLacunarity, int mapSeed, int spawnSeed, float marshLimit, 
-        Texture2D forestTexture, Texture2D[] marshTextures, Material mapMaterial,
+        MapConfig mapConfig, MapInitData mapInitData,
         Dictionary<MapVertexType, List<int>> spawnConfigDict
     ) {
-        this.mapSize = mapSize;
-        this.mapChunkSize = mapChunkSize; 
-        this.cellSize = cellSize;
-
-        this.noiseLacunarity = noiseLacunarity;
-        this.mapSeed = mapSeed;
-        this.spawnSeed = spawnSeed;
-        this.marshLimit = marshLimit;
-
-        this.forestTexture = forestTexture;
-        this.marshTextures = marshTextures;
-        this.mapMaterial = mapMaterial;
-
+        this.mapConfig = mapConfig;
+        this.mapInitData = mapInitData;
         this.spawnConfigDict = spawnConfigDict;
-
         this.GenerateMapData();
     }
     
     // 生成通用地图块数据
     public void GenerateMapData() {
         // 生成网格/顶点数据
-        mapGrid = new MapGrid(mapSize * mapChunkSize, mapSize * mapChunkSize, cellSize);
+        mapGrid = new MapGrid(
+            mapInitData.mapSize * mapConfig.mapChunkSize, 
+            mapInitData.mapSize * mapConfig.mapChunkSize, mapConfig.cellSize
+        );
         // 生成perlin噪声图, 需要提前设定地图noise生成种子
-        UnityEngine.Random.InitState(mapSeed);
-        float[,] noiseMap = GenerateNoiseMap(mapSize * mapChunkSize, mapSize * mapChunkSize, noiseLacunarity);
+        UnityEngine.Random.InitState(mapInitData.mapSeed);
+        float[,] noiseMap = GenerateNoiseMap(
+            mapInitData.mapSize * mapConfig.mapChunkSize, 
+            mapInitData.mapSize * mapConfig.mapChunkSize, mapConfig.noiseLacunarity
+        );
         // 确定各个顶点的类型以及计算周围网格贴图的索引数字
-        mapGrid.CalculateMapVertexType(noiseMap, marshLimit);
+        mapGrid.CalculateMapVertexType(noiseMap, mapInitData.marshLimit);
         // 实例化森林默认材质尺寸
-        mapMaterial.mainTexture = forestTexture;
-        mapMaterial.SetTextureScale("_MainTex", new Vector2(cellSize * mapChunkSize, cellSize * mapChunkSize));
+        mapConfig.mapMaterial.mainTexture = mapConfig.forestTexture;
+        mapConfig.mapMaterial.SetTextureScale(
+            "_MainTex", 
+            new Vector2(mapConfig.cellSize * mapConfig.mapChunkSize, mapConfig.cellSize * mapConfig.mapChunkSize)
+        );
         // 实例化一个沼泽材质
-        marshMaterial = new Material(mapMaterial);
+        marshMaterial = new Material(mapConfig.mapMaterial);
         marshMaterial.SetTextureScale("_MainTex", Vector2.one);
         // 生成地图块mesh
-        mapChunkMesh = GenerateMapMesh(mapChunkSize, mapChunkSize, cellSize);
+        mapChunkMesh = GenerateMapMesh(mapConfig.mapChunkSize, mapConfig.mapChunkSize, mapConfig.cellSize);
         // 设定地图物品随机种子
-        UnityEngine.Random.InitState(spawnSeed);
+        UnityEngine.Random.InitState(mapInitData.spawnSeed);
         // 计算地图物品配置总权重
         this.forestSpawnWeightTotal = 0;
         List<int> temp = spawnConfigDict[MapVertexType.Forest];
@@ -101,7 +94,7 @@ public class MapGenerator
         this.StartCoroutine(GenerateMapTexture(chunkIndex, (texture, isAllForset) => {
             // 如果当前地图块全部是森林, 则不需要实例化一个材质球
             if (isAllForset == true) {
-                mapChunkObj.AddComponent<MeshRenderer>().sharedMaterial = mapMaterial;
+                mapChunkObj.AddComponent<MeshRenderer>().sharedMaterial = mapConfig.mapMaterial;
             } else {
                 mapTexture = texture;
                 Material material = new Material(marshMaterial);
@@ -111,9 +104,9 @@ public class MapGenerator
             callBackForMapTexture?.Invoke();
             // 确定坐标
             Vector3 position = new Vector3(
-                chunkIndex.x * mapChunkSize * cellSize, 
+                chunkIndex.x * mapConfig.mapChunkSize * mapConfig.cellSize, 
                 0, 
-                chunkIndex.y * mapChunkSize * cellSize
+                chunkIndex.y * mapConfig.mapChunkSize * mapConfig.cellSize
             );
             mapChunk.transform.position = position;
             mapChunkObj.transform.SetParent(parent);
@@ -121,7 +114,7 @@ public class MapGenerator
             List<MapChunkMapObjectModel> mapObjectList = SpawnMapObject(chunkIndex);
             mapChunk.Init(
                 chunkIndex,
-                position + new Vector3((mapChunkSize * cellSize) / 2, 0, (mapChunkSize * cellSize) / 2),
+                position + new Vector3((mapConfig.mapChunkSize * mapConfig.cellSize) / 2, 0, (mapConfig.mapChunkSize * mapConfig.cellSize) / 2),
                 isAllForset, mapObjectList
             );
         }));
@@ -175,12 +168,12 @@ public class MapGenerator
     // Returns: 如果贴图块全是森林则直接返回森林
     private IEnumerator GenerateMapTexture(Vector2Int chunkIndex, System.Action<Texture2D, bool> callBack) {
         // 当前地图块的偏移量, 找到这个地图块每块具体的格子位置
-        int cellOffsetX = chunkIndex.x * mapChunkSize + 1;
-        int cellOffsetZ = chunkIndex.y * mapChunkSize + 1;
+        int cellOffsetX = chunkIndex.x * mapConfig.mapChunkSize + 1;
+        int cellOffsetZ = chunkIndex.y * mapConfig.mapChunkSize + 1;
         // 确定是否都为森林, 如果都为森林则不进行重复渲染
         bool isAllForest = true;
-        for (int z = 0; z < mapChunkSize; z++) {
-            for (int x = 0; x < mapChunkSize; x++) {
+        for (int z = 0; z < mapConfig.mapChunkSize; z++) {
+            for (int x = 0; x < mapConfig.mapChunkSize; x++) {
                 MapCell cell = mapGrid.GetCell(x + cellOffsetX, z + cellOffsetZ);
                 if (cell != null && cell.textureIndex != 0) {
                     isAllForest = false;
@@ -192,15 +185,15 @@ public class MapGenerator
         Texture2D mapTexture = null;
         if (isAllForest == false) {
             // 约定好贴图都是矩形, 计算整个地图块texture的宽高
-            int textureCellSize = forestTexture.width;
-            int textureSize = mapChunkSize * textureCellSize;
+            int textureCellSize = mapConfig.forestTexture.width;
+            int textureSize = mapConfig.mapChunkSize * textureCellSize;
             mapTexture = new Texture2D(textureSize, textureSize, TextureFormat.RGB24, false);
             // 遍历格子并绘制格子中的每个像素点
-            for (int z = 0; z < mapChunkSize; z++) {
+            for (int z = 0; z < mapConfig.mapChunkSize; z++) {
                 // 利用协程实现分帧绘制像素, 一帧只绘制一列像素, 利用多帧时间完成整个格子内的像素绘制
                 yield return null;
                 int pixelOffsetZ = z * textureCellSize;
-                for (int x = 0; x < mapChunkSize; x++) {
+                for (int x = 0; x < mapConfig.mapChunkSize; x++) {
                     int pixelOffsetX = x * textureCellSize;
                     int textureIndex = mapGrid.GetCell(x + cellOffsetX, z + cellOffsetZ).textureIndex - 1; // -1代表forestTexture, >=0代表marshTextures
                     // 绘制每一个格子内的像素
@@ -209,11 +202,11 @@ public class MapGenerator
                             // 设置像素点颜色
                             // 格子是森林 || 格子是沼泽但是像素点是透明的也需要绘制forestTexture同位置的像素颜色
                             // 需要注意半透明也需要重新绘制地图
-                            if (textureIndex == -1 || marshTextures[textureIndex].GetPixel(x1, z1).a < 1) {
-                                Color color = forestTexture.GetPixel(x1, z1);
+                            if (textureIndex == -1 || mapConfig.marshTextures[textureIndex].GetPixel(x1, z1).a < 1) {
+                                Color color = mapConfig.forestTexture.GetPixel(x1, z1);
                                 mapTexture.SetPixel(x1 + pixelOffsetX, z1 + pixelOffsetZ, color);
                             } else {
-                                Color color = marshTextures[textureIndex].GetPixel(x1, z1);
+                                Color color = mapConfig.marshTextures[textureIndex].GetPixel(x1, z1);
                                 mapTexture.SetPixel(x1 + pixelOffsetX, z1 + pixelOffsetZ, color);
                             }
                         }
@@ -233,11 +226,11 @@ public class MapGenerator
     private List<MapChunkMapObjectModel> SpawnMapObject(Vector2Int chunkIndex) {
         List<MapChunkMapObjectModel> mapObjectList = new List<MapChunkMapObjectModel>();
         
-        int offsetX = chunkIndex.x * mapChunkSize;
-        int offsetZ = chunkIndex.y * mapChunkSize;
+        int offsetX = chunkIndex.x * mapConfig.mapChunkSize;
+        int offsetZ = chunkIndex.y * mapConfig.mapChunkSize;
 
-        for (int x = 1; x < mapChunkSize; x++) {
-            for (int z = 1; z < mapChunkSize; z++) {
+        for (int x = 1; x < mapConfig.mapChunkSize; x++) {
+            for (int z = 1; z < mapConfig.mapChunkSize; z++) {
                 MapVertex mapVertex = mapGrid.GetVertex(x + offsetX, z + offsetZ);
                 // 根据权重配置随机生成物品
                 List<int> configIds = spawnConfigDict[mapVertex.vertexType];
@@ -260,9 +253,9 @@ public class MapGenerator
                 if (spawnModel.isEmpty == false) {
                     // 实例化物品
                     Vector3 offset = new Vector3(
-                        UnityEngine.Random.Range(-cellSize/2, cellSize/2), 
+                        UnityEngine.Random.Range(-mapConfig.cellSize/2, mapConfig.cellSize/2), 
                         0,
-                        UnityEngine.Random.Range(-cellSize/2, cellSize/2)
+                        UnityEngine.Random.Range(-mapConfig.cellSize/2, mapConfig.cellSize/2)
                     );
                     Vector3 position = mapVertex.position + offset;
                     mapObjectList.Add(new MapChunkMapObjectModel { configId = configId, position = position });                
