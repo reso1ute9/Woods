@@ -82,7 +82,7 @@ public class UI_MapWindow : UI_WindowBase
     }
 
     // 添加地图块UI
-    public void AddMapChunk(Vector2Int chunkIndex, List<MapChunkMapObjectModel> mapObjectList, Texture2D texture = null) {
+    public void AddMapChunk(Vector2Int chunkIndex, List<MapChunkMapObjectData> mapObjectList, Texture2D texture = null) {
         RectTransform mapChunkRect = Instantiate(mapItemPrefab, content).GetComponent<RectTransform>();
         // 确定地图块在UI界面中的位置和大小(宽高)
         mapChunkRect.anchoredPosition = new Vector2(chunkIndex.x * mapChunkImageSize, chunkIndex.y * mapChunkImageSize);

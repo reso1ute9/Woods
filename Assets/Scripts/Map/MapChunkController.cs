@@ -4,16 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using JKFrame;
 
-public class MapChunkData
-{
-    public List<MapChunkMapObjectModel> mapObjectList = new List<MapChunkMapObjectModel>();
-}
 
-public class MapChunkMapObjectModel
-{   
-    public int configId;                    // 之前为prefab, 改为int后方便存档
-    public Vector3 position;
-}
 
 public class MapChunkController : MonoBehaviour
 {
@@ -26,10 +17,10 @@ public class MapChunkController : MonoBehaviour
     private bool isActive = false;
     public bool isInitialized = false;              // 标记地图UI是否已经初始化
 
-    public void Init(Vector2Int chunkIndex, Vector3 centrePosition, bool isAllForest, List<MapChunkMapObjectModel> mapObjectList) {
+    public void Init(Vector2Int chunkIndex, Vector3 centrePosition, bool isAllForest, List<MapChunkMapObjectData> mapObjectList) {
         this.centrePosition = centrePosition;
         this.chunkIndex = chunkIndex;
-        // 初始化地图块数据
+        // 初始化地图块数据, TODO:后续需要从存档中获取
         this.mapChunkData = new MapChunkData();
         this.mapChunkData.mapObjectList = mapObjectList;
         this.mapObjectList = new List<GameObject>(mapObjectList.Count);

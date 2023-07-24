@@ -111,7 +111,7 @@ public class MapGenerator
             mapChunk.transform.position = position;
             mapChunkObj.transform.SetParent(parent);
             // 生成场景物体数据
-            List<MapChunkMapObjectModel> mapObjectList = SpawnMapObject(chunkIndex);
+            List<MapChunkMapObjectData> mapObjectList = SpawnMapObject(chunkIndex);
             mapChunk.Init(
                 chunkIndex,
                 position + new Vector3((mapConfig.mapChunkSize * mapConfig.cellSize) / 2, 0, (mapConfig.mapChunkSize * mapConfig.cellSize) / 2),
@@ -223,8 +223,8 @@ public class MapGenerator
     }
 
     // 生成各种地图对象, 需要根据配置和地图网格信息确定生成对象位置
-    private List<MapChunkMapObjectModel> SpawnMapObject(Vector2Int chunkIndex) {
-        List<MapChunkMapObjectModel> mapObjectList = new List<MapChunkMapObjectModel>();
+    private List<MapChunkMapObjectData> SpawnMapObject(Vector2Int chunkIndex) {
+        List<MapChunkMapObjectData> mapObjectList = new List<MapChunkMapObjectData>();
         
         int offsetX = chunkIndex.x * mapConfig.mapChunkSize;
         int offsetZ = chunkIndex.y * mapConfig.mapChunkSize;
@@ -258,7 +258,7 @@ public class MapGenerator
                         UnityEngine.Random.Range(-mapConfig.cellSize/2, mapConfig.cellSize/2)
                     );
                     Vector3 position = mapVertex.position + offset;
-                    mapObjectList.Add(new MapChunkMapObjectModel { configId = configId, position = position });                
+                    mapObjectList.Add(new MapChunkMapObjectData { configId = configId, position = position });                
                 }
             }
         }
