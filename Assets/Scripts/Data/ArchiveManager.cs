@@ -66,7 +66,7 @@ public class ArchiveManager : Singleton<ArchiveManager>
         MapConfig mapConfig = ConfigManager.Instance.GetConfig<MapConfig>(ConfigName.Map);
         float mapSizeOnWorld = mapSize * mapConfig.mapChunkSize * mapConfig.cellSize;
         playerTransformData = new PlayerTransformData() {
-            position = new Vector3(mapSizeOnWorld / 2, mapSizeOnWorld / 2),
+            position = new Vector3(mapSizeOnWorld / 2, 0, mapSizeOnWorld / 2),
             rotation = Vector3.zero
         };
         SavePlayerTransformData();

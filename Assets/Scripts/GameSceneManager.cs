@@ -31,6 +31,6 @@ public class GameSceneManager : LogicManagerBase<GameSceneManager>
         Camera_Controller.Instance.Init(mapSizeOnWorld);
         // 初始化地图+更新观察者位置
         MapManager.Instance.Init();
-        MapManager.Instance.UpdateView(Player_Controller.Instance.playerTransform);
+        MapManager.Instance.UpdateView(Player_Controller.Instance.transform);
     }
 }

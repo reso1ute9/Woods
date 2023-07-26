@@ -27,7 +27,7 @@ public class MapChunkMapObjectData {
     private Serialization_Vector3 sv_position;      // 坐标: sv_postion存档用, position外部调用用
     public Vector3 position { 
         get => sv_position.ConverToVector3(); 
-        set => value.ConverToSVector3();
+        set => sv_position = value.ConverToSVector3();
     }
 }
 
