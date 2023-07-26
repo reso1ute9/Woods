@@ -33,6 +33,9 @@ public class UI_MenuScenceMainWindow : UI_WindowBase
     public override void OnShow() {
         // 当前如果不存在存档则不显示游戏按钮
         base.OnShow();
+        if (ArchiveManager.Instance.haveArchive == false) {
+            continue_Button.gameObject.SetActive(false);
+        }
     }
 
     private void NewGame() {

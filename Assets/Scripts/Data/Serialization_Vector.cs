@@ -49,8 +49,13 @@ public static class SerializationExtensions {
         return new Vector2Int((int)vec2.x, (int)vec2.y);
     }
 
+    // 将unity的Vector2转化为可序列化的vector2
+    public static Vector2Int ConverToSVector2Init(this Serialization_Vector2 vec2) {
+        return new Vector2Int((int)vec2.x, (int)vec2.y);
+    }
+
     // 将unity的Vector2转化为可序列化的vector3
-    public static Serialization_Vector2 ConverToSVector2(this Vector2 vec2) {
+    public static Serialization_Vector2 ConverToSVector2(this Vector2Int vec2) {
         return new Serialization_Vector2(vec2.x, vec2.y);
     }
     

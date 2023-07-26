@@ -10,11 +10,12 @@ public class MapInitData {
     public int mapSize;         // 地图大小(地图块数量)
     public int mapSeed;
     public int spawnSeed;
-    public int marshLimit;
+    public float marshLimit;
 }
 
 // 地图数据
-[Serializable]                                 public class MapData {
+[Serializable]                                 
+public class MapData {
     // 地图块索引列表: 已经生成过的所有地图块
     public List<Serialization_Vector2> MapChunkIndexList = new List<Serialization_Vector2>();
 }

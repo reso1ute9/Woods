@@ -5,7 +5,7 @@ using JKFrame;
 using System;
 
 [Serializable]
-public struct PlayerTransformData
+public class PlayerTransformData
 {
     // 坐标: sv_postion存档用, position外部调用用
     private Serialization_Vector3 sv_position;
