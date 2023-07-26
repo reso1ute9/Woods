@@ -79,7 +79,9 @@ public class MapGenerator
     }
 
     // 在指定位置生成地图块
-    public MapChunkController GenerateMapChunk(Vector2Int chunkIndex, Transform parent, Action callBackForMapTexture) {
+    public MapChunkController GenerateMapChunk(
+        Vector2Int chunkIndex, Transform parent, MapChunkData mapChunkData, Action callBackForMapTexture
+    ) {
         // 生成地图块物体
         GameObject mapChunkObj = new GameObject("Chunk_" + chunkIndex.ToString());
         MapChunkController mapChunk = mapChunkObj.AddComponent<MapChunkController>();
@@ -110,12 +112,19 @@ public class MapGenerator
             );
             mapChunk.transform.position = position;
             mapChunkObj.transform.SetParent(parent);
-            // 生成场景物体数据
-            List<MapChunkMapObjectData> mapObjectList = SpawnMapObject(chunkIndex);
+
+            // 如果没有指定地图块数据则说明是新建的, 需要生成默认数据
+            if (mapChunkData == null) {
+                mapChunkData = new MapChunkData();
+                // 生成场景物体数据
+                mapChunkData.mapObjectList = SpawnMapObject(chunkIndex);
+                // 生成以后进行持久化保存
+                ArchiveManager.Instance.AddAndSaveMapChunkData(chunkIndex, mapChunkData);
+            }
             mapChunk.Init(
                 chunkIndex,
                 position + new Vector3((mapConfig.mapChunkSize * mapConfig.cellSize) / 2, 0, (mapConfig.mapChunkSize * mapConfig.cellSize) / 2),
-                isAllForset, mapObjectList
+                isAllForset, mapChunkData
             );
         }));
         return mapChunk;

@@ -19,13 +19,9 @@ public class Camera_Controller : SingletonMono<Camera_Controller>
 
     // 由于MapManager.Instance是在Awake中进行初始化, 所以需要将camera的初始化
     // 顺序调整到Start中
-    private void Start() {
-        Init();
-    }
-
-    public void Init() {
+    public void Init(float mapSizeOnWorld) {
         mTransform = transform;
-        InitPositionScope(MapManager.Instance.mapSizeOnWorld);
+        InitPositionScope(mapSizeOnWorld);
     }
 
     // 传入游戏内3D地图大小初始化相机移动范围, 需要注意由于有Y轴高度, 所以相机移动

@@ -46,6 +46,8 @@ public class UI_MenuScenceMainWindow : UI_WindowBase
 
     private void ContinueGame() {
         // 基于之前存档进行游戏
+        GameManager.Instance.UseCurrentArchive_EnterGame();
+        Close();
     }
 
     private void QuitGame() {

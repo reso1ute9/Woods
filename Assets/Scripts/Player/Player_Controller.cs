@@ -18,7 +18,6 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
     [SerializeField] public Player_Model playerModel;
     public Animator animator;
     public CharacterController characterController;
-    [SerializeField] AudioClip[] foodstepAudioClips;                // 脚步音效
 
     private StateMachine stateMachine;
     public Transform playerTransform { get; private set; }
@@ -28,23 +27,30 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
     public Vector2 positionXScope { get; private set; }               // 相机能移动的X轴范围
     public Vector2 positionZScope { get; private set; }               // 相机能移动的Y轴范围
 
+    #region 音效资源
+    [SerializeField] AudioClip[] foodstepAudioClips;                // 脚步音效
+    #endregion
 
-    private void Start() {
-        Init();
-    }
+    #region 存档相关数据
+    private PlayerTransformData playerTransformData;
+    #endregion
 
-    private void Update() {
-        // transform.Translate(new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")) * Time.deltaTime * 3.5f);
-    }
+    public void Init(float mapSizeOnWorld) {
+        // 确定存档位置
+        playerTransformData = ArchiveManager.Instance.playerTransformData;
 
-    public void Init() {
+        // 初始化音效、位置、状态机
         playerModel.Init(PlayAudioOnFootstep);
         playerTransform = transform;
         stateMachine = ResManager.Load<StateMachine>();
         stateMachine.Init(this);
         // 设置初始状态: 待机
         stateMachine.ChangeState<Player_Idle>((int)PlayerState.Idle);
-        InitPositionScope(MapManager.Instance.mapSizeOnWorld);
+        InitPositionScope(mapSizeOnWorld);
+        
+        // 初始化文档相关数据
+        playerTransform.localPosition = playerTransformData.position;
+        playerTransform.localRotation = Quaternion.Euler(playerTransformData.rotation);
     }
 
     // 传入游戏内3D地图大小初始化相机移动范围, 需要注意由于有Y轴高度, 所以相机移动
@@ -56,5 +62,12 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
 
     private void PlayAudioOnFootstep(int index) {
         AudioManager.Instance.PlayOnShot(foodstepAudioClips[index], playerTransform.position, 0.5f);
+    }
+
+    // 场景切换或关闭时将存档数据写入磁盘
+    private void OnDestroy() {
+        playerTransformData.position = playerTransform.localPosition;
+        playerTransformData.rotation = playerTransform.localRotation.eulerAngles;
+        ArchiveManager.Instance.SavePlayerTransformData();
     }
 }

@@ -37,12 +37,15 @@ public class GameManager : SingletonMono<GameManager>
     public void CreateNewArchive_EnterGame(int mapSize, int mapSeed, int spawnSeed, float marshLimit) {
         // 初始化新存档
         ArchiveManager.Instance.CreateNewArchive(mapSize, mapSeed, spawnSeed, marshLimit);
+        // 加载场景
+        SceneManager.LoadScene("GameScene");
     }
 
     // 使用当前存档进行游戏
-    public void ContinueGame() {
+    public void UseCurrentArchive_EnterGame() {
         ArchiveManager.Instance.LoadCurrentArchive();
         // 加载场景
+        SceneManager.LoadScene("GameScene");
     }
     #endregion
 }

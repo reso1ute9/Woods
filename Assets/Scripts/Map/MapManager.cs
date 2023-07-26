@@ -16,12 +16,12 @@ public class MapManager : SingletonMono<MapManager>
 
     // 运行时逻辑
     #region 运行时逻辑
-    private MapGenerator mapGenerator;  // 地图生成器
-    public Transform viewer;            // 观察者
+    private MapGenerator mapGenerator;                              // 地图生成器
+    private Transform viewer;                                       // 观察者
     private Vector3 lastViewerPosition = Vector3.one * -1;          // 观察者最后的位置, 用以控制地图是否进行刷新
     public Dictionary<Vector2Int, MapChunkController> mapChunkDict; // 全部已有的地图块
-    public float mapSizeOnWorld;   // 在世界中世界的地图尺寸
-    private float chunkSizeOnWorld; // 在世界中实际的地图块尺寸    
+    public float mapSizeOnWorld;                                    // 在世界中世界的地图尺寸
+    private float chunkSizeOnWorld;                                 // 在世界中实际的地图块尺寸    
     public float UpdateVisibleChunkTime = 1.0f;                     // 地图更新最小时间
     private bool canUpdateChunk = true;                             // 地图是否能进行更新
     private List<MapChunkController> lastVisibleChunkList = new List<MapChunkController>();
@@ -29,24 +29,21 @@ public class MapManager : SingletonMono<MapManager>
     
     // 配置
     #region 配置
-    public MapConfig mapConfig;     // 地图配置
+    private MapConfig mapConfig;                                    // 地图配置
     private Dictionary<MapVertexType, List<int>> spawnConfigDict;   // 地图配置数据
     #endregion
 
     // 存档
     #region  存档
-    // public MapChunkData mapData;
-    public MapInitData mapInitData;
+    private MapInitData mapInitData;
+    private MapData mapData;
     #endregion
-    
-    // 需要注意: 使用单例方式的时候需要在awke中进行初始化, 否则后续用到单例instance时
-    // 可能会报错
-    protected override void Awake() {
-        base.Awake();
-        Init();
-    }
 
-    private void Init() {
+    public void Init() {
+        // 确定存档
+        mapInitData = ArchiveManager.Instance.mapInitData;
+        mapData = ArchiveManager.Instance.mapData;
+
         // 确定配置
         mapConfig = ConfigManager.Instance.GetConfig<MapConfig>(ConfigName.Map);
         Dictionary<int, ConfigBase> temp_dict = ConfigManager.Instance.GetConfigs(ConfigName.mapObject);
@@ -64,6 +61,17 @@ public class MapManager : SingletonMono<MapManager>
         mapChunkDict = new Dictionary<Vector2Int, MapChunkController>();
         chunkSizeOnWorld = mapConfig.mapChunkSize * mapConfig.cellSize;
         mapSizeOnWorld = chunkSizeOnWorld * mapInitData.mapSize;
+
+        // 根据存档恢复整个地图状态
+        for (int i = 0; i < mapData.MapChunkIndexList.Count; i++) {
+            Serialization_Vector2 chunkIndex = mapData.MapChunkIndexList[i];
+            MapChunkData mapChunkData = ArchiveManager.Instance.GetMapChunkData(chunkIndex);
+            GenerateMapChunk(chunkIndex.ConverToSVector2Init(), mapChunkData);
+        }
+    }
+
+    public void UpdateView(Transform viewer) {
+        this.viewer = viewer;
     }
 
     private void Update() {
@@ -125,10 +133,6 @@ public class MapManager : SingletonMono<MapManager>
                     }
                 } else {
                     chunk = GenerateMapChunk(chunkIndex);
-                    // if (chunk != null) {
-                    //     chunk.SetActive(true);
-                    //     lastVisibleChunkList.Add(chunk);
-                    // }
                 }
             }
         }
@@ -141,11 +145,11 @@ public class MapManager : SingletonMono<MapManager>
         return new Vector2Int(x, z);
     }
 
-    private MapChunkController GenerateMapChunk(Vector2Int index) {
-        if (index.x > mapInitData.mapSize-1 || index.y > mapInitData.mapSize-1) return null;
+    private MapChunkController GenerateMapChunk(Vector2Int index, MapChunkData mapChunkData = null) {
+        if (index.x > mapInitData.mapSize - 1 || index.y > mapInitData.mapSize - 1) return null;
         if (index.x < 0 || index.y < 0) return null;
         // 利用回调+lambda表达式实现协程结束后将协程中生成的地图块索引加入到UI地图块显示索引列表中
-        MapChunkController chunk = mapGenerator.GenerateMapChunk(index, transform, () => mapUIUpdateChunkIndexList.Add(index));
+        MapChunkController chunk = mapGenerator.GenerateMapChunk(index, transform, mapChunkData, () => mapUIUpdateChunkIndexList.Add(index));
         mapChunkDict.Add(index, chunk);
         return chunk;
     }

@@ -17,13 +17,12 @@ public class MapChunkController : MonoBehaviour
     private bool isActive = false;
     public bool isInitialized = false;              // 标记地图UI是否已经初始化
 
-    public void Init(Vector2Int chunkIndex, Vector3 centrePosition, bool isAllForest, List<MapChunkMapObjectData> mapObjectList) {
+    public void Init(Vector2Int chunkIndex, Vector3 centrePosition, bool isAllForest, MapChunkData mapChunkData) {
         this.centrePosition = centrePosition;
         this.chunkIndex = chunkIndex;
-        // 初始化地图块数据, TODO:后续需要从存档中获取
-        this.mapChunkData = new MapChunkData();
-        this.mapChunkData.mapObjectList = mapObjectList;
-        this.mapObjectList = new List<GameObject>(mapObjectList.Count);
+        // 初始化地图块数据
+        this.mapChunkData = mapChunkData;
+        this.mapObjectList = new List<GameObject>(mapChunkData.mapObjectList.Count);
         this.isAllForest = isAllForest;
         this.isInitialized = true;
     }
@@ -44,7 +43,6 @@ public class MapChunkController : MonoBehaviour
                 }
             } else {
                 // 注意放回的时候放的时mapObjectList中的对象
-                // for (int i = 0; i < mapObjectList.Count; i++) {
                 for (int i = 0; i < mapChunkData.mapObjectList.Count; i++) {
                     PoolManager.Instance.PushGameObject(mapObjectList[i]);
                 }
