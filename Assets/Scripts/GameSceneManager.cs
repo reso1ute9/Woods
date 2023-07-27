@@ -8,7 +8,6 @@ using JKFrame;
 public class GameSceneManager : LogicManagerBase<GameSceneManager>
 {
     public bool IsInitialized { get; private set; }
-
     protected override void CancelEventListener() {}
     protected override void RegisterEventListener() {}
 
@@ -20,8 +19,9 @@ public class GameSceneManager : LogicManagerBase<GameSceneManager>
     private void StartGame() {
         // 如果运行到这里一定所有存档都准备好了
         IsInitialized = false;
-        // TODO: 加载进度条
-
+        // 加载进度条
+        loadingWindow = UIManager.Instance.Show<UI_GameLoadingWindow>();
+        loadingWindow.UpdateProgress(0);
         // 确定地图初始化配置数据
         MapConfig mapConfig = ConfigManager.Instance.GetConfig<MapConfig>(ConfigName.Map);
         float mapSizeOnWorld = ArchiveManager.Instance.mapInitData.mapSize * mapConfig.mapChunkSize * mapConfig.cellSize;
@@ -33,4 +33,21 @@ public class GameSceneManager : LogicManagerBase<GameSceneManager>
         MapManager.Instance.Init();
         MapManager.Instance.UpdateView(Player_Controller.Instance.transform);
     }
+
+    #region  加载进度
+    private UI_GameLoadingWindow loadingWindow;
+
+    // 更新地图进度
+    public void UpdateMapProgress(int current, int max) {
+        float currentProgress = current * 100.0f / max;
+        if (currentProgress == 100.0f) {
+            loadingWindow.UpdateProgress(100);
+            IsInitialized = true;
+            loadingWindow.Close();
+            loadingWindow = null;
+        } else {
+            loadingWindow.UpdateProgress(currentProgress);
+        }
+    }
+    #endregion
 }

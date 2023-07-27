@@ -40,6 +40,10 @@ public class MapManager : SingletonMono<MapManager>
     #endregion
 
     public void Init() {
+        StartCoroutine(DoInit());
+    }
+
+    private IEnumerator DoInit() {
         // 确定存档
         mapInitData = ArchiveManager.Instance.mapInitData;
         mapData = ArchiveManager.Instance.mapData;
@@ -62,11 +66,29 @@ public class MapManager : SingletonMono<MapManager>
         chunkSizeOnWorld = mapConfig.mapChunkSize * mapConfig.cellSize;
         mapSizeOnWorld = chunkSizeOnWorld * mapInitData.mapSize;
 
-        // 根据存档恢复整个地图状态
-        for (int i = 0; i < mapData.MapChunkIndexList.Count; i++) {
-            Serialization_Vector2 chunkIndex = mapData.MapChunkIndexList[i];
-            MapChunkData mapChunkData = ArchiveManager.Instance.GetMapChunkData(chunkIndex);
-            GenerateMapChunk(chunkIndex.ConverToSVector2Init(), mapChunkData);
+        // 需要判断是否
+        int mapChunkDataCount = mapData.MapChunkIndexList.Count;
+        if (mapChunkDataCount > 0) {
+            // 根据存档恢复整个地图状态
+            for (int i = 0; i < mapChunkDataCount; i++) {
+                Serialization_Vector2 chunkIndex = mapData.MapChunkIndexList[i];
+                MapChunkData mapChunkData = ArchiveManager.Instance.GetMapChunkData(chunkIndex);
+                GenerateMapChunk(chunkIndex.ConverToSVector2Init(), mapChunkData);
+            }
+            // 进度条时间需要跟地图块生成数量关联
+            for (int i = 0; i < mapChunkDataCount; i++) {
+                // 缓存一小段时间
+                yield return new WaitForSeconds(0.1f);
+                GameSceneManager.Instance.UpdateMapProgress(i + 1, mapChunkDataCount);
+            }
+        } else {
+            // 进度条时间默认为加载九宫格时间
+            mapChunkDataCount = 9;
+            for (int i = 0; i < mapChunkDataCount; i++) {
+                // 缓存一小段时间
+                yield return new WaitForSeconds(0.1f);
+                GameSceneManager.Instance.UpdateMapProgress(i + 1, mapChunkDataCount);
+            }
         }
     }
 
