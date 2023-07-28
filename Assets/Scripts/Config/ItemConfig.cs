@@ -41,7 +41,7 @@ public class ItemConfig : ConfigBase
     }
 }
 
-// 物品类型信息结构
+// 物品类型信息接口
 public interface IItemTypeInfo {}
 
 // 武器类型信息
