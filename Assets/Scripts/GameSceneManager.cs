@@ -32,6 +32,8 @@ public class GameSceneManager : LogicManagerBase<GameSceneManager>
         // 初始化地图+更新观察者位置
         MapManager.Instance.Init();
         MapManager.Instance.UpdateView(Player_Controller.Instance.transform);
+        // 初始化物品快捷栏
+        UIManager.Instance.Show<UI_InventoryWindows>();
     }
 
     #region  加载进度

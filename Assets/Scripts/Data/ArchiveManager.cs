@@ -9,6 +9,7 @@ public class ArchiveManager : Singleton<ArchiveManager>
     public PlayerTransformData playerTransformData { get; private set; }
     public MapInitData mapInitData { get; private set; }
     public MapData mapData { get; private set; }
+    public InventoryData inventoryData { get; private set; }
     public bool haveArchive { get; private set; }           // 判断当前情况是否有存档
     
     public ArchiveManager() {
@@ -20,6 +21,11 @@ public class ArchiveManager : Singleton<ArchiveManager>
         // 单存档情况下默认获取
         SaveItem saveItem = SaveManager.GetSaveItem(0);
         haveArchive = (saveItem != null);
+    }
+
+    // 保存物品快捷栏数据
+    public void SaveInventoryData() {
+        SaveManager.SaveObject(inventoryData);
     }
 
     // 保存玩家位置数据存档到磁盘上
@@ -73,6 +79,9 @@ public class ArchiveManager : Singleton<ArchiveManager>
         // 3. 地图数据
         mapData = new MapData();
         SaveMapData();
+        // 4. 初始化物品快捷栏数据, 默认14个快捷栏
+        inventoryData = new InventoryData(14);
+        SaveInventoryData();
     }
 
     // 加载当前存档
@@ -83,5 +92,7 @@ public class ArchiveManager : Singleton<ArchiveManager>
         playerTransformData = SaveManager.LoadObject<PlayerTransformData>(0);
         // 地图数据
         mapData = SaveManager.LoadObject<MapData>(0);
+        // 物品快捷栏
+        inventoryData = SaveManager.LoadObject<InventoryData>(0);
     }
 }
