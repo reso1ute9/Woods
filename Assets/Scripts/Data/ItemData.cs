@@ -12,8 +12,8 @@ public class ItemData
     public int configId;
     public IItemTypeData itemTypeData;
 
-    private ItemConfig config {
-        get => ConfigManager.Instance.GetConfig<ItemConfig>(ConfigName.Item);
+    public ItemConfig config {
+        get => ConfigManager.Instance.GetConfig<ItemConfig>(ConfigName.Item, configId);
     }
     
     public static ItemData CreateItemData(int configId) {
@@ -23,13 +23,13 @@ public class ItemData
         switch (itemData.config.itemType)
         {
             case ItemType.Weapon:
-                itemData.itemTypeData = new ItemWeaponData();
+                itemData.itemTypeData = new ItemWeaponData() { durability = 100 };
                 break;
             case ItemType.Consumable:
                 itemData.itemTypeData = new ItemConsumableData() { count = 1 };
                 break;
             case ItemType.Meterial:
-                itemData.itemTypeData = new ItemMeterialData() { count = 1 };
+                itemData.itemTypeData = new ItemMaterialData() { count = 1 };
                 break;
             default:
                 break;
@@ -43,16 +43,21 @@ public class ItemData
 public interface IItemTypeData {}
 
 // 武器接口类
-public class ItemWeaponData : IItemTypeData {}
+[Serializable]
+public class ItemWeaponData : IItemTypeData {
+    public int durability;          // 武器耐久度
+}
 
 // 消耗品接口类
+[Serializable]
 public class ItemConsumableData : IItemTypeData 
 {
-    public int count = 1;
+    public int count;
 }
 
 // 材料接口类
-public class ItemMeterialData : IItemTypeData 
+[Serializable]
+public class ItemMaterialData : IItemTypeData 
 {
-    public int count = 1;
+    public int count;
 }

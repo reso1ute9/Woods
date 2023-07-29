@@ -81,6 +81,17 @@ public class ArchiveManager : Singleton<ArchiveManager>
         SaveMapData();
         // 4. 初始化物品快捷栏数据, 默认14个快捷栏
         inventoryData = new InventoryData(14);
+
+        #region 物品快捷栏测试数据
+        inventoryData.itemDatas[0] = ItemData.CreateItemData(0);
+        (inventoryData.itemDatas[0].itemTypeData as ItemMaterialData).count = 10;
+        inventoryData.itemDatas[1] = ItemData.CreateItemData(1);
+        inventoryData.itemDatas[2] = ItemData.CreateItemData(2);
+        (inventoryData.itemDatas[2].itemTypeData as ItemWeaponData).durability = 60;
+        inventoryData.itemDatas[3] = ItemData.CreateItemData(3);
+        (inventoryData.itemDatas[3].itemTypeData as ItemConsumableData).count = 10;
+        #endregion
+        
         SaveInventoryData();
     }
 

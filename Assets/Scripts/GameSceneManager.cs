@@ -33,7 +33,7 @@ public class GameSceneManager : LogicManagerBase<GameSceneManager>
         MapManager.Instance.Init();
         MapManager.Instance.UpdateView(Player_Controller.Instance.transform);
         // 初始化物品快捷栏
-        UIManager.Instance.Show<UI_InventoryWindows>();
+        UIManager.Instance.Show<UI_InventoryWindow>();
     }
 
     #region  加载进度

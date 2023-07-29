@@ -20,7 +20,7 @@ public class ItemConfig : ConfigBase
     [LabelText("类型"), OnValueChanged(nameof(OnItemTypeChanged))] public ItemType itemType;
     [LabelText("名称")] public string itemName; 
     [LabelText("描述"), MultiLineProperty] public string descript;
-    [LabelText("图标")] public Sprite Icon;
+    [LabelText("图标")] public Sprite itemIcon;
     [LabelText("类型专属信息")] public IItemTypeInfo itemTypeInfo;
 
     // 当类型修改时自动生成同等类型应有的专属信息
@@ -33,7 +33,7 @@ public class ItemConfig : ConfigBase
                 itemTypeInfo = new ItemConsumableInfo();
                 break;
             case ItemType.Meterial:
-                itemTypeInfo = new ItemMeterialInfo();
+                itemTypeInfo = new ItemMaterialInfo();
                 break;
             default:
                 break;
@@ -55,6 +55,6 @@ public class ItemConsumableInfo: IItemTypeInfo {
 }
 
 // 材料类型信息
-public class ItemMeterialInfo: IItemTypeInfo {
+public class ItemMaterialInfo: IItemTypeInfo {
     [LabelText("堆积上限")] public int maxCount;
 }
