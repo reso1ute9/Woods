@@ -9,9 +9,9 @@ using JKFrame;
 public class UI_InventoryWindow : UI_WindowBase
 {
     private InventoryData inventoryData;
-    [SerializeField] UI_ItemSlots[] slots;          // 物品槽
-    [SerializeField] UI_ItemSlots weaponSlot;       // 装备槽
-
+    [SerializeField] public UI_ItemSlot[] slots;          // 物品槽
+    [SerializeField] public UI_ItemSlot weaponSlot;       // 装备槽
+    public Sprite[] bgSprite;                       // 框图
     
     public override void Init() {
         base.Init();
@@ -22,6 +22,7 @@ public class UI_InventoryWindow : UI_WindowBase
             slots[i].Init(i, this);
         }
         weaponSlot.Init(slots.Length, this);
+        UI_ItemSlot.weaponSlot = weaponSlot;
     }
 
     public override void OnShow() {
@@ -44,11 +45,22 @@ public class UI_InventoryWindow : UI_WindowBase
 
     }
 
+    // 从物品快捷栏中移除index处的格子
     public void RemoveItem(int index) {
-
+        // 判断是否为移除武器还是移除普通格子
+        if (index == inventoryData.itemDatas.Length) {
+            inventoryData.RemoveWeaponItem();
+        } else {
+            inventoryData.RemoveItem(index);
+        }
     }
 
     public void SetItem(int index, ItemData itemData) {
-
+        // 判断是否为为武器还是普通格子
+        if (index == inventoryData.itemDatas.Length) {
+            inventoryData.SetWeaponItem(itemData);
+        } else {
+            inventoryData.SetItem(index, itemData);
+        }
     }
 }

@@ -9,8 +9,8 @@ using System;
 public class InventoryData
 {
     // 物品快捷栏中装的物品
-    public ItemData[] itemDatas;  // { get; private set; }
-    public ItemData weaponSlotItemData; // { get; private set; }
+    public ItemData[] itemDatas { get; private set; }
+    public ItemData weaponSlotItemData { get; private set; }
 
     public InventoryData(int itemCount) {
         itemDatas = new ItemData[itemCount];
@@ -27,7 +27,7 @@ public class InventoryData
     }
 
     // 移除武器
-    public void RemoveWeaponItem(int index) {
+    public void RemoveWeaponItem() {
         weaponSlotItemData = null;
     }
 

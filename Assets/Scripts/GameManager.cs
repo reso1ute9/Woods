@@ -24,8 +24,13 @@ public class GameManager : SingletonMono<GameManager>
 
     #region 鼠标指针
     [SerializeField] Texture2D[] cursorTextures;
+    private CursorState currentCursorState = CursorState.Normal;
 
     public void SetCursorState(CursorState cursorState) {
+        if (currentCursorState == cursorState) {
+            return;
+        }
+        currentCursorState = cursorState;
         Texture2D tex = cursorTextures[(int) cursorState];
         Cursor.SetCursor(tex, Vector2.zero, CursorMode.Auto);
     }
