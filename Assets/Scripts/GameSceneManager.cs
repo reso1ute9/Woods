@@ -7,11 +7,27 @@ using JKFrame;
 // 游戏场景管理器
 public class GameSceneManager : LogicManagerBase<GameSceneManager>
 {
+    #region 测试逻辑
+    public bool isTest = true;
+    public bool isCreatNewArchive = true;
+    #endregion
+
     public bool IsInitialized { get; private set; }
     protected override void CancelEventListener() {}
     protected override void RegisterEventListener() {}
 
     private void Start() {
+        
+        #region 测试逻辑
+        if (isTest) {
+            if (isCreatNewArchive) {
+                ArchiveManager.Instance.CreateNewArchive(10, 1, 1, 0.75f);
+            } else {
+                ArchiveManager.Instance.LoadCurrentArchive();
+            }
+        }
+        #endregion 
+
         UIManager.Instance.CloseAll();
         StartGame();
     }
@@ -30,8 +46,8 @@ public class GameSceneManager : LogicManagerBase<GameSceneManager>
         // 初始化相机
         Camera_Controller.Instance.Init(mapSizeOnWorld);
         // 初始化地图+更新观察者位置
-        MapManager.Instance.Init();
         MapManager.Instance.UpdateView(Player_Controller.Instance.transform);
+        MapManager.Instance.Init();
         // 初始化物品快捷栏
         UIManager.Instance.Show<UI_InventoryWindow>();
     }

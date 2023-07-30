@@ -20,7 +20,7 @@ public class MapManager : SingletonMono<MapManager>
     private Transform viewer;                                       // 观察者
     private Vector3 lastViewerPosition = Vector3.one * -1;          // 观察者最后的位置, 用以控制地图是否进行刷新
     public Dictionary<Vector2Int, MapChunkController> mapChunkDict; // 全部已有的地图块
-    public float mapSizeOnWorld;                                    // 在世界中世界的地图尺寸
+    private float mapSizeOnWorld;                                    // 在世界中世界的地图尺寸
     private float chunkSizeOnWorld;                                 // 在世界中实际的地图块尺寸    
     public float UpdateVisibleChunkTime = 1.0f;                     // 地图更新最小时间
     private bool canUpdateChunk = true;                             // 地图是否能进行更新
@@ -66,15 +66,17 @@ public class MapManager : SingletonMono<MapManager>
         chunkSizeOnWorld = mapConfig.mapChunkSize * mapConfig.cellSize;
         mapSizeOnWorld = chunkSizeOnWorld * mapInitData.mapSize;
 
-        // 需要判断是否
+        // 需要判断是否需要加载之前的地图
         int mapChunkDataCount = mapData.MapChunkIndexList.Count;
         if (mapChunkDataCount > 0) {
             // 根据存档恢复整个地图状态
             for (int i = 0; i < mapChunkDataCount; i++) {
                 Serialization_Vector2 chunkIndex = mapData.MapChunkIndexList[i];
                 MapChunkData mapChunkData = ArchiveManager.Instance.GetMapChunkData(chunkIndex);
-                GenerateMapChunk(chunkIndex.ConverToSVector2Init(), mapChunkData);
+                GenerateMapChunk(chunkIndex.ConverToSVector2Init(), mapChunkData).gameObject.SetActive(false);
             }
+            // 更新目前可见地图块
+            DoUpdateVisibleChunk();
             // 进度条时间需要跟地图块生成数量关联
             for (int i = 0; i < mapChunkDataCount; i++) {
                 // 缓存一小段时间
@@ -82,8 +84,10 @@ public class MapManager : SingletonMono<MapManager>
                 GameSceneManager.Instance.UpdateMapProgress(i + 1, mapChunkDataCount);
             }
         } else {
+            // 更新目前可见地图块
+            DoUpdateVisibleChunk();
             // 进度条时间默认为加载九宫格时间
-            mapChunkDataCount = 9;
+            mapChunkDataCount = 10;
             for (int i = 0; i < mapChunkDataCount; i++) {
                 // 缓存一小段时间
                 yield return new WaitForSeconds(0.1f);
@@ -97,8 +101,11 @@ public class MapManager : SingletonMono<MapManager>
     }
 
     private void Update() {
+        // 当地图场景未加载好时不需要执行下面的操作
+        if (GameSceneManager.Instance.IsInitialized == false) {
+            return;
+        }
         UpdateVisibleChunk();
-
         if (Input.GetKeyDown(KeyCode.M)) {
             if (isShowMaping) {
                 CloseMapUI();
@@ -119,11 +126,17 @@ public class MapManager : SingletonMono<MapManager>
         if (viewer.position == lastViewerPosition || canUpdateChunk == false) {
             return;
         }
+        lastViewerPosition = viewer.position;
         // 更新地图UI坐标
         if (isShowMaping) {
             mapUI.UpdatePivot(viewer.position);
         }
+        // 更新目前可见地图块
+        DoUpdateVisibleChunk();
+    }
 
+    // 更新目前可见地图块
+    private void DoUpdateVisibleChunk() {
         // 当前观察者所在地图块
         Vector2Int currChunkIndex = GetMapChunkIndexByWorldPosition(viewer.position);
         // 关闭不需要显示的地图块
@@ -141,9 +154,6 @@ public class MapManager : SingletonMono<MapManager>
         int startY = currChunkIndex.y - mapConfig.viewDistance;
         for (int x = 0; x < 2 * mapConfig.viewDistance + 1; x++) {
             for (int y = 0; y < 2 * mapConfig.viewDistance + 1; y++) {
-                // 控制地图块刷新时间, 当时间间隔>=UpdateVisibleChunkTime时才可进行刷新
-                canUpdateChunk = false;
-                Invoke("ResetCanUpdateChunkFlag", UpdateVisibleChunkTime);
                 Vector2Int chunkIndex = new Vector2Int(startX + x, startY + y);
                 // 之前加载过则直接使用dict中cache的结果, 否则需要重新绘制, 需要注意由于
                 // 贴图是在协程中进行生成, 所以执行完毕后才算初始化完毕
@@ -158,6 +168,9 @@ public class MapManager : SingletonMono<MapManager>
                 }
             }
         }
+        // 控制地图块刷新时间, 当时间间隔>=UpdateVisibleChunkTime时才可进行刷新
+        canUpdateChunk = false;
+        Invoke(nameof(ResetCanUpdateChunkFlag), UpdateVisibleChunkTime);
     }
     
     // 通过世界坐标去获取地图块索引

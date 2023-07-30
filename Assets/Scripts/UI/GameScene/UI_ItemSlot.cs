@@ -8,7 +8,7 @@ using JKFrame;
 // 物品快捷栏中的格子
 public class UI_ItemSlot : MonoBehaviour
 {
-    [SerializeField] Image bgImg;                   // 格子背景图片
+    [SerializeField] public Image bgImg;                   // 格子背景图片
     [SerializeField] Image iconImg;                 // 格子里图标
     [SerializeField] Text countText;                // 格子中显示的数值
     
@@ -146,7 +146,6 @@ public class UI_ItemSlot : MonoBehaviour
         // 拖拽过程: 1. 将事件数据arg1的位置赋值给图标位置; 2. 保持鼠标形状
         GameManager.Instance.SetCursorState(CursorState.Handle);
         iconTransform.position = arg1.position;
-        // iconTransform
     }
 
     private void EndDrag(PointerEventData arg1, object[] arg2) {
