@@ -6,12 +6,14 @@ using JKFrame;
 
 public class ArchiveManager : Singleton<ArchiveManager>
 {
-    public PlayerTransformData playerTransformData { get; private set; }
-    public MapInitData mapInitData { get; private set; }
-    public MapData mapData { get; private set; }
-    public InventoryData inventoryData { get; private set; }
-    public bool haveArchive { get; private set; }           // 判断当前情况是否有存档
+    public PlayerTransformData playerTransformData { get; private set; }    // 当前存档玩家数据
+    public MapInitData mapInitData { get; private set; }                    // 当前存档地图初始化参数
+    public MapData mapData { get; private set; }                            // 当前存档地图数据
+    public InventoryData inventoryData { get; private set; }                // 当前存档物品快捷栏数据
+    public TimeData timeData { get; private set; }                          // 当前存档时间数据
+    public bool haveArchive { get; private set; }                           // 判断当前情况是否有存档
     
+
     public ArchiveManager() {
         LoadSaveData();
     }
@@ -21,6 +23,11 @@ public class ArchiveManager : Singleton<ArchiveManager>
         // 单存档情况下默认获取
         SaveItem saveItem = SaveManager.GetSaveItem(0);
         haveArchive = (saveItem != null);
+    }
+
+    // 保存时间数据
+    public void SaveTimeData() {
+        SaveManager.SaveObject(timeData);
     }
 
     // 保存物品快捷栏数据
@@ -93,6 +100,15 @@ public class ArchiveManager : Singleton<ArchiveManager>
         #endregion
         
         SaveInventoryData();
+        
+        // 5. 初始化时间数据
+        TimeConfig timeConfig = ConfigManager.Instance.GetConfig<TimeConfig>(ConfigName.Time);
+        timeData = new TimeData {
+            stateIndex = 0, 
+            calcTime = timeConfig.timeStateConfig[1].durationTime, 
+            dayNum = 0
+        };
+        SaveTimeData();
     }
 
     // 加载当前存档
@@ -105,5 +121,7 @@ public class ArchiveManager : Singleton<ArchiveManager>
         mapData = SaveManager.LoadObject<MapData>(0);
         // 物品快捷栏
         inventoryData = SaveManager.LoadObject<InventoryData>(0);
+        // 时间数据
+        timeData = SaveManager.LoadObject<TimeData>(0);
     }
 }

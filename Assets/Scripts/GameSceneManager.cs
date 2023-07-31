@@ -50,6 +50,8 @@ public class GameSceneManager : LogicManagerBase<GameSceneManager>
         MapManager.Instance.Init();
         // 初始化物品快捷栏
         UIManager.Instance.Show<UI_InventoryWindow>();
+        // 初始化时间系统
+        TimeManager.Instance.Init();
     }
 
     #region  加载进度
