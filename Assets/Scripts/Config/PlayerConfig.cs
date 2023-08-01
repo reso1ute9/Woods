@@ -1,6 +1,8 @@
 using UnityEngine;
 using Sirenix.OdinInspector;
 using JKFrame;
+using System.Collections.Generic;
+
 
 // 玩家杂七杂八的配置
 [CreateAssetMenu(fileName = "角色配置", menuName = "Config/角色配置")]
@@ -26,5 +28,10 @@ public class PlayerConfig : ConfigBase
     public AudioClip[] footstepAudioClips;                // 脚步音效
     [FoldoutGroup("角色音效资源"), LabelText("脚步音量")]
     public float footstepVolume = 0.5f;                   // 脚步音效音量
+    #endregion
+
+    #region 杂项
+    [FoldoutGroup("杂项"), LabelText("音效配置")]    
+    public Dictionary<AudioType, AudioClip> AudioClipDict; // 音效配置字典
     #endregion
 }
