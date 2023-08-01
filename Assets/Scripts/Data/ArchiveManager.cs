@@ -6,7 +6,8 @@ using JKFrame;
 
 public class ArchiveManager : Singleton<ArchiveManager>
 {
-    public PlayerTransformData playerTransformData { get; private set; }    // 当前存档玩家数据
+    public PlayerTransformData playerTransformData { get; private set; }    // 当前存档玩家位置数据
+    public PlayerMainData playerMainData { get; private set; }              // 当前存档玩家主要数据
     public MapInitData mapInitData { get; private set; }                    // 当前存档地图初始化参数
     public MapData mapData { get; private set; }                            // 当前存档地图数据
     public InventoryData inventoryData { get; private set; }                // 当前存档物品快捷栏数据
@@ -38,6 +39,11 @@ public class ArchiveManager : Singleton<ArchiveManager>
     // 保存玩家位置数据存档到磁盘上
     public void SavePlayerTransformData() {
         SaveManager.SaveObject(playerTransformData);
+    }
+
+    // 保存玩家主要属性到磁盘上
+    public void SavePlayerMainData() {
+        SaveManager.SaveObject(playerMainData);
     }
 
     // 保存地图数据
@@ -75,7 +81,7 @@ public class ArchiveManager : Singleton<ArchiveManager>
             marshLimit = marshLimit
         };
         SaveManager.SaveObject(mapInitData);
-        // 2. 存储玩家初始化数据
+        // 2. 存储玩家初始化数据: 1. 位置数据； 2. 血量、饱食度
         MapConfig mapConfig = ConfigManager.Instance.GetConfig<MapConfig>(ConfigName.Map);
         float mapSizeOnWorld = mapSize * mapConfig.mapChunkSize * mapConfig.cellSize;
         playerTransformData = new PlayerTransformData() {
@@ -83,6 +89,14 @@ public class ArchiveManager : Singleton<ArchiveManager>
             rotation = Vector3.zero
         };
         SavePlayerTransformData();
+
+        PlayerConfig playerConfig = ConfigManager.Instance.GetConfig<PlayerConfig>(ConfigName.Player);
+        playerMainData = new PlayerMainData() {
+            hp = playerConfig.maxHP,
+            hungry = playerConfig.maxHungry
+        };
+        SavePlayerMainData();
+
         // 3. 地图数据
         mapData = new MapData();
         SaveMapData();
@@ -106,7 +120,7 @@ public class ArchiveManager : Singleton<ArchiveManager>
         timeData = new TimeData {
             stateIndex = 0, 
             calcTime = timeConfig.timeStateConfig[1].durationTime, 
-            dayNum = 0
+            dayNum = 1
         };
         SaveTimeData();
     }
@@ -117,6 +131,7 @@ public class ArchiveManager : Singleton<ArchiveManager>
         mapInitData = SaveManager.LoadObject<MapInitData>(0);
         // 玩家数据
         playerTransformData = SaveManager.LoadObject<PlayerTransformData>(0);
+        playerMainData = SaveManager.LoadObject<PlayerMainData>(0);
         // 地图数据
         mapData = SaveManager.LoadObject<MapData>(0);
         // 物品快捷栏

@@ -1,3 +1,4 @@
+using System.Security.Cryptography.X509Certificates;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,4 +21,12 @@ public class PlayerTransformData
         get => sv_rotation.ConverToVector3(); 
         set => sv_rotation = value.ConverToSVector3();
     }
+}
+
+// 玩家主要数据: 生命值、饱食度
+[Serializable]
+public class PlayerMainData 
+{
+    public float hp;
+    public float hungry;
 }

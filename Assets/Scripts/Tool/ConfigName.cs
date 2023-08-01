@@ -8,5 +8,6 @@ public static class ConfigName
     public static string Map = "Map";
     public static string Item = "Item";
     public static string Time = "Time";
+    public static string Player = "Player";
 }
 

@@ -67,6 +67,8 @@ public class TimeManager : LogicManagerBase<TimeManager>
     private void EnterNextState() {
         // 更新状态索引、天数、当前状态剩余时间
         timeData.stateIndex = nextIndex;
+        // 触发是否为白天的状态
+        EventManager.EventTrigger<bool>(EventName.UpdateTimeState, timeData.stateIndex <= 1);
         nextIndex = (timeData.stateIndex + 1 >= timeConfig.timeStateConfig.Length) ? 0 : timeData.stateIndex + 1;
         if (timeData.stateIndex == 0) {
             timeData.dayNum += 1;
@@ -80,9 +82,7 @@ public class TimeManager : LogicManagerBase<TimeManager>
         if (timeConfig.timeStateConfig[timeData.stateIndex].bgAudioClip != null) {
             StartCoroutine(ChangeBGAudio(timeConfig.timeStateConfig[timeData.stateIndex].bgAudioClip));
         }
-        // 触发是否为白天的状态
-        EventManager.EventTrigger<bool>(EventName.UpdateTimeState, timeData.stateIndex <= 1);
-    }
+        }
 
     private void SetLight(Quaternion rotation, Color color, float intensity) {
         // 设置阳光强度/角度/颜色

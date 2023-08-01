@@ -41,18 +41,24 @@ public class GameSceneManager : LogicManagerBase<GameSceneManager>
         // 确定地图初始化配置数据
         MapConfig mapConfig = ConfigManager.Instance.GetConfig<MapConfig>(ConfigName.Map);
         float mapSizeOnWorld = ArchiveManager.Instance.mapInitData.mapSize * mapConfig.mapChunkSize * mapConfig.cellSize;
-        // 初始化角色
-        Player_Controller.Instance.Init(mapSizeOnWorld);
         // 初始化相机
         Camera_Controller.Instance.Init(mapSizeOnWorld);
         // 初始化地图+更新观察者位置
         MapManager.Instance.UpdateView(Player_Controller.Instance.transform);
         MapManager.Instance.Init();
-        // 初始化物品快捷栏
+        // 显示物品快捷栏UI
         UIManager.Instance.Show<UI_InventoryWindow>();
+        /*** 显示游戏页面中昼夜/血量/饥饿值显示UI
+        * 依赖关系:
+        * 1. TimeManager.Instance.Init(): 初始化时间相关UI
+        * 2. Player_Controller.Instance.Init(mapSizeOnWorld): 初始化角色相关UI
+        ***/
+        UIManager.Instance.Show<UI_MainInfoWindow>();
         // 初始化时间系统
         TimeManager.Instance.Init();
-    }
+        // 初始化角色
+        Player_Controller.Instance.Init(mapSizeOnWorld);
+    }    
 
     #region  加载进度
     private UI_GameLoadingWindow loadingWindow;
