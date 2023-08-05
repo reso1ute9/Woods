@@ -41,8 +41,19 @@ public class UI_InventoryWindow : UI_WindowBase
         weaponSlot.InitData(data.weaponSlotItemData);
     }
 
-    public void AddItem() {
+    // 添加物品
+    public void AddItem(int configId) {
+        bool res = AddItemForLogic(configId);
+        if (res) {
+            ProjectTool.PlayerAudio(AudioType.Bag);
+        } else {
+            ProjectTool.PlayerAudio(AudioType.Fail);
+        }
+    }
 
+    // 逻辑层面添加物品
+    public bool AddItemForLogic(int configId) {
+        return false;
     }
 
     // 从物品快捷栏中移除index处的格子
