@@ -29,9 +29,17 @@ public class UI_InventoryWindow : UI_WindowBase
         base.OnShow();
         // 根据存档复原物品快捷栏格子
         InitData(inventoryData);
-
     }
 
+    public void Update() {
+        #region 测试逻辑
+        if (Input.GetKeyDown(KeyCode.Alpha0)) AddItem(0);
+        if (Input.GetKeyDown(KeyCode.Alpha1)) AddItem(1);
+        if (Input.GetKeyDown(KeyCode.Alpha2)) AddItem(2);
+        if (Input.GetKeyDown(KeyCode.Alpha3)) AddItem(3);
+        #endregion
+    }
+    
     // 初始化物品快捷栏所有格子UI界面
     private void InitData(InventoryData data) {
         for (int i = 0; i < data.itemDatas.Length; i++) {
@@ -53,6 +61,68 @@ public class UI_InventoryWindow : UI_WindowBase
 
     // 逻辑层面添加物品
     public bool AddItemForLogic(int configId) {
+        ItemConfig itemConfig = ConfigManager.Instance.GetConfig<ItemConfig>(ConfigName.Item, configId);
+        switch (itemConfig.itemType) {
+            case ItemType.Weapon:
+                // 武器只能放空位
+                return CheckAndAddItemForEmptySlot(configId);
+            case ItemType.Consumable:
+                // 消耗品优先堆叠, 当消耗品数量达到堆叠上限时再选择空格子进行放置
+                if (CheckAndPileItemForSlot(configId)) {
+                    return true;
+                } else {
+                    return CheckAndAddItemForEmptySlot(configId);
+                }
+            case ItemType.Meterial:
+                // 材料优先堆叠, 当消耗品数量达到堆叠上限时再选择空格子进行放置
+                if (CheckAndPileItemForSlot(configId)) {
+                    return true;
+                } else {
+                    return CheckAndAddItemForEmptySlot(configId);
+                }
+            default:
+                break;
+        }
+        return false;
+    }
+
+    // 检查和添加物品到空格子
+    private bool CheckAndAddItemForEmptySlot(int configId) {
+        int index = GetEmptySlot();
+        if (index >= 0) {
+            SetItem(index, ItemData.CreateItemData(configId));
+        }
+        return false;
+    }
+
+    // 得到一个空格子, return -1代表没有空格子
+    private int GetEmptySlot() {
+        for (int i = 0; i < slots.Length; i++) {
+            if (slots[i].itemData == null) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    // 检测并堆放物体到格子上
+    private bool CheckAndPileItemForSlot(int configId) {
+        for (int i = 0; i < slots.Length; i++) {
+            // 当前格子不为空 & 物品类型一致
+            if (slots[i].itemData != null && 
+                slots[i].itemData.configId == configId
+            ) {
+                // 是否到达堆叠上限
+                PileItemTypeDataBase data = slots[i].itemData.itemTypeData as PileItemTypeDataBase;
+                PileItemTypeInfoBase info = slots[i].itemData.config.itemTypeInfo as PileItemTypeInfoBase;
+                if (data.count < info.maxCount) {
+                    data.count += 1;
+                    // 刷新物品UI数值
+                    slots[i].UpdateNumTextView();
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -70,8 +140,10 @@ public class UI_InventoryWindow : UI_WindowBase
         // 判断是否为为武器还是普通格子
         if (index == inventoryData.itemDatas.Length) {
             inventoryData.SetWeaponItem(itemData);
+            weaponSlot.InitData(itemData);
         } else {
             inventoryData.SetItem(index, itemData);
+            slots[index].InitData(itemData);
         }
     }
 }

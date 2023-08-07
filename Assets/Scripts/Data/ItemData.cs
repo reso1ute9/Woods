@@ -1,8 +1,10 @@
+using System.Reflection.Emit;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using JKFrame;
 using System;
+using Sirenix.OdinInspector;
 
 
 // 玩家物品的动态数据
@@ -42,6 +44,12 @@ public class ItemData
 // 物品数据接口类
 public interface IItemTypeData {}
 
+// 设置抽象类对可堆放物品进行进一步抽象
+[Serializable]
+public abstract class PileItemTypeDataBase {
+    public int count;               // 当前可堆叠物品数量
+}
+
 // 武器接口类
 [Serializable]
 public class ItemWeaponData : IItemTypeData {
@@ -50,14 +58,10 @@ public class ItemWeaponData : IItemTypeData {
 
 // 消耗品接口类
 [Serializable]
-public class ItemConsumableData : IItemTypeData 
-{
-    public int count;
+public class ItemConsumableData : PileItemTypeDataBase, IItemTypeData {
 }
 
 // 材料接口类
 [Serializable]
-public class ItemMaterialData : IItemTypeData 
-{
-    public int count;
+public class ItemMaterialData : PileItemTypeDataBase, IItemTypeData {
 }

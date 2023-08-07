@@ -1,9 +1,13 @@
+using System;
+using System.Security.AccessControl;
+using System.Diagnostics;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using JKFrame;
+
 
 // 物品快捷栏中的格子
 public class UI_ItemSlot : MonoBehaviour
@@ -56,13 +60,13 @@ public class UI_ItemSlot : MonoBehaviour
             switch (itemData.config.itemType)
             {
                 case ItemType.Weapon:
-                    Debug.Log("可以使用" + itemData.config.itemName);
+                    UnityEngine.Debug.Log("可以使用" + itemData.config.itemName);
                     break;
                 case ItemType.Consumable:
-                    Debug.Log("可以使用" + itemData.config.itemName);
+                    UnityEngine.Debug.Log("可以使用" + itemData.config.itemName);
                     break;
                 default:
-                    Debug.Log("无法使用");
+                    UnityEngine.Debug.Log("无法使用");
                     break;
             }
         }
@@ -74,7 +78,7 @@ public class UI_ItemSlot : MonoBehaviour
         this.ownerWindow = ownerWindow;
     }
 
-    // 初始化格子中的数据
+    // 初始化格子中的数据并刷新数值UI
     public void InitData(ItemData itemData = null) {
         this.itemData = itemData;
         // 如果数据为空则是空格子
@@ -92,9 +96,13 @@ public class UI_ItemSlot : MonoBehaviour
         countText.gameObject.SetActive(true);
         iconImg.gameObject.SetActive(true);
         iconImg.sprite = itemData.config.itemIcon;
+        // 更新
+        UpdateNumTextView();
+    }
+
+    public void UpdateNumTextView() {
         // 根据不同的物品类型显示不同的效果
-        switch (itemData.config.itemType)
-        {
+        switch (itemData.config.itemType) {
             case ItemType.Weapon:
                 bgImg.color = Color.white;
                 countText.text = (itemData.itemTypeData as ItemWeaponData).durability.ToString() + "%";
@@ -166,7 +174,7 @@ public class UI_ItemSlot : MonoBehaviour
             UIManager.Instance.AddTips("只能放入武器");
             return;
         } else {
-            Debug.Log("可以装备物品:" + itemData.config.itemName);
+            UnityEngine.Debug.Log("可以装备物品:" + itemData.config.itemName);
         }
         // 检查拖拽结束时物品在不在格子上
         if (currentMouseEnterSlot == null) {
@@ -187,23 +195,23 @@ public class UI_ItemSlot : MonoBehaviour
             // 从存档里去除这份数据
             // TOOD: 物品掉落在地上
             // TODO: 将数据传递给地图块, 可能存在销毁的情况
-            Debug.Log("物品掉落在地上" + itemData.config.itemName);
+            UnityEngine.Debug.Log("物品掉落在地上" + itemData.config.itemName);
             // 物品移走时需要重新初始化当前格子
             InitData(null);
         } else {
-            // 交换或放入格子
-            ItemData dragItem = itemData;
-            ItemData targetItem = currentMouseEnterSlot.itemData;
-            // 更改格子内部数据
-            InitData(targetItem);
-            currentMouseEnterSlot.InitData(dragItem);
-            // 注意: 有可能是跨窗口, 比如快捷栏和仓库
-            // 更改物品快捷栏UI内容
-            ownerWindow.SetItem(index, targetItem);
-            currentMouseEnterSlot.ownerWindow.SetItem(currentMouseEnterSlot.index, dragItem);
+            // 交换物品槽中的物品
+            SwapSlotItem(this, currentMouseEnterSlot);
         }
         // 更新存档
         ArchiveManager.Instance.SaveInventoryData();
+    }
+
+    // 交换物品槽中的数据并刷新物品槽UI
+    public static void SwapSlotItem(UI_ItemSlot slot1, UI_ItemSlot slot2) {
+        ItemData itemData1 = slot1.itemData;
+        ItemData itemData2 = slot2.itemData;
+        slot1.ownerWindow.SetItem(slot1.index, itemData2);
+        slot2.ownerWindow.SetItem(slot2.index, itemData1);
     }
     #endregion 
 }

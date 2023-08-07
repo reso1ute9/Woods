@@ -44,17 +44,24 @@ public class ItemConfig : ConfigBase
 // 物品类型信息接口
 public interface IItemTypeInfo {}
 
+// 设置抽象类对可堆放物品进行进一步抽象
+[Serializable]
+public abstract class PileItemTypeInfoBase {
+    [LabelText("堆叠上限")] public int maxCount;
+}
+
 // 武器类型信息
+[Serializable]
 public class ItemWeaponInfo: IItemTypeInfo {
     [LabelText("攻击力")] public float attackValue;
 }
 
 // 消耗品类型信息
-public class ItemConsumableInfo: IItemTypeInfo {
-    [LabelText("堆积上限")] public int maxCount;
+[Serializable]
+public class ItemConsumableInfo: PileItemTypeInfoBase, IItemTypeInfo {
 }
 
 // 材料类型信息
-public class ItemMaterialInfo: IItemTypeInfo {
-    [LabelText("堆积上限")] public int maxCount;
+[Serializable]
+public class ItemMaterialInfo: PileItemTypeInfoBase, IItemTypeInfo {
 }
