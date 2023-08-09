@@ -127,12 +127,33 @@ public class UI_InventoryWindow : UI_WindowBase
     }
 
     // 从物品快捷栏中移除index处的格子
-    public void RemoveItem(int index) {
+    private void RemoveItem(int index) {
         // 判断是否为移除武器还是移除普通格子
         if (index == inventoryData.itemDatas.Length) {
             inventoryData.RemoveWeaponItem();
+            weaponSlot.InitData(null);
         } else {
             inventoryData.RemoveItem(index);
+            slots[index].InitData(null);
+        }
+    }
+
+    // 丢掉一件物品
+    public void DiscardItem(int index) {
+        // 如果是武器直接丢弃
+        if (index == slots.Length || slots[index].itemData.config.itemType == ItemType.Weapon) {
+            RemoveItem(index);
+            return;
+        }
+        // 根据类型去判断, 对于可堆积的物品每次减少一个
+        ItemData itemData = slots[index].itemData;
+        // 当进入到这里时一定时消耗品
+        PileItemTypeDataBase typeData = itemData.itemTypeData as PileItemTypeDataBase;
+        typeData.count -= 1;
+        if (typeData.count == 0) {
+            RemoveItem(index);
+        } else {
+            slots[index].UpdateNumTextView();
         }
     }
 

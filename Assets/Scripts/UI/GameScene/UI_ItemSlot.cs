@@ -10,7 +10,7 @@ using JKFrame;
 
 
 // 物品快捷栏中的格子
-public class UI_ItemSlot : MonoBehaviour
+public class  UI_ItemSlot : MonoBehaviour
 {
     [SerializeField] public Image bgImg;                   // 格子背景图片
     [SerializeField] Image iconImg;                 // 格子里图标
@@ -163,21 +163,6 @@ public class UI_ItemSlot : MonoBehaviour
         if (currentMouseEnterSlot == null) {
             // 鼠标形状恢复
             GameManager.Instance.SetCursorState(CursorState.Normal);
-        }
-        // 拖拽中的图标复原
-        iconTransform.SetParent(slotTransform);
-        iconTransform.localPosition = Vector3.zero;         // 归到中心点
-        // 如果拖拽到自己原本格子中
-        if (currentMouseEnterSlot == this) return;
-        // 检查当前格子类型是否满足拖入要求, 例如消耗品不能拖入武器栏
-        if (currentMouseEnterSlot == weaponSlot && itemData.config.itemType != ItemType.Weapon) {
-            UIManager.Instance.AddTips("只能放入武器");
-            return;
-        } else {
-            UnityEngine.Debug.Log("可以装备物品:" + itemData.config.itemName);
-        }
-        // 检查拖拽结束时物品在不在格子上
-        if (currentMouseEnterSlot == null) {
             // 如果目标没有格子, 但是是UI物体, 可以无视
             // if (EventSystem.current.IsPointerOverGameObject()) return;
             // 使用射线去检测是否放到了地面上
@@ -196,11 +181,29 @@ public class UI_ItemSlot : MonoBehaviour
             // TOOD: 物品掉落在地上
             // TODO: 将数据传递给地图块, 可能存在销毁的情况
             UnityEngine.Debug.Log("物品掉落在地上" + itemData.config.itemName);
-            // 物品移走时需要重新初始化当前格子
-            InitData(null);
+            // 丢弃一件物品, 注意数据/UI/音效需要同步
+            ProjectTool.PlayerAudio(AudioType.Bag);
+            ownerWindow.DiscardItem(index);
+        }
+        // 拖拽到格子后的图标需要复原
+        iconTransform.SetParent(slotTransform);
+        iconTransform.localPosition = Vector3.zero;
+        // 如果拖拽到自己原本格子中
+        if (currentMouseEnterSlot == this) return;
+        // 检查当前格子类型是否满足拖入要求, 例如消耗品不能拖入武器栏
+        if (currentMouseEnterSlot == weaponSlot) {
+            if (itemData.config.itemType != ItemType.Weapon) {
+                ProjectTool.PlayerAudio(AudioType.Fail);
+                UIManager.Instance.AddTips("只能放入武器");
+                return;
+            } else {
+                ProjectTool.PlayerAudio(AudioType.TakeUpWeapon);
+                UnityEngine.Debug.Log("可以装备物品:" + itemData.config.itemName);
+                SwapSlotItem(this, currentMouseEnterSlot);
+                return;
+            }
         } else {
-            // 交换物品槽中的物品
-            SwapSlotItem(this, currentMouseEnterSlot);
+
         }
         // 更新存档
         ArchiveManager.Instance.SaveInventoryData();
