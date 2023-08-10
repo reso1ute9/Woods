@@ -57,18 +57,20 @@ public class  UI_ItemSlot : MonoBehaviour
     private void CheckMouseRightClick() {
         if (itemData == null) return;
         if (isMouseStay && Input.GetMouseButtonDown(1)) {
-            switch (itemData.config.itemType)
-            {
-                case ItemType.Weapon:
-                    UnityEngine.Debug.Log("可以使用" + itemData.config.itemName);
-                    break;
-                case ItemType.Consumable:
-                    UnityEngine.Debug.Log("可以使用" + itemData.config.itemName);
-                    break;
-                default:
-                    UnityEngine.Debug.Log("无法使用");
-                    break;
-            }
+            // switch (itemData.config.itemType) {
+            //     case ItemType.Weapon:
+            //         UnityEngine.Debug.Log("可以使用" + itemData.config.itemName);
+            //         break;
+            //     case ItemType.Consumable:
+            //         UnityEngine.Debug.Log("可以使用" + itemData.config.itemName);
+            //         break;
+            //     default:
+            //         UnityEngine.Debug.Log("无法使用");
+            //         break;
+            // }
+            // 根据使用情况播放音效
+            AudioType resultAudioType = ownerWindow.UseItem(index);
+            ProjectTool.PlayerAudio(resultAudioType);
         }
     }
 

@@ -59,6 +59,55 @@ public class UI_InventoryWindow : UI_WindowBase
         }
     }
 
+    // 使用物品
+    public AudioType UseItem(int index) {
+        // TODO: 玩家的状态不一定能使用物品
+        if (Player_Controller.Instance.canUseItem == false) {
+            return AudioType.PlayerConnot;
+        }
+        // 1. 武器物品栏
+        if (index == slots.Length) {
+            int emptySlotIndex = GetEmptySlot();
+            if (emptySlotIndex >= 0) {
+                UI_ItemSlot.SwapSlotItem(weaponSlot, slots[emptySlotIndex]);
+                return AudioType.TakeDownWeapon;
+            } else {
+                return AudioType.Fail;
+            }
+        }
+        // 2. 普通物品栏
+        ItemData itemData = slots[index].itemData;
+        switch (itemData.config.itemType) {
+            case ItemType.Weapon:
+                // 使用武器
+                UI_ItemSlot.SwapSlotItem(slots[index], weaponSlot);
+                return AudioType.TakeUpWeapon;
+            case ItemType.Consumable:
+                // 使用消耗品
+                ItemConsumableInfo info = itemData.config.itemTypeInfo as ItemConsumableInfo;
+                if (info.recoverHP != 0) {
+                    Player_Controller.Instance.RecoverHP(info.recoverHP);
+                }
+                if (info.recoverHungry != 0) {
+                    Player_Controller.Instance.RecoverHungry(info.recoverHungry);
+                }
+                ItemConsumableData data = itemData.itemTypeData as ItemConsumableData;
+                data.count -= 1;
+                if (data.count == 0) {
+                    RemoveItem(index);
+                } else {
+                    slots[index].UpdateNumTextView();
+                }
+                return AudioType.ConsumableOK;
+            case ItemType.Meterial:
+                // 使用材料
+                return AudioType.Fail;
+            default:
+                return AudioType.Fail;
+        }
+
+    }
+
     // 逻辑层面添加物品
     public bool AddItemForLogic(int configId) {
         ItemConfig itemConfig = ConfigManager.Instance.GetConfig<ItemConfig>(ConfigName.Item, configId);

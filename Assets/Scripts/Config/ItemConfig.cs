@@ -59,6 +59,8 @@ public class ItemWeaponInfo: IItemTypeInfo {
 // 消耗品类型信息
 [Serializable]
 public class ItemConsumableInfo: PileItemTypeInfoBase, IItemTypeInfo {
+    [LabelText("恢复生命值")] public float recoverHP;
+    [LabelText("恢复饱食度")] public float recoverHungry;
 }
 
 // 材料类型信息

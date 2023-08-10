@@ -27,7 +27,7 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
     public Transform playerTransform { get; private set; }
     public Vector2 positionXScope { get; private set; }               // 相机能移动的X轴范围
     public Vector2 positionZScope { get; private set; }               // 相机能移动的Y轴范围
-
+    public bool canUseItem { get; private set; } = true;              // 玩家当前是否能使用物品
     
 
     #region 存档相关数据
@@ -95,12 +95,26 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
         }
     }
 
+    // 触发更新生命值事件, 当生命值发生变动时需要触发更新事件
     private void TriggerUpdateHPEvent() {
         EventManager.EventTrigger(EventName.UpdatePlayerHP, playerMainData.hp);
     }
 
+    // 触发更新饱食度事件, 当饱食度发生变动时需要触发更新事件
     private void TriggerUpdateHungryEvent() {
         EventManager.EventTrigger(EventName.UpdatePlayerHungry, playerMainData.hungry);
+    }
+
+    // 恢复生命值
+    public void RecoverHP(float value) {
+        playerMainData.hp = Mathf.Clamp(playerMainData.hp + value, 0, playerConfig.maxHP);
+        TriggerUpdateHPEvent();
+    }
+
+    // 恢复饱食度
+    public void RecoverHungry(float value) {
+        playerMainData.hungry = Mathf.Clamp(playerMainData.hungry + value, 0, playerConfig.maxHungry);
+        TriggerUpdateHungryEvent();
     }
 
     // 场景切换或关闭时将存档数据写入磁盘
