@@ -184,26 +184,41 @@ public class  UI_ItemSlot : MonoBehaviour
             // 丢弃一件物品, 注意数据/UI/音效需要同步
             ProjectTool.PlayerAudio(AudioType.Bag);
             ownerWindow.DiscardItem(index);
+            return;
         }
         // 拖拽到格子后的图标需要复原
         iconTransform.SetParent(slotTransform);
         iconTransform.localPosition = Vector3.zero;
         // 如果拖拽到自己原本格子中
         if (currentMouseEnterSlot == this) return;
-        // 检查当前格子类型是否满足拖入要求, 例如消耗品不能拖入武器栏
+        // 判断拖入的格子类型
         if (currentMouseEnterSlot == weaponSlot) {
+            // 当前进入的是武器格子
             if (itemData.config.itemType != ItemType.Weapon) {
                 ProjectTool.PlayerAudio(AudioType.Fail);
                 UIManager.Instance.AddTips("只能放入武器");
-                return;
             } else {
                 ProjectTool.PlayerAudio(AudioType.TakeUpWeapon);
                 UnityEngine.Debug.Log("可以装备物品:" + itemData.config.itemName);
                 SwapSlotItem(this, currentMouseEnterSlot);
-                return;
             }
         } else {
-
+            // 当前进入是普通格子
+            if (itemData.config.itemType != ItemType.Weapon) {
+                ProjectTool.PlayerAudio(AudioType.Bag);
+                UnityEngine.Debug.Log("交换物品:" + itemData.config.itemName);
+                SwapSlotItem(this, currentMouseEnterSlot);
+            } else {
+                if (currentMouseEnterSlot.itemData == null) {
+                    ProjectTool.PlayerAudio(AudioType.TakeDownWeapon);
+                    UnityEngine.Debug.Log("脱下装备:" + itemData.config.itemName);
+                    SwapSlotItem(this, currentMouseEnterSlot);
+                }
+                else {
+                    ProjectTool.PlayerAudio(AudioType.Fail);
+                    UnityEngine.Debug.Log("装备无法放入已经存在物品的格子中:" + itemData.config.itemName);
+                }
+            }
         }
         // 更新存档
         ArchiveManager.Instance.SaveInventoryData();
