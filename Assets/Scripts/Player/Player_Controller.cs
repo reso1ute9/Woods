@@ -77,7 +77,9 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
     private void PlayAudioOnFootstep(int index) {
         AudioManager.Instance.PlayOnShot(playerConfig.footstepAudioClips[index], playerTransform.position, playerConfig.footstepVolume);
     }
+    
 
+    #region 核心数值
     // 计算当前角色饱食度
     private void CalculateHungryOnUpdate() {
         if (playerMainData.hungry > 0) {
@@ -95,16 +97,6 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
         }
     }
 
-    // 触发更新生命值事件, 当生命值发生变动时需要触发更新事件
-    private void TriggerUpdateHPEvent() {
-        EventManager.EventTrigger(EventName.UpdatePlayerHP, playerMainData.hp);
-    }
-
-    // 触发更新饱食度事件, 当饱食度发生变动时需要触发更新事件
-    private void TriggerUpdateHungryEvent() {
-        EventManager.EventTrigger(EventName.UpdatePlayerHungry, playerMainData.hungry);
-    }
-
     // 恢复生命值
     public void RecoverHP(float value) {
         playerMainData.hp = Mathf.Clamp(playerMainData.hp + value, 0, playerConfig.maxHP);
@@ -116,6 +108,48 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
         playerMainData.hungry = Mathf.Clamp(playerMainData.hungry + value, 0, playerConfig.maxHungry);
         TriggerUpdateHungryEvent();
     }
+
+    // 触发更新生命值事件, 当生命值发生变动时需要触发更新事件
+    private void TriggerUpdateHPEvent() {
+        EventManager.EventTrigger(EventName.UpdatePlayerHP, playerMainData.hp);
+    }
+
+    // 触发更新饱食度事件, 当饱食度发生变动时需要触发更新事件
+    private void TriggerUpdateHungryEvent() {
+        EventManager.EventTrigger(EventName.UpdatePlayerHungry, playerMainData.hungry);
+    }
+    #endregion
+
+    #region 武器相关
+    private ItemData currentWeaponItemData;
+    private GameObject currentWeaponGameObject;
+    // 修改武器: 武器数值、动画、图标等
+    public void ChangeWeapon(ItemData newWeapon) {
+        // 如果没有切换武器
+        if (currentWeaponItemData == newWeapon) {
+            return;
+        }
+        // 旧武器如果有数据, 则需要放回对象池进行回收
+        if (currentWeaponItemData != null) {
+            currentWeaponGameObject.JKGameObjectPushPool();     // 放进对象池时是基于GameObject.name的, 因此不能重名
+        }
+        // 新武器如果!=null则需要更新武器模型, 否则角色应该切换为空手状态
+        currentWeaponItemData = newWeapon;
+        if (newWeapon != null) {
+            ItemWeaponInfo itemWeaponInfo = newWeapon.config.itemTypeInfo as ItemWeaponInfo;
+            // 设置新武器模型: 武器位置、角度、动画
+            currentWeaponGameObject = PoolManager.Instance.GetGameObject(itemWeaponInfo.prefabOnPlayer, playerModel.weaponRoot);
+            currentWeaponGameObject.transform.localPosition = itemWeaponInfo.positionOnPlayer;
+            currentWeaponGameObject.transform.localRotation = Quaternion.Euler(itemWeaponInfo.rotationOnPlayer);
+            animator.runtimeAnimatorController = itemWeaponInfo.animatorController;
+            // 需要重新激活一次动画, 动画会出错, 例如在移动中突然切换AnimatorController会不播放动画
+            stateMachine.ChangeState<Player_Idle>((int)PlayerState.Idle, true);
+        } else {
+            animator.runtimeAnimatorController = playerConfig.normalAnimatorController;
+            stateMachine.ChangeState<Player_Idle>((int)PlayerState.Idle, true);
+        }
+    }
+    #endregion
 
     // 场景切换或关闭时将存档数据写入磁盘
     private void OnDestroy() {

@@ -211,6 +211,8 @@ public class UI_InventoryWindow : UI_WindowBase
         if (index == inventoryData.itemDatas.Length) {
             inventoryData.SetWeaponItem(itemData);
             weaponSlot.InitData(itemData);
+            // 将武器数据同步给玩家
+            Player_Controller.Instance.ChangeWeapon(itemData);
         } else {
             inventoryData.SetItem(index, itemData);
             slots[index].InitData(itemData);
