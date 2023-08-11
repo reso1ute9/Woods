@@ -21,6 +21,8 @@ public class PlayerConfig : ConfigBase
     public float hungryReduceSpeed = 0.2f;        // 初设为5s掉1滴血
     [FoldoutGroup("角色配置"), LabelText("饱食度为0时玩家生命值衰减速度")]
     public float hpReduceSpeedOnHungryIsZero = 2.0f;
+    [FoldoutGroup("角色配置"), LabelText("默认动画状态机")]
+    public RuntimeAnimatorController normalAnimatorController;
     #endregion
 
     #region 角色音效资源

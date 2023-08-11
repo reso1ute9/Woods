@@ -111,6 +111,10 @@ public class ArchiveManager : Singleton<ArchiveManager>
         (inventoryData.itemDatas[2].itemTypeData as ItemWeaponData).durability = 60;
         inventoryData.itemDatas[3] = ItemData.CreateItemData(3);
         (inventoryData.itemDatas[3].itemTypeData as ItemConsumableData).count = 4;
+        inventoryData.itemDatas[4] = ItemData.CreateItemData(4);
+        (inventoryData.itemDatas[4].itemTypeData as ItemWeaponData).durability = 30;
+        inventoryData.itemDatas[5] = ItemData.CreateItemData(5);
+        (inventoryData.itemDatas[5].itemTypeData as ItemWeaponData).durability = 20;
         #endregion
         
         SaveInventoryData();

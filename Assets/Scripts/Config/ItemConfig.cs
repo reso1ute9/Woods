@@ -13,6 +13,13 @@ public enum ItemType {
     [LabelText("材料")] Meterial,
 }
 
+// 武器类型
+public enum WeaponType {
+    [LabelText("斧头")] Axe,
+    [LabelText("镐")] PickAxe,
+    [LabelText("镰刀")] Sickle,
+}
+
 // 物品配置
 [CreateAssetMenu(menuName = "Config/物品配置")]
 public class ItemConfig : ConfigBase
@@ -53,7 +60,15 @@ public abstract class PileItemTypeInfoBase {
 // 武器类型信息
 [Serializable]
 public class ItemWeaponInfo: IItemTypeInfo {
+    [LabelText("武器类型")] public WeaponType weaponType;
+    [LabelText("玩家手中的预制体")] public GameObject prefabOnPlayer;
+    [LabelText("玩家手中武器坐标")] public Vector3 positionOnPlayer;
+    [LabelText("玩家手中武器旋转")] public Vector3 rotationOnPlayer;
+    [LabelText("地图中的预制体")] public GameObject prefabOnMap;
+    [LabelText("动画状态机")] public AnimatorOverrideController animatorController;
     [LabelText("攻击力")] public float attackValue;
+    [LabelText("每次攻击损耗耐久度")] public float attackDurabilityCost;
+    // TODO: 攻击音效
 }
 
 // 消耗品类型信息
