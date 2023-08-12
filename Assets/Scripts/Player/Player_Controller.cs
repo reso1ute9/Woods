@@ -151,6 +151,16 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
     }
     #endregion
 
+    #region 战斗/伐木/采摘
+    // 当选择地图对象时
+    public void OnSelectMapObject(RaycastHit hitInfo) {
+        if (hitInfo.collider.TryGetComponent<MapObjectBase>(out MapObjectBase mapObject)) {
+            // TODO: 根据玩家选中的地图对象类型以及当前角色的武器来判断做什么
+            print("选中:" + mapObject.name);
+        }
+    }
+    #endregion
+
     // 场景切换或关闭时将存档数据写入磁盘
     private void OnDestroy() {
         playerTransformData.position = playerTransform.localPosition;

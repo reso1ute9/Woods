@@ -57,6 +57,8 @@ public class GameSceneManager : LogicManagerBase<GameSceneManager>
         // 加载进度条
         loadingWindow = UIManager.Instance.Show<UI_GameLoadingWindow>();
         loadingWindow.UpdateProgress(0);
+        // 初始化输入管理器
+        InputManager.Instance.Init();
     }    
 
     #region  加载进度

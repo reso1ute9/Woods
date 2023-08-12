@@ -6,12 +6,14 @@ using JKFrame;
 public class Camera_Controller : SingletonMono<Camera_Controller>
 {
     private Transform mTransform;
-    [SerializeField] private Transform target;    // 相机目标
-    [SerializeField] private Vector3 offset;      // 便宜跟随量
-    [SerializeField] private float moveSpeed;     // 相机跟随速度
+    [SerializeField] private Transform target;              // 相机目标
+    [SerializeField] private Vector3 offset;                // 便宜跟随量
+    [SerializeField] private float moveSpeed;               // 相机跟随速度
+    [SerializeField] private Camera current_camera;         // 相机
+    public Camera Camera { get => this.current_camera; }
 
-    private Vector2 positionXScope;               // 相机能移动的X轴范围
-    private Vector2 positionZScope;               // 相机能移动的Y轴范围
+    private Vector2 positionXScope;                         // 相机能移动的X轴范围
+    private Vector2 positionZScope;                         // 相机能移动的Y轴范围
 
     protected override void Awake() {
         base.Awake();

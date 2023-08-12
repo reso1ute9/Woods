@@ -26,7 +26,7 @@ public class  UI_ItemSlot : MonoBehaviour
 
     public static UI_ItemSlot currentMouseEnterSlot;    // 当前鼠标进入/出入的格子
     public static UI_ItemSlot weaponSlot;               // 记录一下当前的武器栏
-    public static List<RaycastResult> raycastResults = new List<RaycastResult>(10); // 记录鼠标与UI碰撞的结果
+    
     private static Sprite weaponSlotDefaultSprite;      // 记录默认的武器栏图标
 
     private void Start() {
@@ -125,14 +125,14 @@ public class  UI_ItemSlot : MonoBehaviour
 
     #region 鼠标交互事件
     private bool isMouseStay = false;
-    private void MouseEnter(PointerEventData arg1, object[] arg2) {
+    private void MouseEnter(PointerEventData eventData, object[] arg2) {
         GameManager.Instance.SetCursorState(CursorState.Handle);
         bgImg.sprite = ownerWindow.bgSprite[1];
         isMouseStay = true;
         currentMouseEnterSlot = this;
     }
 
-    private void MouseExit(PointerEventData arg1, object[] arg2) {
+    private void MouseExit(PointerEventData eventData, object[] arg2) {
         GameManager.Instance.SetCursorState(CursorState.Normal);
         if (weaponSlot != this) {
             bgImg.sprite = ownerWindow.bgSprite[0];
@@ -143,22 +143,22 @@ public class  UI_ItemSlot : MonoBehaviour
         currentMouseEnterSlot = null;
     }
 
-    private void BeginDrag(PointerEventData arg1, object[] arg2) {
+    private void BeginDrag(PointerEventData eventData, object[] arg2) {
         // 格子中没有物体
         if (itemData == null) return;
         // 将拖拽图标设置到DragLayer上保证不会被其他UI图层覆盖
         iconTransform.SetParent(UIManager.Instance.DragLayer);
     }
 
-    private void Drag(PointerEventData arg1, object[] arg2) {
+    private void Drag(PointerEventData eventData, object[] arg2) {
         // 格子中没有物体
         if (itemData == null) return;
         // 拖拽过程: 1. 将事件数据arg1的位置赋值给图标位置; 2. 保持鼠标形状
         GameManager.Instance.SetCursorState(CursorState.Handle);
-        iconTransform.position = arg1.position;
+        iconTransform.position = eventData.position;
     }
 
-    private void EndDrag(PointerEventData arg1, object[] arg2) {
+    private void EndDrag(PointerEventData eventData, object[] arg2) {
         // 格子中没有物体
         if (itemData == null) return;
         // 当前是否拖拽结束时没有到其他格子里
@@ -166,19 +166,7 @@ public class  UI_ItemSlot : MonoBehaviour
             // 鼠标形状恢复
             GameManager.Instance.SetCursorState(CursorState.Normal);
             // 如果目标没有格子, 但是是UI物体, 可以无视
-            // if (EventSystem.current.IsPointerOverGameObject()) return;
-            // 使用射线去检测是否放到了地面上
-            EventSystem.current.RaycastAll(arg1, raycastResults);
-            for (int i = 0; i < raycastResults.Count; i++) {
-                RaycastResult raycastResult = raycastResults[i];
-                // 如果是UI但是不是Mask模块则返回
-                if (raycastResult.gameObject.name != "Mask" && 
-                    raycastResult.gameObject.TryGetComponent<RectTransform>(out var _temp)) {
-                    raycastResults.Clear();
-                    return;
-                }
-            }
-            raycastResults.Clear();
+            if (InputManager.Instance.CheckMouseOnUI()) return;
             // 从存档里去除这份数据
             // TOOD: 物品掉落在地上
             // TODO: 将数据传递给地图块, 可能存在销毁的情况
