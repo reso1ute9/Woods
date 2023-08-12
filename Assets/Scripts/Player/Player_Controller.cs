@@ -24,7 +24,7 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
     private PlayerConfig playerConfig;
     public float rotateSpeed { get => playerConfig.rotateSpeed; }
     public float moveSpeed { get => playerConfig.moveSpeed; }
-    public Transform playerTransform { get; private set; }
+    public Transform playerTransform { get; private set; }            // 玩家位置/转向数据信息
     public Vector2 positionXScope { get; private set; }               // 相机能移动的X轴范围
     public Vector2 positionZScope { get; private set; }               // 相机能移动的Y轴范围
     public bool canUseItem { get; private set; } = true;              // 玩家当前是否能使用物品
@@ -35,6 +35,7 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
     private PlayerMainData playerMainData;
     #endregion
 
+    #region 初始化信息
     public void Init(float mapSizeOnWorld) {
         // 确定角色配置
         playerConfig = ConfigManager.Instance.GetConfig<PlayerConfig>(ConfigName.Player);
@@ -48,7 +49,7 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
         TriggerUpdateHungryEvent();
 
         // 初始化音效、位置、状态机
-        playerModel.Init(PlayAudioOnFootstep);
+        playerModel.Init(PlayAudioOnFootstep, OnStartHit, OnStopHit, OnAttackOver);
         playerTransform = transform;
         stateMachine = ResManager.Load<StateMachine>();
         stateMachine.Init(this);
@@ -62,22 +63,14 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
         playerTransform.localRotation = Quaternion.Euler(playerTransformData.rotation);
     }
 
-    private void Update() {
-        if (GameSceneManager.Instance.IsInitialized == false) return;
-        CalculateHungryOnUpdate();
-    }
-
     // 传入游戏内3D地图大小初始化相机移动范围, 需要注意由于有Y轴高度, 所以相机移动
     // 范围需要适当的缩小, 可通过提前在scene中测量得到合适的值
     private void InitPositionScope(float mapSizeOnWorld) {
         positionXScope = new Vector2(1, mapSizeOnWorld - 1);
         positionZScope = new Vector2(1, mapSizeOnWorld - 1);
     }
+    #endregion
 
-    private void PlayAudioOnFootstep(int index) {
-        AudioManager.Instance.PlayOnShot(playerConfig.footstepAudioClips[index], playerTransform.position, playerConfig.footstepVolume);
-    }
-    
 
     #region 核心数值
     // 计算当前角色饱食度
@@ -121,8 +114,8 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
     #endregion
 
     #region 武器相关
-    private ItemData currentWeaponItemData;
-    private GameObject currentWeaponGameObject;
+    private ItemData currentWeaponItemData;         // 当前武器数据
+    private GameObject currentWeaponGameObject;     // 当前武器模型
     // 修改武器: 武器数值、动画、图标等
     public void ChangeWeapon(ItemData newWeapon) {
         // 如果没有切换武器
@@ -151,15 +144,102 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
     }
     #endregion
 
+
     #region 战斗/伐木/采摘
+    private bool canAttack = true;                              // 当前是否能攻击
+    public Quaternion attackDirection { get; private set; }     // 当前攻击方向
     // 当选择地图对象时
     public void OnSelectMapObject(RaycastHit hitInfo) {
         if (hitInfo.collider.TryGetComponent<MapObjectBase>(out MapObjectBase mapObject)) {
-            // TODO: 根据玩家选中的地图对象类型以及当前角色的武器来判断做什么
-            print("选中:" + mapObject.name);
+            // 根据玩家选中的地图对象类型以及当前角色的武器来判断做什么
+            float dis = Vector3.Distance(playerTransform.position, mapObject.transform.position);
+            switch (mapObject.ObjectType) {
+                case mapObjectType.Tree:
+                    // 允许在2m内挥斧头
+                    if (dis < 2) {
+                        FellingTree(mapObject);
+                    }
+                    break;
+                case mapObjectType.Stone:
+                    break;
+                case mapObjectType.SamllStone:
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    // 伐木
+    private void FellingTree(MapObjectBase mapObject) {
+        if (canAttack && 
+            currentWeaponItemData != null && 
+            (currentWeaponItemData.config.itemTypeInfo as ItemWeaponInfo).weaponType == WeaponType.Axe) 
+        {   
+            // 防止立刻进行攻击
+            canAttack = false;
+            // 禁止使用物品
+            canUseItem = false;
+            // 计算方向
+            attackDirection = Quaternion.LookRotation(mapObject.transform.position - transform.position);
+            // 切换状态
+            ChangeState(PlayerState.Attack);
         }
     }
     #endregion
+
+
+    #region 辅助函数: e.g. 状态变化, 播放音效
+    // 修改状态
+    public void ChangeState(PlayerState playerState) {
+        switch (playerState) {
+            case PlayerState.Idle:
+                stateMachine.ChangeState<Player_Idle>((int)PlayerState.Idle);
+                break;
+            case PlayerState.Move:
+                stateMachine.ChangeState<Player_Move>((int)PlayerState.Move);
+                break;
+            case PlayerState.Attack:
+                stateMachine.ChangeState<Player_Attack>((int)PlayerState.Attack);
+                break;
+            case PlayerState.BeAttack:
+                // stateMachine.ChangeState<Player_Move>(3);
+                break;
+            case PlayerState.Dead:
+                // stateMachine.ChangeState<Player_Move>(4);
+                break;
+        }
+    }
+
+    // 开启攻击: 开启伤害检测
+    private void OnStartHit() {
+
+    }
+
+    // 停止攻击: 停止伤害检测
+    private void OnStopHit() {
+
+    }
+
+    // 攻击动作结束
+    private void OnAttackOver() {
+        // 可以开启新的攻击动作
+        canAttack = true;
+        // 允许使用物品
+        canUseItem = true;
+        // 切换状态到待机
+        ChangeState(PlayerState.Idle);
+    }
+
+    private void PlayAudioOnFootstep(int index) {
+        AudioManager.Instance.PlayOnShot(playerConfig.footstepAudioClips[index], playerTransform.position, playerConfig.footstepVolume);
+    }
+    #endregion
+
+    private void Update() {
+        if (GameSceneManager.Instance.IsInitialized == false) return;
+        CalculateHungryOnUpdate();
+    }
 
     // 场景切换或关闭时将存档数据写入磁盘
     private void OnDestroy() {

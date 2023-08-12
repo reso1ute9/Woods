@@ -24,7 +24,7 @@ public class Player_Move : PlayerStateBase
         float v = Input.GetAxis("Vertical");
         // 1. 检查是否进入待机状态, 如果不移动则进入待机状态
         if (h == 0 && v == 0) {
-            this.ChangeState(PlayerState.Idle);
+            player.ChangeState(PlayerState.Idle);
             return;
         }
         // 2. 查看是否进行朝向计算
