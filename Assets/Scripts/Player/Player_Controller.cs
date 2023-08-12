@@ -148,6 +148,7 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
     #region 战斗/伐木/采摘
     private bool canAttack = true;                              // 当前是否能攻击
     public Quaternion attackDirection { get; private set; }     // 当前攻击方向
+    private List<MapObjectBase> lastAttackMapObjectList = new List<MapObjectBase>();
     // 当选择地图对象时
     public void OnSelectMapObject(RaycastHit hitInfo) {
         if (hitInfo.collider.TryGetComponent<MapObjectBase>(out MapObjectBase mapObject)) {
@@ -213,12 +214,13 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
 
     // 开启攻击: 开启伤害检测
     private void OnStartHit() {
-
+        currentWeaponGameObject.transform.OnTriggerEnter(OnWeaponTriggerEnter);
     }
 
     // 停止攻击: 停止伤害检测
     private void OnStopHit() {
-
+        currentWeaponGameObject.transform.RemoveTriggerEnter(OnWeaponTriggerEnter);
+        lastAttackMapObjectList.Clear();
     }
 
     // 攻击动作结束
@@ -229,6 +231,34 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
         canUseItem = true;
         // 切换状态到待机
         ChangeState(PlayerState.Idle);
+    }
+
+    // 武器触发器: 当武器碰到物体时
+    private void OnWeaponTriggerEnter(Collider other, object[] arg2) {
+        // 判断对方是否为地图对象
+        if (other.TryGetComponent<MapObjectBase>(out MapObjectBase mapObject)) {
+            // 记录攻击对象, 防止计算二次伤害
+            if (lastAttackMapObjectList.Contains(mapObject)) return;
+            lastAttackMapObjectList.Add(mapObject);
+            // 检测对方类型以及当前武器类型
+            ItemWeaponInfo itemWeaponInfo = (currentWeaponItemData.config.itemTypeInfo as ItemWeaponInfo);
+            switch (mapObject.ObjectType) {
+                case mapObjectType.Tree:
+                    // 判断当前武器是否为石斧                
+                    if (itemWeaponInfo.weaponType == WeaponType.Axe) {
+                        // TODO: 更新树的生命值
+                        (mapObject as Tree_Controller).Hurt(itemWeaponInfo.attackValue);
+                        // TODO: 更新武器耐久度
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    private void OnWeaponTriggerExit(Collider other, object[] arg2) {
+
     }
 
     private void PlayAudioOnFootstep(int index) {
