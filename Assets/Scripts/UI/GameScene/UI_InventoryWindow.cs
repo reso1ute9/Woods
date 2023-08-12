@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using JKFrame;
 
 
-[UIElement(false, "UI/UI_InventoryWindow", 1)]
+[UIElement(true, "UI/UI_InventoryWindow", 1)]
 public class UI_InventoryWindow : UI_WindowBase
 {
     private InventoryData inventoryData;
@@ -23,6 +23,8 @@ public class UI_InventoryWindow : UI_WindowBase
         }
         weaponSlot.Init(slots.Length, this);
         UI_ItemSlot.weaponSlot = weaponSlot;
+        // 将武器更新到角色模型上
+        Player_Controller.Instance.ChangeWeapon(inventoryData.weaponSlotItemData);
     }
 
     public override void OnShow() {
@@ -217,5 +219,40 @@ public class UI_InventoryWindow : UI_WindowBase
             inventoryData.SetItem(index, itemData);
             slots[index].InitData(itemData);
         }
+    }
+
+    // 玩家使用武器成功攻击
+    private void OnPlayerWeaponAttackSucceed() {
+        if (inventoryData.weaponSlotItemData == null) {
+            return;
+        }
+        // 获取当前快捷栏中武器数据
+        ItemWeaponData itemWeaponData = inventoryData.weaponSlotItemData.itemTypeData as ItemWeaponData;
+        ItemWeaponInfo itemWeaponInfo = inventoryData.weaponSlotItemData.config.itemTypeInfo as ItemWeaponInfo;
+        // itemWeaponData.durability = Mathf.Clamp(itemWeaponData.durability - itemWeaponInfo.attackDurabilityCost, 0, 100);
+        itemWeaponData.durability -= itemWeaponInfo.attackDurabilityCost;
+        // 检查当前武器是否损坏
+        if (itemWeaponData.durability <= 0) {
+            // 移除武器数据和UI
+            RemoveItem(inventoryData.itemDatas.Length);
+            // 玩家模型更换武器
+            Player_Controller.Instance.ChangeWeapon(null);
+        } else {
+            // 更新UI
+            weaponSlot.UpdateNumTextView();
+        }
+    }
+    
+    // 注册监听事件
+    protected override void RegisterEventListener() {
+        base.RegisterEventListener();
+        // 窗口隐藏时该事件也应该持续监听
+        EventManager.AddEventListener(EventName.PlayerWeaponAttackSucceed, OnPlayerWeaponAttackSucceed);
+    }
+
+    // 取消监听事件
+    protected override void CancelEventListener() {
+        base.CancelEventListener();
+        // EventManager.RemoveEventListener(EventName.PlayerWeaponAttackSucceed, OnPlayerWeaponAttackSucceed);
     }
 }

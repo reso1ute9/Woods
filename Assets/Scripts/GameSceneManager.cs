@@ -40,13 +40,13 @@ public class GameSceneManager : LogicManagerBase<GameSceneManager>
         * 1. TimeManager.Instance.Init(): 初始化时间相关UI
         * 2. Player_Controller.Instance.Init(mapSizeOnWorld): 初始化角色相关UI
         ***/
-        UIManager.Instance.Show<UI_InventoryWindow>();
         UIManager.Instance.Show<UI_MainInfoWindow>();
         // 确定地图初始化配置数据
         MapConfig mapConfig = ConfigManager.Instance.GetConfig<MapConfig>(ConfigName.Map);
         float mapSizeOnWorld = ArchiveManager.Instance.mapInitData.mapSize * mapConfig.mapChunkSize * mapConfig.cellSize;
         // 初始化角色
         Player_Controller.Instance.Init(mapSizeOnWorld);
+        UIManager.Instance.Show<UI_InventoryWindow>();
         // 初始化地图+更新观察者位置
         MapManager.Instance.UpdateView(Player_Controller.Instance.transform);
         MapManager.Instance.Init();

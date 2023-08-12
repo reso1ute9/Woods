@@ -47,13 +47,13 @@ public interface IItemTypeData {}
 // 设置抽象类对可堆放物品进行进一步抽象
 [Serializable]
 public abstract class PileItemTypeDataBase {
-    public int count;               // 当前可堆叠物品数量
+    public int count;                       // 当前可堆叠物品数量
 }
 
 // 武器接口类
 [Serializable]
 public class ItemWeaponData : IItemTypeData {
-    public int durability;          // 武器耐久度
+    public float durability = 100;          // 武器耐久度, 默认值为100%
 }
 
 // 消耗品接口类

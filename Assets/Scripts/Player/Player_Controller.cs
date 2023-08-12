@@ -116,6 +116,7 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
     #region 武器相关
     private ItemData currentWeaponItemData;         // 当前武器数据
     private GameObject currentWeaponGameObject;     // 当前武器模型
+    
     // 修改武器: 武器数值、动画、图标等
     public void ChangeWeapon(ItemData newWeapon) {
         // 如果没有切换武器
@@ -149,7 +150,9 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
     private bool canAttack = true;                              // 当前是否能攻击
     public Quaternion attackDirection { get; private set; }     // 当前攻击方向
     private List<MapObjectBase> lastAttackMapObjectList = new List<MapObjectBase>();
-    // 当选择地图对象时
+    private int attackSucceedCount = 0;                         // 攻击时成功命中地图对象数量
+
+    // 选择地图对象
     public void OnSelectMapObject(RaycastHit hitInfo) {
         if (hitInfo.collider.TryGetComponent<MapObjectBase>(out MapObjectBase mapObject)) {
             // 根据玩家选中的地图对象类型以及当前角色的武器来判断做什么
@@ -187,6 +190,59 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
             ChangeState(PlayerState.Attack);
         }
     }
+
+    // 开启攻击: 开启伤害检测
+    private void OnStartHit() {
+        // 清空标记对象数量
+        attackSucceedCount = 0;
+        currentWeaponGameObject.transform.OnTriggerEnter(OnWeaponTriggerEnter);
+    }
+
+    // 停止攻击: 停止伤害检测
+    private void OnStopHit() {
+        // 清空攻击标记数组
+        lastAttackMapObjectList.Clear();
+        currentWeaponGameObject.transform.RemoveTriggerEnter(OnWeaponTriggerEnter);
+    }
+
+    // 攻击动作结束
+    private void OnAttackOver() {
+        // 更新武器耐久度
+        for (int i = 0; i < attackSucceedCount; i++) {
+            EventManager.EventTrigger(EventName.PlayerWeaponAttackSucceed);
+        }
+        // 可以开启新的攻击动作
+        canAttack = true;
+        // 允许使用物品
+        canUseItem = true;
+        // 切换状态到待机
+        ChangeState(PlayerState.Idle);
+    }
+
+    // 武器触发器: 当武器碰到物体时
+    private void OnWeaponTriggerEnter(Collider other, object[] arg2) {
+        // 判断对方是否为地图对象
+        if (other.TryGetComponent<MapObjectBase>(out MapObjectBase mapObject)) {
+            // 记录攻击对象, 防止计算二次伤害, 该数组中包含的地图对象不一定能成功攻击
+            // 例如无法用石斧攻击矿石
+            if (lastAttackMapObjectList.Contains(mapObject)) return;
+            lastAttackMapObjectList.Add(mapObject);
+            // 检测对方类型以及当前武器类型
+            ItemWeaponInfo itemWeaponInfo = (currentWeaponItemData.config.itemTypeInfo as ItemWeaponInfo);
+            switch (mapObject.ObjectType) {
+                case mapObjectType.Tree:
+                    // 判断当前武器是否为石斧                
+                    if (itemWeaponInfo.weaponType == WeaponType.Axe) {
+                        // TODO: 更新树的生命值
+                        (mapObject as Tree_Controller).Hurt(itemWeaponInfo.attackValue);
+                        attackSucceedCount += 1;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
     #endregion
 
 
@@ -210,55 +266,6 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
                 // stateMachine.ChangeState<Player_Move>(4);
                 break;
         }
-    }
-
-    // 开启攻击: 开启伤害检测
-    private void OnStartHit() {
-        currentWeaponGameObject.transform.OnTriggerEnter(OnWeaponTriggerEnter);
-    }
-
-    // 停止攻击: 停止伤害检测
-    private void OnStopHit() {
-        currentWeaponGameObject.transform.RemoveTriggerEnter(OnWeaponTriggerEnter);
-        lastAttackMapObjectList.Clear();
-    }
-
-    // 攻击动作结束
-    private void OnAttackOver() {
-        // 可以开启新的攻击动作
-        canAttack = true;
-        // 允许使用物品
-        canUseItem = true;
-        // 切换状态到待机
-        ChangeState(PlayerState.Idle);
-    }
-
-    // 武器触发器: 当武器碰到物体时
-    private void OnWeaponTriggerEnter(Collider other, object[] arg2) {
-        // 判断对方是否为地图对象
-        if (other.TryGetComponent<MapObjectBase>(out MapObjectBase mapObject)) {
-            // 记录攻击对象, 防止计算二次伤害
-            if (lastAttackMapObjectList.Contains(mapObject)) return;
-            lastAttackMapObjectList.Add(mapObject);
-            // 检测对方类型以及当前武器类型
-            ItemWeaponInfo itemWeaponInfo = (currentWeaponItemData.config.itemTypeInfo as ItemWeaponInfo);
-            switch (mapObject.ObjectType) {
-                case mapObjectType.Tree:
-                    // 判断当前武器是否为石斧                
-                    if (itemWeaponInfo.weaponType == WeaponType.Axe) {
-                        // TODO: 更新树的生命值
-                        (mapObject as Tree_Controller).Hurt(itemWeaponInfo.attackValue);
-                        // TODO: 更新武器耐久度
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    private void OnWeaponTriggerExit(Collider other, object[] arg2) {
-
     }
 
     private void PlayAudioOnFootstep(int index) {
