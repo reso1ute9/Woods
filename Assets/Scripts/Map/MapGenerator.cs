@@ -25,14 +25,16 @@ public class MapGenerator
     
     #region 存档
     private MapInitData mapInitData;
+    private MapData mapData;
     #endregion
 
     public MapGenerator(
-        MapConfig mapConfig, MapInitData mapInitData,
+        MapConfig mapConfig, MapInitData mapInitData, MapData mapData, 
         Dictionary<MapVertexType, List<int>> spawnConfigDict
     ) {
         this.mapConfig = mapConfig;
         this.mapInitData = mapInitData;
+        this.mapData = mapData;
         this.spawnConfigDict = spawnConfigDict;
         this.GenerateMapData();
     }
@@ -117,7 +119,7 @@ public class MapGenerator
             if (mapChunkData == null) {
                 mapChunkData = new MapChunkData();
                 // 生成场景物体数据
-                mapChunkData.mapObjectList = SpawnMapObject(chunkIndex);
+                mapChunkData.mapObjectDict = SpawnMapObject(chunkIndex);
                 // 生成以后进行持久化保存
                 ArchiveManager.Instance.AddAndSaveMapChunkData(chunkIndex, mapChunkData);
             }
@@ -232,8 +234,8 @@ public class MapGenerator
     }
 
     // 生成各种地图对象, 需要根据配置和地图网格信息确定生成对象位置
-    private List<MapChunkMapObjectData> SpawnMapObject(Vector2Int chunkIndex) {
-        List<MapChunkMapObjectData> mapObjectList = new List<MapChunkMapObjectData>();
+    private Serialization_Dict<ulong, MapObjectData> SpawnMapObject(Vector2Int chunkIndex) {
+        Serialization_Dict<ulong, MapObjectData> mapObjectDict = new Serialization_Dict<ulong, MapObjectData>();
         
         int offsetX = chunkIndex.x * mapConfig.mapChunkSize;
         int offsetZ = chunkIndex.y * mapConfig.mapChunkSize;
@@ -267,10 +269,11 @@ public class MapGenerator
                         UnityEngine.Random.Range(-mapConfig.cellSize/2, mapConfig.cellSize/2)
                     );
                     Vector3 position = mapVertex.position + offset;
-                    mapObjectList.Add(new MapChunkMapObjectData { configId = configId, position = position });                
+                    mapObjectDict.dictionary.Add(mapData.currentId, new MapObjectData { configId = configId, position = position });                
+                    mapData.currentId += 1;
                 }
             }
         }
-        return mapObjectList;
+        return mapObjectDict;
     }
 }

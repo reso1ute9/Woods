@@ -60,7 +60,7 @@ public class MapManager : SingletonMono<MapManager>
         }
 
         // 初始化地图生成器
-        mapGenerator = new MapGenerator(mapConfig, mapInitData, spawnConfigDict);
+        mapGenerator = new MapGenerator(mapConfig, mapInitData, mapData, spawnConfigDict);
         mapGenerator.GenerateMapData();
         mapChunkDict = new Dictionary<Vector2Int, MapChunkController>();
         chunkSizeOnWorld = mapConfig.mapChunkSize * mapConfig.cellSize;
@@ -214,7 +214,7 @@ public class MapManager : SingletonMono<MapManager>
             if (mapChunk.isAllForest == false) {
                 texture = (Texture2D)mapChunk.GetComponent<MeshRenderer>().material.mainTexture;
             }
-            mapUI.AddMapChunk(chunkIndex, mapChunk.mapChunkData.mapObjectList, texture);
+            mapUI.AddMapChunk(chunkIndex, mapChunk.mapChunkData.mapObjectDict, texture);
         }
         // 当更新到UI中后就不需要当前存储的index了
         mapUIUpdateChunkIndexList.Clear();

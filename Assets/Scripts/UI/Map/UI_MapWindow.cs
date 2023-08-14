@@ -82,7 +82,7 @@ public class UI_MapWindow : UI_WindowBase
     }
 
     // 添加地图块UI
-    public void AddMapChunk(Vector2Int chunkIndex, List<MapChunkMapObjectData> mapObjectList, Texture2D texture = null) {
+    public void AddMapChunk(Vector2Int chunkIndex, Serialization_Dict<ulong, MapObjectData> mapObjectDict, Texture2D texture = null) {
         RectTransform mapChunkRect = Instantiate(mapItemPrefab, content).GetComponent<RectTransform>();
         // 确定地图块在UI界面中的位置和大小(宽高)
         mapChunkRect.anchoredPosition = new Vector2(chunkIndex.x * mapChunkImageSize, chunkIndex.y * mapChunkImageSize);
@@ -100,9 +100,9 @@ public class UI_MapWindow : UI_WindowBase
         } else {
             mapChunkImage.sprite = CreateMapSprite(texture);
         }
-        // TODO: 添加物体icon
-        for (int i = 0; i < mapObjectList.Count; i++) {
-            MapObjectConfig config = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, mapObjectList[i].configId);
+        // 添加物体icon
+        foreach (var mapObject in mapObjectDict.dictionary) {
+            MapObjectConfig config = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, mapObject.Value.configId);
             // 按照id一定能查到物体, 但是物体不一定具有地图icon
             if (config.mapIconSprite == null) {
                 continue;
@@ -111,12 +111,11 @@ public class UI_MapWindow : UI_WindowBase
             tempObject.GetComponent<Image>().sprite = config.mapIconSprite;
             // 因为整个content的尺寸在初始化的时候已经乘上mapScaleFactorNum了, 所以在计算icon位置时
             // 也需要乘上相同的系数
-            float x = mapObjectList[i].position.x * mapScaleFactorNum;
-            float y = mapObjectList[i].position.z * mapScaleFactorNum;
+            float x = mapObject.Value.position.x * mapScaleFactorNum;
+            float y = mapObject.Value.position.z * mapScaleFactorNum;
             tempObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(x, y);
 
         }
-
         // TODO: 待重构, 后续需要保存icon信息, icon信息可能会移除(树、花被销毁)
         mapImageDict.Add(chunkIndex, mapChunkImage);
     }
