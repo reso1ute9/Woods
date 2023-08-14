@@ -29,7 +29,8 @@ public class Tree_Controller : MapObjectBase {
     }
 
     private void Dead() {
-        // TODO: 临时直接销毁
-        Destroy(gameObject);
+        // 将当前树木对象放到对象池并掉落物品(TODO)
+        RemoveOnMap();
+        // TODO: 显示树木倒下动画
     }
 }

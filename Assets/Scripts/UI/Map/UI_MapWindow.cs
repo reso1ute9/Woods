@@ -15,7 +15,8 @@ public class UI_MapWindow : UI_WindowBase
     [SerializeField] private GameObject mapIconPrefab;  // 单个icon在UI中的预制体
     [SerializeField] private RectTransform playerIcon;  // 玩家所在位置的icon
 
-    private Dictionary<Vector2Int, Image> mapImageDict = new Dictionary<Vector2Int, Image>();   // 地图图片字典
+    private Dictionary<ulong, Image> mapObjectIconDict = new Dictionary<ulong, Image>();        // 地图物品icon字典
+
     private int mapChunkSize;           // 一个地图块有多少格子
     private float mapChunkImageSize;    // UI地图块图片的尺寸
     private float mapSizeOnWorld;       // 游戏内3D地图大小
@@ -26,8 +27,7 @@ public class UI_MapWindow : UI_WindowBase
     private float mapScaleFactorNum = 10;   // 预设值: UI地图content与原始地图的比例系数
 
 
-    public override void Init()
-    {
+    public override void Init() {
         // 当修改值时与修改值重合
         transform.Find("Scroll View").GetComponent<ScrollRect>().onValueChanged.AddListener(UpdatePlayerIconPosition);
     }
@@ -108,15 +108,25 @@ public class UI_MapWindow : UI_WindowBase
                 continue;
             }
             GameObject tempObject = PoolManager.Instance.GetGameObject(mapIconPrefab, content);
-            tempObject.GetComponent<Image>().sprite = config.mapIconSprite;
+            Image iconImage = tempObject.GetComponent<Image>();
+            iconImage.sprite = config.mapIconSprite;
             // 因为整个content的尺寸在初始化的时候已经乘上mapScaleFactorNum了, 所以在计算icon位置时
             // 也需要乘上相同的系数
             float x = mapObject.Value.position.x * mapScaleFactorNum;
             float y = mapObject.Value.position.z * mapScaleFactorNum;
             tempObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(x, y);
-
+            // 保存icon图片
+            mapObjectIconDict.Add(mapObject.Key, iconImage);
         }
-        // TODO: 待重构, 后续需要保存icon信息, icon信息可能会移除(树、花被销毁)
-        mapImageDict.Add(chunkIndex, mapChunkImage);
+    }
+
+    // 移除地图对象icon
+    public void RemoveMapObjectIcon(ulong mapObjectId) {
+        if (mapObjectIconDict.TryGetValue(mapObjectId, out Image iconImage)) {
+            // 由于该对象是从对象池中取出, 所以在移除时可以直接放入对象池
+            iconImage.JKGameObjectPushPool();
+            // 从字典中删除该id
+            mapObjectIconDict.Remove(mapObjectId);
+        }
     }
 }

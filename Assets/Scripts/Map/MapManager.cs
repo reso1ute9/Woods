@@ -226,5 +226,13 @@ public class MapManager : SingletonMono<MapManager>
     private void CloseMapUI() {
         UIManager.Instance.Close<UI_MapWindow>();
     }
+
+    // 移除一个地图物品
+    public void RemoveMapObject(ulong mapObjectId) {
+        // 移除地图对象icon image
+        if (mapUI != null) {
+            mapUI.RemoveMapObjectIcon(mapObjectId);
+        }
+    }
     #endregion
 }

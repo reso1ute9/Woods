@@ -41,7 +41,8 @@ public class MapChunkController : MonoBehaviour
                     t_object.transform.position = mapObject.Value.position;
                     // 临时测试逻辑, 因为目前只有树木继承自MapObjectBase, 其他地图对象未设置继承关系
                     if (t_object.TryGetComponent<MapObjectBase>(out MapObjectBase temp)) {
-                        this.mapObjectDict.Add(mapObject.Key, temp);
+                        temp.Init(this, mapObject.Key);
+                        mapObjectDict.Add(mapObject.Key, temp);
                     }
                 }
             } else {
@@ -49,8 +50,18 @@ public class MapChunkController : MonoBehaviour
                 foreach (var mapObject in mapChunkData.mapObjectDict.dictionary) {
                     mapObject.Value.JKObjectPushPool();
                 }
-                this.mapObjectDict.Clear();
+                mapObjectDict.Clear();
             }
         }
+    }
+
+    // 移除一个地图对象
+    public void RemoveMapObject(ulong mapObjectId) {
+        // 显示层面移除
+        mapObjectDict.Remove(mapObjectId);
+        // 数据层面移除(控制器层面)
+        mapChunkData.mapObjectDict.dictionary.Remove(mapObjectId);
+        // UI层面移除
+        MapManager.Instance.RemoveMapObject(mapObjectId);
     }
 }
