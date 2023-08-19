@@ -16,6 +16,8 @@ public class MapObjectConfig : ConfigBase
     public GameObject prefab;
     [LabelText("UI地图中的icon")]
     public Sprite mapIconSprite;
+    [LabelText("UI地图中的icon尺寸")]
+    public float mapIconSpriteSize;
     [LabelText("生成概率(百分比类型)")]
     public int probability;
 }
