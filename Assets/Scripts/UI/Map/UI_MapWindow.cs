@@ -110,6 +110,7 @@ public class UI_MapWindow : UI_WindowBase
             GameObject tempObject = PoolManager.Instance.GetGameObject(mapIconPrefab, content);
             Image iconImage = tempObject.GetComponent<Image>();
             iconImage.sprite = config.mapIconSprite;
+            iconImage.transform.localScale = Vector3.one * config.mapIconSpriteSize;
             // 因为整个content的尺寸在初始化的时候已经乘上mapScaleFactorNum了, 所以在计算icon位置时
             // 也需要乘上相同的系数
             float x = mapObject.Value.position.x * mapScaleFactorNum;
