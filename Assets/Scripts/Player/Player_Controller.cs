@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -161,33 +162,20 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
                 case mapObjectType.Tree:
                     // 允许在2m内挥斧头
                     if (dis < 2) {
-                        FellingTree(mapObject);
+                        CheckHitMapObject(mapObject, WeaponType.Axe);
                     }
                     break;
                 case mapObjectType.Stone:
+                    // 允许在1.5m内挥铁镐
+                    if (dis < 1.5f) {
+                        CheckHitMapObject(mapObject, WeaponType.PickAxe);
+                    }
                     break;
                 case mapObjectType.SamllStone:
                     break;
                 default:
                     break;
             }
-        }
-    }
-
-    // 伐木
-    private void FellingTree(MapObjectBase mapObject) {
-        if (canAttack && 
-            currentWeaponItemData != null && 
-            (currentWeaponItemData.config.itemTypeInfo as ItemWeaponInfo).weaponType == WeaponType.Axe) 
-        {   
-            // 防止立刻进行攻击
-            canAttack = false;
-            // 禁止使用物品
-            canUseItem = false;
-            // 计算方向
-            attackDirection = Quaternion.LookRotation(mapObject.transform.position - transform.position);
-            // 切换状态
-            ChangeState(PlayerState.Attack);
         }
     }
 
@@ -228,19 +216,47 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
             if (lastAttackMapObjectList.Contains(mapObject)) return;
             lastAttackMapObjectList.Add(mapObject);
             // 检测对方类型以及当前武器类型
-            ItemWeaponInfo itemWeaponInfo = (currentWeaponItemData.config.itemTypeInfo as ItemWeaponInfo);
             switch (mapObject.ObjectType) {
                 case mapObjectType.Tree:
-                    // 判断当前武器是否为石斧                
-                    if (itemWeaponInfo.weaponType == WeaponType.Axe) {
-                        // TODO: 更新树的生命值
-                        (mapObject as Tree_Controller).Hurt(itemWeaponInfo.attackValue);
-                        attackSucceedCount += 1;
-                    }
+                    // 判断当前武器是否为石斧
+                    CheckMapObjectHurt(mapObject as HitMapObjectBase, WeaponType.Axe);
+                    break;
+                case mapObjectType.Stone:
+                    // 判断当前武器是否为铁镐
+                    CheckMapObjectHurt(mapObject as HitMapObjectBase, WeaponType.PickAxe);
                     break;
                 default:
                     break;
             }
+        }
+    }
+
+    // 检测地图对象能否受伤
+    private void CheckMapObjectHurt(HitMapObjectBase hitMapObject, WeaponType weaponType) {
+        ItemWeaponInfo itemWeaponInfo = (currentWeaponItemData.config.itemTypeInfo as ItemWeaponInfo);
+        UnityEngine.Debug.Log("itemWeaponInfo.weaponType:" + itemWeaponInfo.weaponType);
+        UnityEngine.Debug.Log("WeaponType:" + weaponType);
+        if (itemWeaponInfo.weaponType == weaponType) {
+            hitMapObject.Hurt(itemWeaponInfo.attackValue);
+            attackSucceedCount += 1;
+        }
+    }
+
+    // 检查是否可以攻击当前地图对象
+    private void CheckHitMapObject(MapObjectBase mapObject, WeaponType weaponType) {
+        // 如果能攻击并且武器类型符合要求
+        if (canAttack && 
+            currentWeaponItemData != null && 
+            (currentWeaponItemData.config.itemTypeInfo as ItemWeaponInfo).weaponType == weaponType) 
+        {   
+            // 防止立刻进行攻击
+            canAttack = false;
+            // 禁止使用物品
+            canUseItem = false;
+            // 计算方向
+            attackDirection = Quaternion.LookRotation(mapObject.transform.position - transform.position);
+            // 切换状态
+            ChangeState(PlayerState.Attack);
         }
     }
     #endregion

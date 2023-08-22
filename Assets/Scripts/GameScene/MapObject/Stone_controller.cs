@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using JKFrame;
 
-public class Stone_controller : HitMapObjectBase
+public class Stone_Controller : HitMapObjectBase
 {
 
 }
