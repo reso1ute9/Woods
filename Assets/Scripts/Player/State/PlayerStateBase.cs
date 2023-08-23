@@ -13,9 +13,4 @@ public class PlayerStateBase : StateBase
         base.Init(owner, stateType, stateMachine);
         player = owner as Player_Controller;
     }
-
-    // 播放动画
-    protected void PlayAnimation(string animationName, float fixedTime = 0.25f) {
-        player.animator.CrossFadeInFixedTime(animationName, fixedTime);
-    }
 }

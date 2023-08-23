@@ -52,13 +52,14 @@ public class UI_InventoryWindow : UI_WindowBase
     }
 
     // 添加物品
-    public void AddItem(int configId) {
+    public bool AddItem(int configId) {
         bool res = AddItemForLogic(configId);
         if (res) {
             ProjectTool.PlayerAudio(AudioType.Bag);
         } else {
             ProjectTool.PlayerAudio(AudioType.Fail);
         }
+        return res;
     }
 
     // 使用物品
@@ -242,7 +243,7 @@ public class UI_InventoryWindow : UI_WindowBase
             weaponSlot.UpdateNumTextView();
         }
     }
-    
+
     // 注册监听事件
     protected override void RegisterEventListener() {
         base.RegisterEventListener();

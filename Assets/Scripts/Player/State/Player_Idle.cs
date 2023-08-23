@@ -6,7 +6,7 @@ using UnityEngine;
 public class Player_Idle : PlayerStateBase
 {
     public override void Enter() {
-        PlayAnimation("Idle");
+        player.PlayAnimation("Idle");
     }
 
     public override void Exit() {

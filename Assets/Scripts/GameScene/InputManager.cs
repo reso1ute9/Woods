@@ -27,13 +27,15 @@ public class InputManager : SingletonMono<InputManager> {
     // 检查选中地图对象
     private void CheckSelectMapObject() {
         // 如果鼠标一直按下
-        if (Input.GetMouseButton(0)) {
+        bool mouseButton = Input.GetMouseButton(0);
+        bool mouseButtonDown = Input.GetMouseButtonDown(0);
+        if (mouseButton || mouseButtonDown) {
             if (CheckMouseOnUI()) return;
             // 射线检测地图上的3d物体
             Ray ray = Camera_Controller.Instance.Camera.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hitInfo, 100, mapObjectLayer)) {
                 // 发送给玩家控制器去处理
-                Player_Controller.Instance.OnSelectMapObject(hitInfo);
+                Player_Controller.Instance.OnSelectMapObject(hitInfo, mouseButtonDown);
             }
         }
     }   

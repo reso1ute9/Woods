@@ -10,7 +10,7 @@ public class Player_Attack : PlayerStateBase
     public override void Enter() {
         // 进入攻击动作时需要确定攻击方向和播放攻击动画
         attackDirection = player.attackDirection;
-        PlayAnimation("Attack");
+        player.PlayAnimation("Attack");
     }
 
     public override void Update() {

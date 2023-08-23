@@ -18,7 +18,7 @@ public enum PlayerState
 public class Player_Controller : SingletonMono<Player_Controller>, IStateMachineOwner
 {
     [SerializeField] public Player_Model playerModel;
-    public Animator animator;
+    [SerializeField] Animator animator;
     public CharacterController characterController;
 
     private StateMachine stateMachine;
@@ -154,33 +154,61 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
     private int attackSucceedCount = 0;                         // 攻击时成功命中地图对象数量
 
     // 选择地图对象
-    public void OnSelectMapObject(RaycastHit hitInfo) {
+    public void OnSelectMapObject(RaycastHit hitInfo, bool isMouseButtonDown) {
         if (hitInfo.collider.TryGetComponent<MapObjectBase>(out MapObjectBase mapObject)) {
-            // 根据玩家选中的地图对象类型以及当前角色的武器来判断做什么
+            // 检查地图对象触碰距离是否合法
             float dis = Vector3.Distance(playerTransform.position, mapObject.transform.position);
-            switch (mapObject.ObjectType) {
-                case mapObjectType.Tree:
-                    // 允许在2m内挥斧头
-                    if (dis < 2) {
-                        CheckHitMapObject(mapObject, WeaponType.Axe);
-                    }
-                    break;
-                case mapObjectType.Stone:
-                    // 允许在1.5m内挥铁镐
-                    if (dis < 1.5f) {
-                        CheckHitMapObject(mapObject, WeaponType.PickAxe);
-                    }
-                    break;
-                case mapObjectType.Bush:
-                    // 允许在1m内挥镰刀
-                    if (dis < 1.0f) {
-                        CheckHitMapObject(mapObject, WeaponType.Sickle);
-                    }
-                    break;
-                case mapObjectType.SamllStone:
-                    break;
-                default:
-                    break;
+            if (mapObject.TouchDistance < 0 || mapObject.TouchDistance < dis) {
+                if (isMouseButtonDown) {
+                    UIManager.Instance.AddTips("距离目标太远.");
+                    ProjectTool.PlayerAudio(AudioType.Fail);
+                }
+                return;
+            }
+            // 判断当前地图对象是否可以拾取
+            if (mapObject.CanPickUp) {
+                int pickUpItemConfigId = mapObject.PickUpItemConfigId;
+                if (pickUpItemConfigId == -1) {
+                    return;
+                }
+                // 将物品放回物品快捷栏, 注意如果背包满了则不应该将该物品放入背包
+                if (UIManager.Instance.Show<UI_InventoryWindow>().AddItem(pickUpItemConfigId)) {
+                    // 拾取物品并销毁地图对象
+                    mapObject.OnPickUp();
+                    // 播放动画, 需要注意当前并未切换状态, 仅在执行动画
+                    PlayAnimation("PickUp");
+                } else if (isMouseButtonDown) {
+                    UIManager.Instance.AddTips("背包已满.");
+                }
+                return;
+            }
+            // 判断攻击并根据玩家选中的地图对象类型以及当前角色的武器来判断做什么
+            if (canAttack == true) {
+                switch (mapObject.ObjectType) {
+                    case mapObjectType.Tree:
+                        if (!CheckHitMapObject(mapObject, WeaponType.Axe) && isMouseButtonDown) {
+                            UIManager.Instance.AddTips("只有石斧能砍树.");
+                            ProjectTool.PlayerAudio(AudioType.Fail);
+                        }
+                        break;
+                    case mapObjectType.Stone:
+                        if (!CheckHitMapObject(mapObject, WeaponType.PickAxe) && isMouseButtonDown) {
+                            UIManager.Instance.AddTips("只有铁镐能采石.");
+                            ProjectTool.PlayerAudio(AudioType.Fail);
+                        }
+                        break;
+                    case mapObjectType.Bush:
+                        if (!CheckHitMapObject(mapObject, WeaponType.Sickle) && isMouseButtonDown) {
+                            UIManager.Instance.AddTips("只有镰刀能收集灌木.");
+                            ProjectTool.PlayerAudio(AudioType.Fail);
+                        }
+                        break;
+                    case mapObjectType.SamllStone:
+                        break;
+                    default:
+                        break;
+                }
+                return;
             }
         }
     }
@@ -244,8 +272,6 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
     // 检测地图对象能否受伤
     private void CheckMapObjectHurt(HitMapObjectBase hitMapObject, WeaponType weaponType) {
         ItemWeaponInfo itemWeaponInfo = (currentWeaponItemData.config.itemTypeInfo as ItemWeaponInfo);
-        UnityEngine.Debug.Log("itemWeaponInfo.weaponType:" + itemWeaponInfo.weaponType);
-        UnityEngine.Debug.Log("WeaponType:" + weaponType);
         if (itemWeaponInfo.weaponType == weaponType) {
             hitMapObject.Hurt(itemWeaponInfo.attackValue);
             attackSucceedCount += 1;
@@ -253,7 +279,7 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
     }
 
     // 检查是否可以攻击当前地图对象
-    private void CheckHitMapObject(MapObjectBase mapObject, WeaponType weaponType) {
+    private bool CheckHitMapObject(MapObjectBase mapObject, WeaponType weaponType) {
         // 如果能攻击并且武器类型符合要求
         if (canAttack && 
             currentWeaponItemData != null && 
@@ -267,7 +293,9 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
             attackDirection = Quaternion.LookRotation(mapObject.transform.position - transform.position);
             // 切换状态
             ChangeState(PlayerState.Attack);
+            return true;
         }
+        return false;
     }
     #endregion
 
@@ -296,6 +324,11 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
 
     private void PlayAudioOnFootstep(int index) {
         AudioManager.Instance.PlayOnShot(playerConfig.footstepAudioClips[index], playerTransform.position, playerConfig.footstepVolume);
+    }
+
+    // 播放动画
+    public void PlayAnimation(string animationName, float fixedTime = 0.25f) {
+        animator.CrossFadeInFixedTime(animationName, fixedTime);
     }
     #endregion
 

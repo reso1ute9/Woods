@@ -12,4 +12,6 @@ public static class EventName
     public static string UpdatePlayerHungry = "UpdatePlayerHungry";
     // 玩家攻击事件
     public static string PlayerWeaponAttackSucceed = "PlayerWeaponAttackSucceed";
+    // 玩家拾取事件
+    public static string AddItem = "AddItem";
 }

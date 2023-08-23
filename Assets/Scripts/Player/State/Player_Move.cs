@@ -14,7 +14,7 @@ public class Player_Move : PlayerStateBase
     }
 
     public override void Enter() {
-        this.PlayAnimation("Move");
+        player.PlayAnimation("Move");
     }
 
     public override void Update() {
