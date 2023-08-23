@@ -171,6 +171,12 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
                         CheckHitMapObject(mapObject, WeaponType.PickAxe);
                     }
                     break;
+                case mapObjectType.Bush:
+                    // 允许在1m内挥镰刀
+                    if (dis < 1.0f) {
+                        CheckHitMapObject(mapObject, WeaponType.Sickle);
+                    }
+                    break;
                 case mapObjectType.SamllStone:
                     break;
                 default:
@@ -224,6 +230,10 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
                 case mapObjectType.Stone:
                     // 判断当前武器是否为铁镐
                     CheckMapObjectHurt(mapObject as HitMapObjectBase, WeaponType.PickAxe);
+                    break;
+                case mapObjectType.Bush:
+                    // 判断当前武器是否为铁镐
+                    CheckMapObjectHurt(mapObject as HitMapObjectBase, WeaponType.Sickle);
                     break;
                 default:
                     break;

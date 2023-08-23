@@ -9,6 +9,7 @@ public enum mapObjectType {
     Tree, 
     Stone, 
     SamllStone,
+    Bush,
 }
 
 // 地图对象基类
