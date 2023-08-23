@@ -64,4 +64,9 @@ public class MapChunkController : MonoBehaviour
         // UI层面移除
         MapManager.Instance.RemoveMapObject(mapObjectId);
     }
+
+    // 当整个地图块数据被销毁时(例如关闭游戏), 需要将当前新的地图块数据保存到磁盘上
+    private void OnDestroy() {
+        ArchiveManager.Instance.SaveMapChunkData(chunkIndex, mapChunkData);    
+    }
 }

@@ -51,14 +51,20 @@ public class ArchiveManager : Singleton<ArchiveManager>
         SaveManager.SaveObject(mapData);
     }
 
-    // 添加单个地图块数据
+    // 添加并保存单个地图块数据
     public void AddAndSaveMapChunkData(Vector2Int chunkIndex, MapChunkData mapChunkData) {
         // 保存索引
         Serialization_Vector2 index = chunkIndex.ConverToSVector2();
         mapData.MapChunkIndexList.Add(index);
         SaveMapData();
         // 保存地图块
-        SaveManager.SaveObject(mapChunkData, "Map_" + index.ToString());  
+        SaveMapChunkData(chunkIndex, mapChunkData);
+    }
+
+    // 保存单个地图块数据
+    public void SaveMapChunkData(Vector2Int chunkIndex, MapChunkData mapChunkData) {
+        Serialization_Vector2 index = chunkIndex.ConverToSVector2();
+        SaveManager.SaveObject(mapChunkData, "Map_" + index.ToString());
     }
 
     // 获取单个地图块数据
