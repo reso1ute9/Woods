@@ -35,10 +35,10 @@ public class UI_InventoryWindow : UI_WindowBase
 
     public void Update() {
         #region 测试逻辑
-        if (Input.GetKeyDown(KeyCode.Alpha0)) AddItem(0);
-        if (Input.GetKeyDown(KeyCode.Alpha1)) AddItem(1);
-        if (Input.GetKeyDown(KeyCode.Alpha2)) AddItem(2);
-        if (Input.GetKeyDown(KeyCode.Alpha3)) AddItem(3);
+        if (Input.GetKeyDown(KeyCode.Alpha0)) AddItemAndPlayAudio(0);
+        if (Input.GetKeyDown(KeyCode.Alpha1)) AddItemAndPlayAudio(1);
+        if (Input.GetKeyDown(KeyCode.Alpha2)) AddItemAndPlayAudio(2);
+        if (Input.GetKeyDown(KeyCode.Alpha3)) AddItemAndPlayAudio(3);
         #endregion
     }
     
@@ -52,8 +52,8 @@ public class UI_InventoryWindow : UI_WindowBase
     }
 
     // 添加物品
-    public bool AddItem(int configId) {
-        bool res = AddItemForLogic(configId);
+    public bool AddItemAndPlayAudio(int configId) {
+        bool res = AddItem(configId);
         if (res) {
             ProjectTool.PlayerAudio(AudioType.Bag);
         } else {
@@ -112,7 +112,7 @@ public class UI_InventoryWindow : UI_WindowBase
     }
 
     // 逻辑层面添加物品
-    public bool AddItemForLogic(int configId) {
+    public bool AddItem(int configId) {
         ItemConfig itemConfig = ConfigManager.Instance.GetConfig<ItemConfig>(ConfigName.Item, configId);
         switch (itemConfig.itemType) {
             case ItemType.Weapon:
@@ -143,8 +143,10 @@ public class UI_InventoryWindow : UI_WindowBase
         int index = GetEmptySlot();
         if (index >= 0) {
             SetItem(index, ItemData.CreateItemData(configId));
+            return true;
+        } else {
+            return false;
         }
-        return false;
     }
 
     // 得到一个空格子, return -1代表没有空格子

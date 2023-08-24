@@ -177,8 +177,15 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
                     mapObject.OnPickUp();
                     // 播放动画, 需要注意当前并未切换状态, 仅在执行动画
                     PlayAnimation("PickUp");
-                } else if (isMouseButtonDown) {
-                    UIManager.Instance.AddTips("背包已满.");
+                    // 播放成功音效
+                    ProjectTool.PlayerAudio(AudioType.Bag);
+                } else {
+                    if (isMouseButtonDown) {
+                        // 显示系统提示
+                        UIManager.Instance.AddTips("背包已满.");
+                        // 显示失败音效
+                        ProjectTool.PlayerAudio(AudioType.Fail);
+                    }
                 }
                 return;
             }
