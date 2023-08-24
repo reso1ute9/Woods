@@ -233,6 +233,8 @@ public class UI_InventoryWindow : UI_WindowBase
         ItemWeaponData itemWeaponData = inventoryData.weaponSlotItemData.itemTypeData as ItemWeaponData;
         ItemWeaponInfo itemWeaponInfo = inventoryData.weaponSlotItemData.config.itemTypeInfo as ItemWeaponInfo;
         // itemWeaponData.durability = Mathf.Clamp(itemWeaponData.durability - itemWeaponInfo.attackDurabilityCost, 0, 100);
+        UnityEngine.Debug.Log("itemWeaponData.durability:" + itemWeaponData.durability);
+        UnityEngine.Debug.Log("itemWeaponInfo.attackDurabilityCost:" + itemWeaponInfo.attackDurabilityCost);
         itemWeaponData.durability -= itemWeaponInfo.attackDurabilityCost;
         // 检查当前武器是否损坏
         if (itemWeaponData.durability <= 0) {

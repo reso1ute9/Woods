@@ -237,6 +237,7 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
     // 攻击动作结束
     private void OnAttackOver() {
         // 更新武器耐久度
+        UnityEngine.Debug.Log("attackSucceedCount:" + attackSucceedCount);
         for (int i = 0; i < attackSucceedCount; i++) {
             EventManager.EventTrigger(EventName.PlayerWeaponAttackSucceed);
         }
