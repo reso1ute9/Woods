@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using JKFrame;
+using TMPro;
 
 public enum PlayerState
 {
@@ -152,6 +153,7 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
     public Quaternion attackDirection { get; private set; }     // 当前攻击方向
     private List<MapObjectBase> lastAttackMapObjectList = new List<MapObjectBase>();
     private int attackSucceedCount = 0;                         // 攻击时成功命中地图对象数量
+    private MapObjectBase lastHitMapObject = null;              // 最后攻击地图对象
 
     // 选择地图对象
     public void OnSelectMapObject(RaycastHit hitInfo, bool isMouseButtonDown) {
@@ -159,14 +161,19 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
             // 检查地图对象触碰距离是否合法
             float dis = Vector3.Distance(playerTransform.position, mapObject.transform.position);
             if (mapObject.TouchDistance < 0 || mapObject.TouchDistance < dis) {
-                if (isMouseButtonDown) {
-                    UIManager.Instance.AddTips("距离目标太远.");
-                    ProjectTool.PlayerAudio(AudioType.Fail);
+                if (isMouseButtonDown == false) {
+                    return;
                 }
+                UIManager.Instance.AddTips("距离目标太远.");
+                ProjectTool.PlayerAudio(AudioType.Fail);
                 return;
             }
             // 判断当前地图对象是否可以拾取
             if (mapObject.CanPickUp) {
+                if (isMouseButtonDown == false) {
+                    return;
+                }
+                lastHitMapObject = null;
                 int pickUpItemConfigId = mapObject.PickUpItemConfigId;
                 if (pickUpItemConfigId == -1) {
                     return;
@@ -191,21 +198,25 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
             }
             // 判断攻击并根据玩家选中的地图对象类型以及当前角色的武器来判断做什么
             if (canAttack == true) {
+                // 如果现在交互的对象不是最后攻击对象则返回, 主要解决采摘后在进行砍伐时出现的bug
+                if (lastHitMapObject != mapObject && isMouseButtonDown == false) {
+                    return;
+                }
                 switch (mapObject.ObjectType) {
                     case mapObjectType.Tree:
-                        if (!CheckHitMapObject(mapObject, WeaponType.Axe) && isMouseButtonDown) {
+                        if (!CheckHitMapObject(mapObject, WeaponType.Axe)) {
                             UIManager.Instance.AddTips("只有石斧能砍树.");
                             ProjectTool.PlayerAudio(AudioType.Fail);
                         }
                         break;
                     case mapObjectType.Stone:
-                        if (!CheckHitMapObject(mapObject, WeaponType.PickAxe) && isMouseButtonDown) {
+                        if (!CheckHitMapObject(mapObject, WeaponType.PickAxe)) {
                             UIManager.Instance.AddTips("只有铁镐能采石.");
                             ProjectTool.PlayerAudio(AudioType.Fail);
                         }
                         break;
                     case mapObjectType.Bush:
-                        if (!CheckHitMapObject(mapObject, WeaponType.Sickle) && isMouseButtonDown) {
+                        if (!CheckHitMapObject(mapObject, WeaponType.Sickle)) {
                             UIManager.Instance.AddTips("只有镰刀能收集灌木.");
                             ProjectTool.PlayerAudio(AudioType.Fail);
                         }
@@ -300,6 +311,8 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
             attackDirection = Quaternion.LookRotation(mapObject.transform.position - transform.position);
             // 切换状态
             ChangeState(PlayerState.Attack);
+            // 记录最后一个攻击对象
+            lastHitMapObject = mapObject;
             return true;
         }
         return false;

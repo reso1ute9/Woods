@@ -12,10 +12,10 @@ public class BushBerry_Controller : Bush_Controller
 
     // 重写摘取方法, 当摘取浆果后灌木丛变为可收集状态
     public override int OnPickUp() {
+        // 设置为不可采摘
+        canPickUp = false;
         // 修改浆果灌木丛外观
         meshRenderer.sharedMaterial = materials[1];
-        // 设置为不可采摘
-        canPickUp = false;    
         return pickUpItemConfigId;
     }
 }
