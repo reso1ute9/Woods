@@ -172,7 +172,7 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
                     return;
                 }
                 // 将物品放回物品快捷栏, 注意如果背包满了则不应该将该物品放入背包
-                if (UIManager.Instance.Show<UI_InventoryWindow>().AddItem(pickUpItemConfigId)) {
+                if (UI_InventoryWindow.Instance.AddItem(pickUpItemConfigId)) {
                     // 拾取物品并销毁地图对象
                     mapObject.OnPickUp();
                     // 播放动画, 需要注意当前并未切换状态, 仅在执行动画
@@ -237,7 +237,6 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
     // 攻击动作结束
     private void OnAttackOver() {
         // 更新武器耐久度
-        UnityEngine.Debug.Log("attackSucceedCount:" + attackSucceedCount);
         for (int i = 0; i < attackSucceedCount; i++) {
             EventManager.EventTrigger(EventName.PlayerWeaponAttackSucceed);
         }

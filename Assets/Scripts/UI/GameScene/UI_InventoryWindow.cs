@@ -8,12 +8,17 @@ using JKFrame;
 [UIElement(true, "UI/UI_InventoryWindow", 1)]
 public class UI_InventoryWindow : UI_WindowBase
 {
+    public static UI_InventoryWindow Instance;
     private InventoryData inventoryData;
     [SerializeField] public UI_ItemSlot[] slots;          // 物品槽
     [SerializeField] public UI_ItemSlot weaponSlot;       // 装备槽
     public Sprite[] bgSprite;                       // 框图
     
     public override void Init() {
+        // TODO: 临时修复bug策略, 待重构
+        Instance = this;
+        EventManager.AddEventListener(EventName.PlayerWeaponAttackSucceed, OnPlayerWeaponAttackSucceed);
+
         base.Init();
         // 确定物品快捷栏存档数据
         inventoryData = ArchiveManager.Instance.inventoryData;
@@ -214,7 +219,7 @@ public class UI_InventoryWindow : UI_WindowBase
     public void SetItem(int index, ItemData itemData) {
         // 判断是否为为武器还是普通格子
         if (index == inventoryData.itemDatas.Length) {
-            inventoryData.SetWeaponItem(itemData);
+            inventoryData. SetWeaponItem(itemData);
             weaponSlot.InitData(itemData);
             // 将武器数据同步给玩家
             Player_Controller.Instance.ChangeWeapon(itemData);
@@ -232,9 +237,6 @@ public class UI_InventoryWindow : UI_WindowBase
         // 获取当前快捷栏中武器数据
         ItemWeaponData itemWeaponData = inventoryData.weaponSlotItemData.itemTypeData as ItemWeaponData;
         ItemWeaponInfo itemWeaponInfo = inventoryData.weaponSlotItemData.config.itemTypeInfo as ItemWeaponInfo;
-        // itemWeaponData.durability = Mathf.Clamp(itemWeaponData.durability - itemWeaponInfo.attackDurabilityCost, 0, 100);
-        UnityEngine.Debug.Log("itemWeaponData.durability:" + itemWeaponData.durability);
-        UnityEngine.Debug.Log("itemWeaponInfo.attackDurabilityCost:" + itemWeaponInfo.attackDurabilityCost);
         itemWeaponData.durability -= itemWeaponInfo.attackDurabilityCost;
         // 检查当前武器是否损坏
         if (itemWeaponData.durability <= 0) {
@@ -251,13 +253,10 @@ public class UI_InventoryWindow : UI_WindowBase
     // 注册监听事件
     protected override void RegisterEventListener() {
         base.RegisterEventListener();
-        // 窗口隐藏时该事件也应该持续监听
-        EventManager.AddEventListener(EventName.PlayerWeaponAttackSucceed, OnPlayerWeaponAttackSucceed);
     }
 
     // 取消监听事件
     protected override void CancelEventListener() {
         base.CancelEventListener();
-        // EventManager.RemoveEventListener(EventName.PlayerWeaponAttackSucceed, OnPlayerWeaponAttackSucceed);
     }
 }
