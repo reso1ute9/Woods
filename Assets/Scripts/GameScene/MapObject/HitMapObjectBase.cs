@@ -8,6 +8,7 @@ public abstract class HitMapObjectBase : MapObjectBase
     [SerializeField] private Animator animator;
     [SerializeField] private AudioClip[] hurtAudioClips;
     [SerializeField] private float maxHp;
+    [SerializeField] private int LootObjectConfigId = -1;   // 死亡时掉落物品id, -1默认为无效掉落
     private float hp;
 
     public override void Init(MapChunkController mapChunk, ulong mapObjectId) {
@@ -33,5 +34,10 @@ public abstract class HitMapObjectBase : MapObjectBase
         // 将当前可以被攻击对象放到对象池并掉落物品(TODO)
         RemoveOnMap();
         // TODO: 显示树木倒下动画
+        // 掉落物品
+        if (LootObjectConfigId == -1) {
+            return;
+        }
+        // TODO: 具体处理掉落物品逻辑
     }
 }
