@@ -37,13 +37,10 @@ public class MapChunkController : MonoBehaviour
                 foreach (var mapObject in mapChunkData.mapObjectDict.dictionary) {
                     // 找到目前地图块上所有mapObject id, 根据id去查找预制体
                     MapObjectConfig config = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, mapObject.Value.configId);
-                    GameObject t_object = PoolManager.Instance.GetGameObject(config.prefab, transform);
+                    MapObjectBase t_object = PoolManager.Instance.GetGameObject<MapObjectBase>(config.prefab, transform);
                     t_object.transform.position = mapObject.Value.position;
-                    // 临时测试逻辑, 因为目前只有树木继承自MapObjectBase, 其他地图对象未设置继承关系
-                    if (t_object.TryGetComponent<MapObjectBase>(out MapObjectBase temp)) {
-                        temp.Init(this, mapObject.Key);
-                        mapObjectDict.Add(mapObject.Key, temp);
-                    }
+                    t_object.Init(this, mapObject.Value.id);
+                    mapObjectDict.Add(mapObject.Key, t_object);
                 }
             } else {
                 // 注意放回的时候放的时mapObjectList中的对象
@@ -52,6 +49,21 @@ public class MapChunkController : MonoBehaviour
                 }
                 mapObjectDict.Clear();
             }
+        }
+    }
+
+    // 添加一个地图对象: 默认仅MapManager调用该方法
+    public void AddMapObject(MapObjectData mapObjectData) {
+        // 添加存档数据
+        mapChunkData.mapObjectDict.dictionary.Add(mapObjectData.id, mapObjectData);
+        // 实例化物品
+        if (isActive == true) {
+            MapObjectConfig mapObjectConfig = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, mapObjectData.configId);
+            // 从对象池中获取
+            MapObjectBase mapObject = PoolManager.Instance.GetGameObject<MapObjectBase>(mapObjectConfig.prefab, transform);
+            mapObject.transform.position = mapObjectData.position;
+            mapObject.Init(this, mapObjectData.id);
+            mapObjectDict.Add(mapObjectData.id, mapObject);
         }
     }
 

@@ -8,7 +8,7 @@ public abstract class HitMapObjectBase : MapObjectBase
     [SerializeField] private Animator animator;
     [SerializeField] private AudioClip[] hurtAudioClips;
     [SerializeField] private float maxHp;
-    [SerializeField] private int LootObjectConfigId = -1;   // 死亡时掉落物品id, -1默认为无效掉落
+    [SerializeField] private int lootObjectConfigId = -1;   // 死亡时掉落物品id, -1默认为无效掉落
     private float hp;
 
     public override void Init(MapChunkController mapChunk, ulong mapObjectId) {
@@ -35,9 +35,24 @@ public abstract class HitMapObjectBase : MapObjectBase
         RemoveOnMap();
         // TODO: 显示树木倒下动画
         // 掉落物品
-        if (LootObjectConfigId == -1) {
+        if (lootObjectConfigId == -1) {
             return;
         }
-        // TODO: 具体处理掉落物品逻辑
+        LootConfig lootConfig = ConfigManager.Instance.GetConfig<LootConfig>(ConfigName.Loot, lootObjectConfigId);
+        if (lootConfig == null) {
+            return;
+        }
+        // 根据概率决定是否实例化
+        for (int i = 0; i < lootConfig.Configs.Count; i++) {
+            int randValue = Random.Range(1, 101);
+            if (randValue < lootConfig.Configs[i].Probability) {
+                // 生成掉落物品
+                // 1. 掉落物品在父物体的上方一些
+                Vector3 pos = transform.position + new Vector3(0, 1, 0);
+                MapManager.Instance.SpawnMapObject(mapChunk, lootConfig.Configs[i].LootObjectConfigId, pos);
+            } else {
+
+            }
+        }
     }
 }

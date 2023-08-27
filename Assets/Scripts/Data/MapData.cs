@@ -25,8 +25,8 @@ public class MapData {
 // 地图块对象数据
 [Serializable] 
 public class MapObjectData {
-    public ulong id;                                // 地图对象id
-    public int configId;                            // 配置id
+    public ulong id;                                // 地图中地图对象id
+    public int configId;                            // 地图物体配置id
     private Serialization_Vector3 sv_position;      // 坐标: sv_postion存档用, position外部调用用
     public Vector3 position { 
         get => sv_position.ConverToVector3(); 

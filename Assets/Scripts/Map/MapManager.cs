@@ -234,5 +234,21 @@ public class MapManager : SingletonMono<MapManager>
             mapUI.RemoveMapObjectIcon(mapObjectId);
         }
     }
+
+    // 生成一个地图对象
+    public void SpawnMapObject(MapChunkController mapChunkController, int mapObjectConfigId, Vector3 position) {
+        // 生成数据
+        MapObjectData mapObjectData = mapGenerator.SpawnMapObject(mapObjectConfigId, position);
+        if (mapObjectData == null) {
+            return;
+        }
+        // 将数据绑定到地图块
+        mapChunkController.AddMapObject(mapObjectData);
+        // 添加UI icon
+        if (mapUI == null) {
+            return;
+        }
+        mapUI.AddMapObjectIcon(mapObjectData);
+    }
     #endregion
 }

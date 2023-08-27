@@ -101,24 +101,28 @@ public class UI_MapWindow : UI_WindowBase
             mapChunkImage.sprite = CreateMapSprite(texture);
         }
         // 添加物体icon
-        foreach (var mapObject in mapObjectDict.dictionary) {
-            MapObjectConfig config = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, mapObject.Value.configId);
-            // 按照id一定能查到物体, 但是物体不一定具有地图icon
-            if (config.mapIconSprite == null) {
-                continue;
-            }
-            GameObject tempObject = PoolManager.Instance.GetGameObject(mapIconPrefab, content);
-            Image iconImage = tempObject.GetComponent<Image>();
-            iconImage.sprite = config.mapIconSprite;
-            iconImage.transform.localScale = Vector3.one * config.mapIconSpriteSize;
-            // 因为整个content的尺寸在初始化的时候已经乘上mapScaleFactorNum了, 所以在计算icon位置时
-            // 也需要乘上相同的系数
-            float x = mapObject.Value.position.x * mapScaleFactorNum;
-            float y = mapObject.Value.position.z * mapScaleFactorNum;
-            tempObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(x, y);
-            // 保存icon图片
-            mapObjectIconDict.Add(mapObject.Key, iconImage);
+        foreach (var mapObjectData in mapObjectDict.dictionary.Values) {
+            AddMapObjectIcon(mapObjectData);
         }
+    }
+
+    // 添加地图对象icon
+    public void AddMapObjectIcon(MapObjectData mapObjectData) {
+        MapObjectConfig mapObjectConfig = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, mapObjectData.configId);
+        if (mapObjectConfig.mapIconSprite == null) {
+            return;
+        }
+        GameObject tempObject = PoolManager.Instance.GetGameObject(mapIconPrefab, content);
+        Image iconImage = tempObject.GetComponent<Image>();
+        iconImage.sprite = mapObjectConfig.mapIconSprite;
+        iconImage.transform.localScale = Vector3.one * mapObjectConfig.mapIconSpriteSize;
+        // 因为整个content的尺寸在初始化的时候已经乘上mapScaleFactorNum了, 所以在计算icon位置时
+        // 也需要乘上相同的系数
+        float x = mapObjectData.position.x * mapScaleFactorNum;
+        float y = mapObjectData.position.z * mapScaleFactorNum;
+        tempObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(x, y);
+        // 保存icon图片
+        mapObjectIconDict.Add(mapObjectData.id, iconImage);
     }
 
     // 移除地图对象icon

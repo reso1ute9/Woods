@@ -276,4 +276,19 @@ public class MapGenerator
         }
         return mapObjectDict;
     }
+
+    // 生成一个地图对象的地图数据
+    public MapObjectData SpawnMapObject(int mapObjectConfigId, Vector3 position) {
+        MapObjectData mapObjectData = null;
+        MapObjectConfig mapObjectConfig = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, mapObjectConfigId);
+        if (mapObjectConfig.isEmpty == false) {
+            mapObjectData = new MapObjectData() {
+                id = mapData.currentId, 
+                configId = mapObjectConfigId,
+                position = position
+            };
+            mapData.currentId += 1;
+        }
+        return mapObjectData;
+    }
 }
