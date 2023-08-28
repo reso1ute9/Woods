@@ -12,6 +12,7 @@ public enum mapObjectType {
     SamllStone,
     Bush,
     MushRoom, 
+    Wood,
 }
 
 // 地图对象基类

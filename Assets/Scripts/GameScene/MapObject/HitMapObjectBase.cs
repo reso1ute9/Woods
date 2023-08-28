@@ -50,8 +50,6 @@ public abstract class HitMapObjectBase : MapObjectBase
                 // 1. 掉落物品在父物体的上方一些
                 Vector3 pos = transform.position + new Vector3(0, 1, 0);
                 MapManager.Instance.SpawnMapObject(mapChunk, lootConfig.Configs[i].LootObjectConfigId, pos);
-            } else {
-
             }
         }
     }

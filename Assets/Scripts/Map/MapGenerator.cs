@@ -15,6 +15,7 @@ public class MapGenerator
     private Mesh mapChunkMesh;          // 地图块mesh
     private int forestSpawnWeightTotal;
     private int marshSpawnWeightTotal;
+    private int groundLayer;            // 地面层
     #endregion    
 
     #region 配置
@@ -37,6 +38,7 @@ public class MapGenerator
         this.mapData = mapData;
         this.spawnConfigDict = spawnConfigDict;
         this.GenerateMapData();
+        groundLayer = LayerMask.NameToLayer("Ground");
     }
     
     // 生成通用地图块数据
@@ -87,7 +89,8 @@ public class MapGenerator
         // 生成地图块物体
         GameObject mapChunkObj = new GameObject("Chunk_" + chunkIndex.ToString());
         MapChunkController mapChunk = mapChunkObj.AddComponent<MapChunkController>();
-        
+        // 将地图块指定到Ground层(Rigidbody-Physics)
+        mapChunkObj.layer = groundLayer;
         // 生成mesh
         mapChunkObj.AddComponent<MeshFilter>().mesh = mapChunkMesh;
         // 添加碰撞体: 会自动将过滤器的网格碰撞体抓过来作为mapChunkObj的MeshCollider
