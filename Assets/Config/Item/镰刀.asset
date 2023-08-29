@@ -1,0 +1,84 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a92d03be6949a4d49a97f91063e464b4, type: 3}
+  m_Name: "\u9570\u5200"
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects:
+    - {fileID: 9088588310510183361, guid: fc327cb65f3231a4098f92350403d8dd, type: 3}
+    - {fileID: 22100000, guid: 5c057a7a90eb52e4eb1ebf26b5b6ef5f, type: 2}
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: itemTypeInfo
+      Entry: 7
+      Data: 0|ItemWeaponInfo, Assembly-CSharp
+    - Name: weaponType
+      Entry: 3
+      Data: 2
+    - Name: prefabOnPlayer
+      Entry: 10
+      Data: 0
+    - Name: positionOnPlayer
+      Entry: 7
+      Data: UnityEngine.Vector3, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: -0.04
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: rotationOnPlayer
+      Entry: 7
+      Data: UnityEngine.Vector3, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: prefabOnMap
+      Entry: 6
+      Data: 
+    - Name: animatorController
+      Entry: 10
+      Data: 1
+    - Name: attackValue
+      Entry: 4
+      Data: 1
+    - Name: attackDurabilityCost
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+  itemType: 0
+  itemName: "\u9570\u5200"
+  descript: "\u4E00\u628A\u7531\u6728\u67C4\u548C\u94C1\u5757\u7EC4\u6210\u7684\u9570\u5200,
+    \u53EF\u4EE5\u641C\u96C6\u5E72\u8349"
+  itemIcon: {fileID: 21300000, guid: 6f6057ea5ee5bf4498651d34d6a25bf4, type: 3}

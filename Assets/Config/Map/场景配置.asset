@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9658cd6f01099b4b9ce4657fab773f2, type: 3}
+  m_Name: "\u573A\u666F\u914D\u7F6E"
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
+  mapChunkSize: 5
+  cellSize: 2
+  noiseLacunarity: 0.25
+  forestTexture: {fileID: 2800000, guid: a4ecc8f1690616d49a31dea795ef3dd0, type: 3}
+  marshTextures:
+  - {fileID: 2800000, guid: f91f903f289666149950ad64a0fdcb74, type: 3}
+  - {fileID: 2800000, guid: 5d732e147ea67444583ab88aa58b33b3, type: 3}
+  - {fileID: 2800000, guid: e95637444b38b9c418ec56ee3ab18bf4, type: 3}
+  - {fileID: 2800000, guid: 470b2cec494bd7a4f8bea9df645af253, type: 3}
+  - {fileID: 2800000, guid: 901df0f47fc909a4eab3021d35146143, type: 3}
+  - {fileID: 2800000, guid: 4700afa24d4a4d34594b1cd76a341de3, type: 3}
+  - {fileID: 2800000, guid: 1b389ef7073571140adbc673e8adb559, type: 3}
+  - {fileID: 2800000, guid: 374fc38506c346a4c80b86da41971129, type: 3}
+  - {fileID: 2800000, guid: 5b25107043b1b744d8a283eccb3a631d, type: 3}
+  - {fileID: 2800000, guid: 30d49f9d27960f24ebebb3860519d885, type: 3}
+  - {fileID: 2800000, guid: 604f0f211e8b2b649bf2c025a8fbe1f5, type: 3}
+  - {fileID: 2800000, guid: ae32e0c65f3d6c141b78b8bcc7aa3acb, type: 3}
+  - {fileID: 2800000, guid: 27e1919eaf12a4d46ba0610e5f8091d8, type: 3}
+  - {fileID: 2800000, guid: d43763e4a1f759e478711922c31767e8, type: 3}
+  - {fileID: 2800000, guid: 47ccf9be2cce2664db2d570eb87615c5, type: 3}
+  mapMaterial: {fileID: 2100000, guid: 162a3a0a39a63684496fc9d6bece7882, type: 2}
+  viewDistance: 2

@@ -62,7 +62,6 @@ crashlytics-build.properties
 /Assets/JKFrame/*
 /Assets/Res/*
 /Assets/Scenes/*
-/Assets/Config/*
 /ProjectSettings/*
 /.vscode/
 /Packages/
