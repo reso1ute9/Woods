@@ -13,6 +13,8 @@ public enum mapObjectType {
     Bush,
     MushRoom, 
     Wood,
+    Twig,
+    Wildflower, 
 }
 
 // 地图对象基类

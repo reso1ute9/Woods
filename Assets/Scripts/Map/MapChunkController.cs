@@ -37,7 +37,9 @@ public class MapChunkController : MonoBehaviour
                 foreach (var mapObject in mapChunkData.mapObjectDict.dictionary) {
                     // 找到目前地图块上所有mapObject id, 根据id去查找预制体
                     MapObjectConfig config = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, mapObject.Value.configId);
-                    MapObjectBase t_object = PoolManager.Instance.GetGameObject<MapObjectBase>(config.prefab, transform);
+                    MapObjectBase t_object = PoolManager.Instance.GetGameObject(config.prefab, transform).GetComponent<MapObjectBase>();
+                    // UnityEngine.Debug.Log("t_object:" + t_object);
+                    // UnityEngine.Debug.Log("t_object.transform:" + t_object.transform);
                     t_object.transform.position = mapObject.Value.position;
                     t_object.Init(this, mapObject.Value.id);
                     mapObjectDict.Add(mapObject.Key, t_object);
