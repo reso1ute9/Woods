@@ -250,5 +250,11 @@ public class MapManager : SingletonMono<MapManager>
         }
         mapUI.AddMapObjectIcon(mapObjectData);
     }
+
+    // 生成一个地图对象
+    public void SpawnMapObject(int mapObjectConfigId, Vector3 position) {
+        Vector2Int currChunkIndex = GetMapChunkIndexByWorldPosition(position);
+        SpawnMapObject(mapChunkDict[currChunkIndex], mapObjectConfigId, position);
+    }
     #endregion
 }

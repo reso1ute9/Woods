@@ -8,6 +8,7 @@ using UnityEngine.EventSystems;
 public class InputManager : SingletonMono<InputManager> {
     private static List<RaycastResult> raycastResults = new List<RaycastResult>(); // 记录鼠标与UI碰撞的结果
     [SerializeField] LayerMask mapObjectLayer;      // 地图对象层
+    [SerializeField] LayerMask groundLayer;         // 地面层
     private bool wantCheck = false;                 // 是否需要检测
 
     public void Init() {
@@ -56,6 +57,16 @@ public class InputManager : SingletonMono<InputManager> {
             }
         }
         raycastResults.Clear();
+        return false;
+    }
+
+    // 获取鼠标在地面上的世界坐标
+    public bool GetMousePositionOnGround(Vector3 mousePosition, out Vector3 worldPosition) {
+        if (Physics.Raycast(Camera.main.ScreenPointToRay(mousePosition), out RaycastHit hitInfo, 1000, groundLayer)) {
+            worldPosition = hitInfo.point;
+            return true;
+        }
+        worldPosition = Vector3.zero;
         return false;
     }
 }

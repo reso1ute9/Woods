@@ -166,10 +166,17 @@ public class  UI_ItemSlot : MonoBehaviour
             // 鼠标形状恢复
             GameManager.Instance.SetCursorState(CursorState.Normal);
             // 如果目标没有格子, 但是是UI物体, 可以无视
-            if (InputManager.Instance.CheckMouseOnUI()) return;
+            if (InputManager.Instance.CheckMouseOnUI()) {
+                return;
+            }
+            // 如果当前鼠标未点击到地面直接无视
+            if (InputManager.Instance.GetMousePositionOnGround(eventData.position, out Vector3 worldPosition) == false) {
+                return;
+            }
             // 从存档里去除这份数据
-            // TOOD: 物品掉落在地上
-            // TODO: 将数据传递给地图块, 可能存在销毁的情况
+            // 物品掉落在地上: 在地面生成物品, 并将y值设置为1
+            worldPosition.y = 1;
+            MapManager.Instance.SpawnMapObject(itemData.config.mapObjectConfigId, worldPosition);
             UnityEngine.Debug.Log("物品掉落在地上" + itemData.config.itemName);
             // 丢弃一件物品, 注意数据/UI/音效需要同步
             ProjectTool.PlayerAudio(AudioType.Bag);

@@ -32,5 +32,6 @@ MonoBehaviour:
       Data: 
   itemType: 2
   itemName: "\u6811\u679D"
+  mapObjectConfigId: 20
   descript: "\u4E00\u6839\u5C0F\u6811\u679D"
   itemIcon: {fileID: 21300000, guid: ab8915ecd54109146a6ecfd8e8f5b416, type: 3}
