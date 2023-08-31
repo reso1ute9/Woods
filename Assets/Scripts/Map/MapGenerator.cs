@@ -272,7 +272,14 @@ public class MapGenerator
                         UnityEngine.Random.Range(-mapConfig.cellSize/2, mapConfig.cellSize/2)
                     );
                     Vector3 position = mapVertex.position + offset;
-                    mapObjectDict.dictionary.Add(mapData.currentId, new MapObjectData { configId = configId, position = position });                
+                    mapObjectDict.dictionary.Add(
+                        mapData.currentId, 
+                        new MapObjectData { 
+                            id = mapData.currentId, 
+                            configId = configId, 
+                            position = position
+                        }
+                    );               
                     mapData.currentId += 1;
                 }
             }
