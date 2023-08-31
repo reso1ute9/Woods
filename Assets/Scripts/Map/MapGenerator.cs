@@ -74,7 +74,7 @@ public class MapGenerator
             this.forestSpawnWeightTotal += ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, temp[i]).probability;   
         }
         this.marshSpawnWeightTotal = 0;
-        temp = spawnConfigDict[MapVertexType.Forest];
+        temp = spawnConfigDict[MapVertexType.Marsh];
         for (int i = 0; i < temp.Count; i++) {
             this.marshSpawnWeightTotal += ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, temp[i]).probability;   
         }
@@ -157,13 +157,13 @@ public class MapGenerator
     // 生成perlin噪声图, 该噪声图是为确定顶点对应的位置是否为森林/沼泽
     public float[,] GenerateNoiseMap(int width, int height, float lacunarity) {
         lacunarity += 0.1f;
-        float[,] noiseMap = new float[width - 1, height - 1];
+        float[,] noiseMap = new float[width, height];
         
         float offsetX = UnityEngine.Random.Range(-10000f, 10000f);
         float offsetY = UnityEngine.Random.Range(-10000f, 10000f);
 
-        for (int x = 0; x < width - 1; x++) {
-            for (int z = 0; z < height - 1; z++) {
+        for (int x = 0; x < width; x++) {
+            for (int z = 0; z < height; z++) {
                 noiseMap[x, z] = Mathf.PerlinNoise(
                     x * lacunarity + offsetX, z * lacunarity + offsetY
                 );

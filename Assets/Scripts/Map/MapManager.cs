@@ -53,7 +53,6 @@ public class MapManager : SingletonMono<MapManager>
         mapConfig = ConfigManager.Instance.GetConfig<MapConfig>(ConfigName.Map);
         Dictionary<int, ConfigBase> temp_dict = ConfigManager.Instance.GetConfigs(ConfigName.mapObject);
         spawnConfigDict = new Dictionary<MapVertexType, List<int>>();
-        spawnConfigDict.Add(MapVertexType.None, new List<int>());
         spawnConfigDict.Add(MapVertexType.Forest, new List<int>());
         spawnConfigDict.Add(MapVertexType.Marsh, new List<int>());
         foreach (var item in temp_dict) {
