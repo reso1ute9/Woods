@@ -16,11 +16,12 @@ public class MapManager : SingletonMono<MapManager>
 
     // 运行时逻辑
     #region 运行时逻辑
+    [SerializeField] MeshCollider meshCollider;
     private MapGenerator mapGenerator;                              // 地图生成器
     private Transform viewer;                                       // 观察者
     private Vector3 lastViewerPosition = Vector3.one * -1;          // 观察者最后的位置, 用以控制地图是否进行刷新
     public Dictionary<Vector2Int, MapChunkController> mapChunkDict; // 全部已有的地图块
-    private float mapSizeOnWorld;                                    // 在世界中世界的地图尺寸
+    private float mapSizeOnWorld;                                   // 在世界中世界的地图尺寸
     private float chunkSizeOnWorld;                                 // 在世界中实际的地图块尺寸    
     public float UpdateVisibleChunkTime = 1.0f;                     // 地图更新最小时间
     private bool canUpdateChunk = true;                             // 地图是否能进行更新
@@ -66,6 +67,9 @@ public class MapManager : SingletonMono<MapManager>
         mapChunkDict = new Dictionary<Vector2Int, MapChunkController>();
         chunkSizeOnWorld = mapConfig.mapChunkSize * mapConfig.cellSize;
         mapSizeOnWorld = chunkSizeOnWorld * mapInitData.mapSize;
+        
+        // 生成地面碰撞体的网格
+        meshCollider.sharedMesh = GenerateGroundMesh(mapSizeOnWorld, mapSizeOnWorld);
 
         // 需要判断是否需要加载之前的地图
         int mapChunkDataCount = mapData.MapChunkIndexList.Count;
@@ -194,6 +198,30 @@ public class MapManager : SingletonMono<MapManager>
     private void ResetCanUpdateChunkFlag() {
         canUpdateChunk = true;
     }
+    
+    // 生成整个地面的mesh
+    public Mesh GenerateGroundMesh(float height, float width) {
+        Mesh mesh = new Mesh();
+        // 确定顶点在哪里
+        mesh.vertices = new Vector3[] {
+            new Vector3(0, 0, 0),
+            new Vector3(0, 0, height),
+            new Vector3(width, 0, height),
+            new Vector3(width, 0, 0)
+        };
+        // 确定哪些点形成三角形
+        mesh.triangles = new int[] {
+            0, 1, 2,
+            0, 2, 3
+        };
+        mesh.uv = new Vector2[] {
+            new Vector3(0, 0),
+            new Vector3(0, 1),
+            new Vector3(1, 1),
+            new Vector3(1, 0)
+        };
+        return mesh;
+    }
 
     #region 地图UI相关
     // 显示地图UI
@@ -258,4 +286,8 @@ public class MapManager : SingletonMono<MapManager>
         SpawnMapObject(mapChunkDict[currChunkIndex], mapObjectConfigId, position);
     }
     #endregion
+
+    private void OnDestroy() {
+        ArchiveManager.Instance.SaveMapData();
+    }
 }

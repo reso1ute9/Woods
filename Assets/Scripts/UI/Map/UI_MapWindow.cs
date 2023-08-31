@@ -101,12 +101,8 @@ public class UI_MapWindow : UI_WindowBase
             mapChunkImage.sprite = CreateMapSprite(texture);
         }
         // 添加物体icon
-        // foreach (var mapObjectData in mapObjectDict.dictionary.Values) {
-        //     AddMapObjectIcon(mapObjectData);
-        // }
-        foreach (var item in mapObjectDict.dictionary) {
-            UnityEngine.Debug.Log("chunkIndex:" + chunkIndex + ", item.key:" + item.Key + ", item.id" + item.Value.id);
-            AddMapObjectIcon(item.Value);
+        foreach (var mapObjectData in mapObjectDict.dictionary.Values) {
+            AddMapObjectIcon(mapObjectData);
         }
     }
 
