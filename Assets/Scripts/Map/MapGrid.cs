@@ -148,8 +148,9 @@ public class MapGrid
 
 // 顶点类型
 public enum MapVertexType {
+    None,   // 默认类型
     Forest, // 森林
-    Marsh,  // 沼泽
+    Marsh,  // 沼泽 
 }
 
 // 地图顶点

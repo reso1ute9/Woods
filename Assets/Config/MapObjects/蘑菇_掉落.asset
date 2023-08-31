@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3c52314092cb1264487d4d75cb1b3e65, type: 3}
-  m_Name: "\u91CE\u82B11"
+  m_Name: "\u8611\u83C7_\u6389\u843D"
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -22,8 +22,8 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   isEmpty: 0
-  mapVertexType: 1
-  prefab: {fileID: 4291549680394129917, guid: 717adf369c0f2a24a8c3660f034e0cfa, type: 3}
+  mapVertexType: 0
+  prefab: {fileID: 5261289486117439327, guid: 200919204c7eb694b802358610d7c0de, type: 3}
   mapIconSprite: {fileID: 0}
-  mapIconSpriteSize: 0.5
-  probability: 5
+  mapIconSpriteSize: 0
+  probability: 0

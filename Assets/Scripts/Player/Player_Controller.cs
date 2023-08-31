@@ -204,24 +204,22 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
                 }
                 switch (mapObject.ObjectType) {
                     case mapObjectType.Tree:
-                        if (!CheckHitMapObject(mapObject, WeaponType.Axe)) {
+                        if (!CheckHitMapObject(mapObject, WeaponType.Axe) && isMouseButtonDown) {
                             UIManager.Instance.AddTips("只有石斧能砍树.");
                             ProjectTool.PlayerAudio(AudioType.Fail);
                         }
                         break;
                     case mapObjectType.Stone:
-                        if (!CheckHitMapObject(mapObject, WeaponType.PickAxe)) {
+                        if (!CheckHitMapObject(mapObject, WeaponType.PickAxe) && isMouseButtonDown) {
                             UIManager.Instance.AddTips("只有铁镐能采石.");
                             ProjectTool.PlayerAudio(AudioType.Fail);
                         }
                         break;
                     case mapObjectType.Bush:
-                        if (!CheckHitMapObject(mapObject, WeaponType.Sickle)) {
+                        if (!CheckHitMapObject(mapObject, WeaponType.Sickle) && isMouseButtonDown) {
                             UIManager.Instance.AddTips("只有镰刀能收集灌木.");
                             ProjectTool.PlayerAudio(AudioType.Fail);
                         }
-                        break;
-                    case mapObjectType.SamllStone:
                         break;
                     default:
                         break;

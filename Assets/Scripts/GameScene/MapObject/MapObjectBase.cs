@@ -11,10 +11,12 @@ public enum mapObjectType {
     Stone, 
     SamllStone,
     Bush,
+    Berry, 
     MushRoom, 
     Wood,
     Twig,
     Wildflower, 
+    Weapon, 
 }
 
 // 地图对象基类

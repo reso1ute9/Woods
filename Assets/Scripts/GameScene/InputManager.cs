@@ -31,6 +31,8 @@ public class InputManager : SingletonMono<InputManager> {
         bool mouseButton = Input.GetMouseButton(0);
         bool mouseButtonDown = Input.GetMouseButtonDown(0);
         if (mouseButton || mouseButtonDown) {
+            UnityEngine.Debug.Log("mouseButton:" + mouseButton);
+            UnityEngine.Debug.Log("mouseButtonDown:" + mouseButtonDown);
             if (CheckMouseOnUI()) return;
             // 射线检测地图上的3d物体
             Ray ray = Camera_Controller.Instance.Camera.ScreenPointToRay(Input.mousePosition);

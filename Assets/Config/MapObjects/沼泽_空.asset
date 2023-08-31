@@ -22,6 +22,8 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   isEmpty: 1
-  mapVertexType: 1
+  mapVertexType: 2
   prefab: {fileID: 0}
+  mapIconSprite: {fileID: 0}
+  mapIconSpriteSize: 1
   probability: 30

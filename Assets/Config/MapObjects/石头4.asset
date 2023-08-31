@@ -22,7 +22,7 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   isEmpty: 0
-  mapVertexType: 0
+  mapVertexType: 1
   prefab: {fileID: 5777203302586456749, guid: eb5d7e52251627e4eb7dc4ab308d9a97, type: 3}
   mapIconSprite: {fileID: 21300000, guid: c7f63e68fc50b8047a6558ced6ebefd9, type: 3}
   mapIconSpriteSize: 0.5

@@ -199,9 +199,10 @@ public class UI_InventoryWindow : UI_WindowBase
 
     // 丢掉一件物品
     public void DiscardItem(int index) {
-        // 如果是武器直接丢弃
+        // 如果是武器直接丢弃, 注意需要修改模型
         if (index == slots.Length || slots[index].itemData.config.itemType == ItemType.Weapon) {
             RemoveItem(index);
+            Player_Controller.Instance.ChangeWeapon(null);
             return;
         }
         // 根据类型去判断, 对于可堆积的物品每次减少一个
@@ -219,7 +220,7 @@ public class UI_InventoryWindow : UI_WindowBase
     public void SetItem(int index, ItemData itemData) {
         // 判断是否为为武器还是普通格子
         if (index == inventoryData.itemDatas.Length) {
-            inventoryData. SetWeaponItem(itemData);
+            inventoryData.SetWeaponItem(itemData);
             weaponSlot.InitData(itemData);
             // 将武器数据同步给玩家
             Player_Controller.Instance.ChangeWeapon(itemData);
