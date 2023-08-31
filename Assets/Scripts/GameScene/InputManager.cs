@@ -7,9 +7,10 @@ using UnityEngine.EventSystems;
 // 输入管理器
 public class InputManager : SingletonMono<InputManager> {
     private static List<RaycastResult> raycastResults = new List<RaycastResult>(); // 记录鼠标与UI碰撞的结果
-    [SerializeField] LayerMask mapObjectLayer;      // 地图对象层
-    [SerializeField] LayerMask groundLayer;         // 地面层
-    private bool wantCheck = false;                 // 是否需要检测
+    [SerializeField] LayerMask bigMapObjectLayer;           // 大型地图对象层(e.g. 树/石头)
+    [SerializeField] LayerMask mouseMapObjectLayer;         // 鼠标可交互的地图对象层
+    [SerializeField] LayerMask groundLayer;                 // 地面层
+    private bool wantCheck = false;                         // 是否需要检测
 
     public void Init() {
         SetCheckState(true);
@@ -25,7 +26,7 @@ public class InputManager : SingletonMono<InputManager> {
         this.wantCheck = wantCheck;
     }
 
-    // 检查选中地图对象
+    // 检查鼠标选中地图对象是否可以进行互动
     private void CheckSelectMapObject() {
         // 如果鼠标一直按下
         bool mouseButton = Input.GetMouseButton(0);
@@ -34,7 +35,7 @@ public class InputManager : SingletonMono<InputManager> {
             if (CheckMouseOnUI()) return;
             // 射线检测地图上的3d物体
             Ray ray = Camera_Controller.Instance.Camera.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hitInfo, 100, mapObjectLayer)) {
+            if (Physics.Raycast(ray, out RaycastHit hitInfo, 100, mouseMapObjectLayer)) {
                 // 发送给玩家控制器去处理
                 Player_Controller.Instance.OnSelectMapObject(hitInfo, mouseButtonDown);
             }
@@ -58,6 +59,11 @@ public class InputManager : SingletonMono<InputManager> {
         }
         raycastResults.Clear();
         return false;
+    }
+
+    // 检查鼠标是否在大型地图对象上
+    public bool CheckMouseOnBigMapObject() {
+        return Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), 1000, bigMapObjectLayer);
     }
 
     // 获取鼠标在地面上的世界坐标

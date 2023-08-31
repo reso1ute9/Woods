@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3240781431821351166}
   - component: {fileID: 1461351674919241267}
   - component: {fileID: 7487384052405328874}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: bush_leaf
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -85,7 +85,7 @@ GameObject:
   - component: {fileID: 8419317017003385591}
   - component: {fileID: 6807956611866849919}
   - component: {fileID: 3732319745644753234}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -161,6 +161,10 @@ public class  UI_ItemSlot : MonoBehaviour
             if (InputManager.Instance.CheckMouseOnUI()) {
                 return;
             }
+            // 使用射线检测防止玩家将物品扔到大型物体身上
+            if (InputManager.Instance.CheckMouseOnBigMapObject()) {
+                return;
+            }
             // 如果当前鼠标未点击到地面直接无视
             if (InputManager.Instance.GetMousePositionOnGround(eventData.position, out Vector3 worldPosition) == false) {
                 return;
