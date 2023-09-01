@@ -7,6 +7,7 @@ public static class EventName
     // 时间事件
     public static string UpdateDayNum = "UpdateDayNum";
     public static string UpdateTimeState = "UpdateTimeState";
+    public static string OnMorning = "OnMorning";
     // 角色信息事件
     public static string UpdatePlayerHP = "UpdatePlayerHP";
     public static string UpdatePlayerHungry = "UpdatePlayerHungry";

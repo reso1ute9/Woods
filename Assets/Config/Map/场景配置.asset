@@ -43,3 +43,4 @@ MonoBehaviour:
   - {fileID: 2800000, guid: 47ccf9be2cce2664db2d570eb87615c5, type: 3}
   mapMaterial: {fileID: 2100000, guid: 162a3a0a39a63684496fc9d6bece7882, type: 2}
   viewDistance: 2
+  mapChunkRefreshProbability: 100

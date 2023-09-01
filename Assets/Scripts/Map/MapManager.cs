@@ -127,6 +127,31 @@ public class MapManager : SingletonMono<MapManager>
         }
     }
 
+    // 生成整个地面的mesh
+    public Mesh GenerateGroundMesh(float height, float width) {
+        Mesh mesh = new Mesh();
+        // 确定顶点在哪里
+        mesh.vertices = new Vector3[] {
+            new Vector3(0, 0, 0),
+            new Vector3(0, 0, height),
+            new Vector3(width, 0, height),
+            new Vector3(width, 0, 0)
+        };
+        // 确定哪些点形成三角形
+        mesh.triangles = new int[] {
+            0, 1, 2,
+            0, 2, 3
+        };
+        mesh.uv = new Vector2[] {
+            new Vector3(0, 0),
+            new Vector3(0, 1),
+            new Vector3(1, 1),
+            new Vector3(1, 0)
+        };
+        return mesh;
+    }
+
+    #region 地图块相关
     // 根据观察者的位置去刷新地图块
     private void UpdateVisibleChunk() {
         // 如果观察者没有移动或者时间没到则不需要刷新
@@ -200,30 +225,12 @@ public class MapManager : SingletonMono<MapManager>
     private void ResetCanUpdateChunkFlag() {
         canUpdateChunk = true;
     }
-    
-    // 生成整个地面的mesh
-    public Mesh GenerateGroundMesh(float height, float width) {
-        Mesh mesh = new Mesh();
-        // 确定顶点在哪里
-        mesh.vertices = new Vector3[] {
-            new Vector3(0, 0, 0),
-            new Vector3(0, 0, height),
-            new Vector3(width, 0, height),
-            new Vector3(width, 0, 0)
-        };
-        // 确定哪些点形成三角形
-        mesh.triangles = new int[] {
-            0, 1, 2,
-            0, 2, 3
-        };
-        mesh.uv = new Vector2[] {
-            new Vector3(0, 0),
-            new Vector3(0, 1),
-            new Vector3(1, 1),
-            new Vector3(1, 0)
-        };
-        return mesh;
+
+    // 在地图块刷新时生成地图对象列表, 为了让MapChunkController能访问到, 因此在这里生成了同名/同功能函数
+    public List<MapObjectData> SpawnMapObjectDataOnMapChunkRefresh(Vector2Int chunkIndex) {
+        return mapGenerator.SpawnMapObjectDataOnMapChunkRefresh(chunkIndex);
     }
+    #endregion
 
     #region 地图UI相关
     // 显示地图UI
@@ -257,13 +264,21 @@ public class MapManager : SingletonMono<MapManager>
     private void CloseMapUI() {
         UIManager.Instance.Close<UI_MapWindow>();
     }
+    #endregion
 
+    #region 地图对象相关
     // 移除一个地图物品
     public void RemoveMapObject(ulong mapObjectId) {
         // 移除地图对象icon image
         if (mapUI != null) {
             mapUI.RemoveMapObjectIcon(mapObjectId);
         }
+    }
+
+    // 生成一个地图对象
+    public void SpawnMapObject(int mapObjectConfigId, Vector3 position) {
+        Vector2Int currChunkIndex = GetMapChunkIndexByWorldPosition(position);
+        SpawnMapObject(mapChunkDict[currChunkIndex], mapObjectConfigId, position);
     }
 
     // 生成一个地图对象
@@ -280,12 +295,6 @@ public class MapManager : SingletonMono<MapManager>
             return;
         }
         mapUI.AddMapObjectIcon(mapObjectData);
-    }
-
-    // 生成一个地图对象
-    public void SpawnMapObject(int mapObjectConfigId, Vector3 position) {
-        Vector2Int currChunkIndex = GetMapChunkIndexByWorldPosition(position);
-        SpawnMapObject(mapChunkDict[currChunkIndex], mapObjectConfigId, position);
     }
     #endregion
 

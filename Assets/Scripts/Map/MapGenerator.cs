@@ -304,8 +304,9 @@ public class MapGenerator
     }
 
     // 在地图块刷新时生成地图对象列表
+    List<MapObjectData> mapObjectDataList = new List<MapObjectData>();
     public List<MapObjectData> SpawnMapObjectDataOnMapChunkRefresh(Vector2Int chunkIndex) {
-        List<MapObjectData> mapObjectDataList = null;;
+        mapObjectDataList.Clear();
         int offsetX = chunkIndex.x * mapConfig.mapChunkSize;
         int offsetZ = chunkIndex.y * mapConfig.mapChunkSize;
         for (int x = 1; x < mapConfig.mapChunkSize; x++) {
@@ -323,9 +324,6 @@ public class MapGenerator
                 int configId = GetMapObjectConfigIdForWeight(mapVertex.vertexType);
                 MapObjectConfig spawnModel = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, configId);
                 if (spawnModel.isEmpty == false) {
-                    if (mapObjectDataList == null) {
-                        mapObjectDataList = new List<MapObjectData>();
-                    }
                     // 实例化物品
                     Vector3 offset = new Vector3(
                         UnityEngine.Random.Range(-mapConfig.cellSize/2, mapConfig.cellSize/2), 

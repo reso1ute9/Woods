@@ -74,6 +74,8 @@ public class TimeManager : LogicManagerBase<TimeManager>
             timeData.dayNum += 1;
             // 触发当前是否为第几天的状态
             EventManager.EventTrigger<int>(EventName.UpdateDayNum, timeData.dayNum);
+            // 触发地图块刷新机制
+            EventManager.EventTrigger(EventName.OnMorning);
         }
         timeData.calcTime = timeConfig.timeStateConfig[timeData.stateIndex].durationTime;
         // 迷雾效果: 直接使用配置中fog的值

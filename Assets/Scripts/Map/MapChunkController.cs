@@ -12,7 +12,7 @@ public class MapChunkController : MonoBehaviour
     public MapChunkData mapChunkData { get; private set; }
 
     public Vector3 centrePosition { get; private set; }
-    public Vector2Int chunkIndex { get; private set; }
+    public Vector2Int chunkIndex { get; private set; }              // 当前地图块索引
     public bool isAllForest { get; private set; }   
     private bool isActive = false;
     public bool isInitialized = false;                              // 标记地图UI是否已经初始化
@@ -25,6 +25,19 @@ public class MapChunkController : MonoBehaviour
         this.mapObjectDict = new Dictionary<ulong, MapObjectBase>(mapChunkData.mapObjectDict.dictionary.Count);
         this.isAllForest = isAllForest;
         this.isInitialized = true;
+        // 添加地图块刷新事件
+        EventManager.AddEventListener(EventName.OnMorning, OnMorning);
+    }
+
+    private void InstantiateMapObject(MapObjectData mapObjectData) {
+        // 获取该地图对象配置信息
+        MapObjectConfig mapObjectConfig = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, mapObjectData.configId);
+        // 从对象池中获取
+        // MapObjectBase mapObject = PoolManager.Instance.GetGameObject<MapObjectBase>(mapObjectConfig.prefab, transform);
+        MapObjectBase mapObject = PoolManager.Instance.GetGameObject(mapObjectConfig.prefab, transform).GetComponent<MapObjectBase>();
+        mapObject.transform.position = mapObjectData.position;
+        mapObject.Init(this, mapObjectData.id);
+        mapObjectDict.Add(mapObjectData.id, mapObject);
     }
 
     // 当前chunk设置为可显示时需要显示出地图+地图中的对象(树, 石头...)
@@ -34,15 +47,8 @@ public class MapChunkController : MonoBehaviour
             gameObject.SetActive(isActive);
             // 从对象池生成/回收所有对象
             if (isActive == true) {
-                foreach (var mapObject in mapChunkData.mapObjectDict.dictionary) {
-                    // 找到目前地图块上所有mapObject id, 根据id去查找预制体
-                    MapObjectConfig config = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, mapObject.Value.configId);
-                    MapObjectBase t_object = PoolManager.Instance.GetGameObject(config.prefab, transform).GetComponent<MapObjectBase>();
-                    // UnityEngine.Debug.Log("t_object:" + t_object);
-                    // UnityEngine.Debug.Log("t_object.transform:" + t_object.transform);
-                    t_object.transform.position = mapObject.Value.position;
-                    t_object.Init(this, mapObject.Value.id);
-                    mapObjectDict.Add(mapObject.Key, t_object);
+                foreach (var mapObject in mapChunkData.mapObjectDict.dictionary.Values) {
+                    InstantiateMapObject(mapObject);
                 }
             } else {
                 // 注意放回的时候放的时mapObjectList中的对象
@@ -60,12 +66,7 @@ public class MapChunkController : MonoBehaviour
         mapChunkData.mapObjectDict.dictionary.Add(mapObjectData.id, mapObjectData);
         // 实例化物品
         if (isActive == true) {
-            MapObjectConfig mapObjectConfig = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, mapObjectData.configId);
-            // 从对象池中获取
-            MapObjectBase mapObject = PoolManager.Instance.GetGameObject<MapObjectBase>(mapObjectConfig.prefab, transform);
-            mapObject.transform.position = mapObjectData.position;
-            mapObject.Init(this, mapObjectData.id);
-            mapObjectDict.Add(mapObjectData.id, mapObject);
+            InstantiateMapObject(mapObjectData);
         }
     }
 
@@ -83,4 +84,15 @@ public class MapChunkController : MonoBehaviour
     private void OnDestroy() {
         ArchiveManager.Instance.SaveMapChunkData(chunkIndex, mapChunkData);    
     }
+
+    #region 监听事件
+    // 当早晨时需要触发事件刷新物体
+    private void OnMorning() {
+        // 获得刷新后新增的地图块中包含的地图对象
+        List<MapObjectData> mapObjectDatas = MapManager.Instance.SpawnMapObjectDataOnMapChunkRefresh(chunkIndex);
+        for (int i = 0; i < mapObjectDatas.Count; i++) {
+            AddMapObject(mapObjectDatas[i]);
+        }
+    }
+    #endregion
 }
