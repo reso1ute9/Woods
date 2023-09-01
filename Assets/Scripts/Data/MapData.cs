@@ -17,7 +17,7 @@ public class MapInitData {
 [Serializable]                                 
 public class MapData {
     // 当前地图对象id取值
-    public ulong currentId = ulong.MinValue;
+    public ulong currentId = 1;
     // 地图块索引列表: 已经生成过的所有地图块
     public List<Serialization_Vector2> MapChunkIndexList = new List<Serialization_Vector2>();
 }

@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.VisualScripting;
 
 // 网格: 主要包含顶点和格子
 public class MapGrid
@@ -21,18 +22,12 @@ public class MapGrid
         this.mapWidth = mapWidth;
         this.cellSize = cellSize;
 
-        // 生成顶点数据和格子数据
-        for (int x = 1; x < this.mapWidth; x++) {
-            for (int z = 1; z < this.mapHeight; z++) {
+        // // 生成顶点数据和格子数据
+        for (int x = 0; x < this.mapWidth; x++) {
+            for (int z = 0; z < this.mapHeight; z++) {
                 AddVertext(x, z);
                 AddCell(x, z);
             }
-        }
-        for (int x = 1; x <= this.mapWidth; x++) {
-            AddCell(x, mapHeight);
-        }
-        for (int z = 1; z < this.mapHeight; z++) {
-            AddCell(mapWidth, z);
         }
     }
 
@@ -132,11 +127,11 @@ public class MapGrid
     public void CalculateMapVertexType(float[,] noiseMap, float limit) {
         int width = noiseMap.GetLength(0);
         int height = noiseMap.GetLength(1);
-        for (int x = 1; x <= width; x++) {
-            for (int z = 1; z <= height; z++) {
+        for (int x = 0; x < width; x++) {
+            for (int z = 0; z < height; z++) {
                 // 根据噪声图的值确认网格类型, 大于边界是沼泽
                 // noiseMap是从0开始的
-                if (noiseMap[x - 1, z - 1] >= limit) {
+                if (noiseMap[x, z] >= limit) {
                     SetVertexType(x, z, MapVertexType.Marsh);
                 } else {
                     SetVertexType(x, z, MapVertexType.Forest);
@@ -158,6 +153,7 @@ public class MapVertex
 {
     public Vector3 position;
     public MapVertexType vertexType;
+    public ulong mapObjectId;           // 当前地图顶点上的物体对象, 0代表为空
 }
 
 // 地图格子

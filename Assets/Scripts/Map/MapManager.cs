@@ -35,7 +35,7 @@ public class MapManager : SingletonMono<MapManager>
     #endregion
 
     // 存档
-    #region  存档
+    #region 存档
     private MapInitData mapInitData;
     private MapData mapData;
     #endregion
@@ -57,6 +57,9 @@ public class MapManager : SingletonMono<MapManager>
         spawnConfigDict.Add(MapVertexType.Marsh, new List<int>());
         foreach (var item in temp_dict) {
             MapVertexType mapVertexType = (item.Value as MapObjectConfig).mapVertexType;
+            if (mapVertexType == MapVertexType.None) {
+                continue;
+            }
             spawnConfigDict[mapVertexType].Add(item.Key);
         }
 

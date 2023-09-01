@@ -1,3 +1,4 @@
+using System.Security.AccessControl;
 using System.Collections;
 using System;
 using System.Collections.Generic;
@@ -116,7 +117,7 @@ public class MapGenerator
             if (mapChunkData == null) {
                 mapChunkData = new MapChunkData();
                 // 生成场景物体数据
-                mapChunkData.mapObjectDict = SpawnMapObject(chunkIndex);
+                mapChunkData.mapObjectDict = SpawnMapObjectDataOnMapChunkInit(chunkIndex);
                 // 生成以后进行持久化保存
                 ArchiveManager.Instance.AddAndSaveMapChunkData(chunkIndex, mapChunkData);
             }
@@ -230,8 +231,28 @@ public class MapGenerator
         callBack?.Invoke(mapTexture, isAllForest);
     }
 
+    // 通过地图权重配置得到一个地图物品id
+    private int GetMapObjectConfigIdForWeight(MapVertexType mapVertexType) {
+        // 根据权重配置随机生成物品
+        List<int> configIds = spawnConfigDict[mapVertexType];
+        // 确定权重总和
+        int weightTotal = mapVertexType == MapVertexType.Forest ? forestSpawnWeightTotal : marshSpawnWeightTotal;
+        // 确定生成物品索引
+        int randValue = UnityEngine.Random.Range(1, weightTotal + 1);
+        float prob_sum = 0.0f;
+        int spawnConfigIndex = 0;
+        for (int i = 0; i < configIds.Count; i++) {
+            prob_sum += ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, configIds[i]).probability;
+            if (prob_sum > randValue) {
+                spawnConfigIndex = i;
+                break;
+            }
+        }
+        return configIds[spawnConfigIndex];
+    }
+
     // 生成各种地图对象, 需要根据配置和地图网格信息确定生成对象位置
-    private Serialization_Dict<ulong, MapObjectData> SpawnMapObject(Vector2Int chunkIndex) {
+    private Serialization_Dict<ulong, MapObjectData> SpawnMapObjectDataOnMapChunkInit(Vector2Int chunkIndex) {
         Serialization_Dict<ulong, MapObjectData> mapObjectDict = new Serialization_Dict<ulong, MapObjectData>();
         
         int offsetX = chunkIndex.x * mapConfig.mapChunkSize;
@@ -240,23 +261,8 @@ public class MapGenerator
         for (int x = 1; x < mapConfig.mapChunkSize; x++) {
             for (int z = 1; z < mapConfig.mapChunkSize; z++) {
                 MapVertex mapVertex = mapGrid.GetVertex(x + offsetX, z + offsetZ);
-                // 根据权重配置随机生成物品
-                List<int> configIds = spawnConfigDict[mapVertex.vertexType];
-                // 确定权重总和
-                int weightTotal = mapVertex.vertexType == MapVertexType.Forest ? forestSpawnWeightTotal : marshSpawnWeightTotal;
-                // 确定生成物品索引
-                int randValue = UnityEngine.Random.Range(1, weightTotal + 1);
-                float prob_sum = 0.0f;
-                int spawnConfigIndex = 0;
-                for (int i = 0; i < configIds.Count; i++) {
-                    prob_sum += ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, configIds[i]).probability;
-                    if (prob_sum > randValue) {
-                        spawnConfigIndex = i;
-                        break;
-                    }
-                }
                 // 确定生成物品
-                int configId = configIds[spawnConfigIndex];
+                int configId = GetMapObjectConfigIdForWeight(mapVertex.vertexType);
                 MapObjectConfig spawnModel = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, configId);
                 if (spawnModel.isEmpty == false) {
                     // 实例化物品
@@ -273,7 +279,8 @@ public class MapGenerator
                             configId = configId, 
                             position = position
                         }
-                    );               
+                    );
+                    mapVertex.mapObjectId = mapData.currentId;
                     mapData.currentId += 1;
                 }
             }
@@ -294,5 +301,50 @@ public class MapGenerator
             mapData.currentId += 1;
         }
         return mapObjectData;
+    }
+
+    // 在地图块刷新时生成地图对象列表
+    public List<MapObjectData> SpawnMapObjectDataOnMapChunkRefresh(Vector2Int chunkIndex) {
+        List<MapObjectData> mapObjectDataList = null;;
+        int offsetX = chunkIndex.x * mapConfig.mapChunkSize;
+        int offsetZ = chunkIndex.y * mapConfig.mapChunkSize;
+        for (int x = 1; x < mapConfig.mapChunkSize; x++) {
+            for (int z = 1; z < mapConfig.mapChunkSize; z++) {
+                // 查看顶点随机值是否满足当前地图刷新概率要求
+                if (UnityEngine.Random.Range(1, 101) > mapConfig.mapChunkRefreshProbability) {
+                    continue;
+                }
+                // 如果当前网格顶点存在地图对象则不进行刷新
+                MapVertex mapVertex = mapGrid.GetVertex(x + offsetX, z + offsetZ);
+                if (mapVertex.mapObjectId != 0) {
+                    continue;
+                }
+                // 确定生成物品
+                int configId = GetMapObjectConfigIdForWeight(mapVertex.vertexType);
+                MapObjectConfig spawnModel = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, configId);
+                if (spawnModel.isEmpty == false) {
+                    if (mapObjectDataList == null) {
+                        mapObjectDataList = new List<MapObjectData>();
+                    }
+                    // 实例化物品
+                    Vector3 offset = new Vector3(
+                        UnityEngine.Random.Range(-mapConfig.cellSize/2, mapConfig.cellSize/2), 
+                        0,
+                        UnityEngine.Random.Range(-mapConfig.cellSize/2, mapConfig.cellSize/2)
+                    );
+                    Vector3 position = mapVertex.position + offset;
+                    mapObjectDataList.Add(
+                        new MapObjectData { 
+                            id = mapData.currentId, 
+                            configId = configId, 
+                            position = position
+                        }
+                    );
+                    mapVertex.mapObjectId = mapData.currentId;
+                    mapData.currentId += 1;
+                }
+            }
+        }
+        return mapObjectDataList;
     }
 }
