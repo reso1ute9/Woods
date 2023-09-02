@@ -117,7 +117,7 @@ public class MapGenerator
             if (mapChunkData == null) {
                 mapChunkData = new MapChunkData();
                 // 生成场景物体数据
-                mapChunkData.mapObjectDict = SpawnMapObjectDataOnMapChunkInit(chunkIndex);
+                mapChunkData.mapObjectDict = GenerateMapObjectDataOnMapChunkInit(chunkIndex);
                 // 生成以后进行持久化保存
                 ArchiveManager.Instance.AddAndSaveMapChunkData(chunkIndex, mapChunkData);
             }
@@ -251,8 +251,29 @@ public class MapGenerator
         return configIds[spawnConfigIndex];
     }
 
+    // 生成一个地图对象的地图数据
+    private MapObjectData GenerateMapObjectData(int mapObjectConfigId, Vector3 position, int destoryDay) {
+        MapObjectData mapObjectData = PoolManager.Instance.GetObject<MapObjectData>();
+        mapObjectData.id = mapData.currentId;
+        mapData.currentId += 1;
+        mapObjectData.configId = mapObjectConfigId;
+        mapObjectData.position = position;
+        mapObjectData.destoryDay = destoryDay;
+        return mapObjectData;
+    }
+    
+    // 生成一个地图对象的地图数据
+    public MapObjectData GenerateMapObjectData(int mapObjectConfigId, Vector3 position) {
+        MapObjectData mapObjectData = null;
+        MapObjectConfig mapObjectConfig = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, mapObjectConfigId);
+        if (mapObjectConfig.isEmpty == false) {
+            return GenerateMapObjectData(mapObjectConfigId, position, mapObjectConfig.destoryDay);
+        }
+        return mapObjectData;
+    }
+
     // 生成各种地图对象, 需要根据配置和地图网格信息确定生成对象位置
-    private Serialization_Dict<ulong, MapObjectData> SpawnMapObjectDataOnMapChunkInit(Vector2Int chunkIndex) {
+    private Serialization_Dict<ulong, MapObjectData> GenerateMapObjectDataOnMapChunkInit(Vector2Int chunkIndex) {
         Serialization_Dict<ulong, MapObjectData> mapObjectDict = new Serialization_Dict<ulong, MapObjectData>();
         
         int offsetX = chunkIndex.x * mapConfig.mapChunkSize;
@@ -263,8 +284,8 @@ public class MapGenerator
                 MapVertex mapVertex = mapGrid.GetVertex(x + offsetX, z + offsetZ);
                 // 确定生成物品
                 int configId = GetMapObjectConfigIdForWeight(mapVertex.vertexType);
-                MapObjectConfig spawnModel = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, configId);
-                if (spawnModel.isEmpty == false) {
+                MapObjectConfig mapObjectConfig = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, configId);
+                if (mapObjectConfig.isEmpty == false) {
                     // 实例化物品
                     Vector3 offset = new Vector3(
                         UnityEngine.Random.Range(-mapConfig.cellSize/2, mapConfig.cellSize/2), 
@@ -272,40 +293,20 @@ public class MapGenerator
                         UnityEngine.Random.Range(-mapConfig.cellSize/2, mapConfig.cellSize/2)
                     );
                     Vector3 position = mapVertex.position + offset;
+                    mapVertex.mapObjectId = mapData.currentId;
                     mapObjectDict.dictionary.Add(
                         mapData.currentId, 
-                        new MapObjectData { 
-                            id = mapData.currentId, 
-                            configId = configId, 
-                            position = position
-                        }
+                        GenerateMapObjectData(configId, position, mapObjectConfig.destoryDay)
                     );
-                    mapVertex.mapObjectId = mapData.currentId;
-                    mapData.currentId += 1;
                 }
             }
         }
         return mapObjectDict;
     }
 
-    // 生成一个地图对象的地图数据
-    public MapObjectData SpawnMapObject(int mapObjectConfigId, Vector3 position) {
-        MapObjectData mapObjectData = null;
-        MapObjectConfig mapObjectConfig = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, mapObjectConfigId);
-        if (mapObjectConfig.isEmpty == false) {
-            mapObjectData = new MapObjectData() {
-                id = mapData.currentId, 
-                configId = mapObjectConfigId,
-                position = position
-            };
-            mapData.currentId += 1;
-        }
-        return mapObjectData;
-    }
-
     // 在地图块刷新时生成地图对象列表
     List<MapObjectData> mapObjectDataList = new List<MapObjectData>();
-    public List<MapObjectData> SpawnMapObjectDataOnMapChunkRefresh(Vector2Int chunkIndex) {
+    public List<MapObjectData> GenerateMapObjectDataOnMapChunkRefresh(Vector2Int chunkIndex) {
         mapObjectDataList.Clear();
         int offsetX = chunkIndex.x * mapConfig.mapChunkSize;
         int offsetZ = chunkIndex.y * mapConfig.mapChunkSize;
@@ -322,8 +323,8 @@ public class MapGenerator
                 }
                 // 确定生成物品
                 int configId = GetMapObjectConfigIdForWeight(mapVertex.vertexType);
-                MapObjectConfig spawnModel = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, configId);
-                if (spawnModel.isEmpty == false) {
+                MapObjectConfig mapObjectConfig = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, configId);
+                if (mapObjectConfig.isEmpty == false) {
                     // 实例化物品
                     Vector3 offset = new Vector3(
                         UnityEngine.Random.Range(-mapConfig.cellSize/2, mapConfig.cellSize/2), 
@@ -331,18 +332,15 @@ public class MapGenerator
                         UnityEngine.Random.Range(-mapConfig.cellSize/2, mapConfig.cellSize/2)
                     );
                     Vector3 position = mapVertex.position + offset;
-                    mapObjectDataList.Add(
-                        new MapObjectData { 
-                            id = mapData.currentId, 
-                            configId = configId, 
-                            position = position
-                        }
-                    );
                     mapVertex.mapObjectId = mapData.currentId;
-                    mapData.currentId += 1;
+                    mapObjectDataList.Add(
+                        GenerateMapObjectData(configId, position, mapObjectConfig.destoryDay)
+                    );
                 }
             }
         }
         return mapObjectDataList;
     }
+
+
 }

@@ -20,4 +20,6 @@ public class MapObjectConfig : ConfigBase
     public float mapIconSpriteSize = 1.0f;
     [LabelText("生成概率(百分比类型)")]
     public int probability;
+    [LabelText("腐烂天数")]
+    public int destoryDay = -1;         // -1代表无效
 }

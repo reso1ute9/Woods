@@ -1,21 +1,25 @@
+using System.Runtime.InteropServices.ComTypes;
 using System.Security.Cryptography.X509Certificates;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using JKFrame;
+using UnityEngine.Rendering.PostProcessing;
 
 
 
 public class MapChunkController : MonoBehaviour
 {
-    private Dictionary<ulong, MapObjectBase> mapObjectDict;         // 记录当前数据块中的对象
     public MapChunkData mapChunkData { get; private set; }
+    private Dictionary<ulong, MapObjectBase> mapObjectDict;                     // 记录当前数据块中的地图对象
+    private Dictionary<ulong, MapObjectData> wantDestoryMapObjectDict;          // 记录当前需要销毁的地图对象
+    private static List<ulong> wantDestoryMapObjectId = new List<ulong>(20);    // 记录当前需要销毁的地图对象id
 
     public Vector3 centrePosition { get; private set; }
-    public Vector2Int chunkIndex { get; private set; }              // 当前地图块索引
+    public Vector2Int chunkIndex { get; private set; }                          // 当前地图块索引
     public bool isAllForest { get; private set; }   
     private bool isActive = false;
-    public bool isInitialized = false;                              // 标记地图UI是否已经初始化
+    public bool isInitialized = false;                                          // 标记地图UI是否已经初始化
 
     public void Init(Vector2Int chunkIndex, Vector3 centrePosition, bool isAllForest, MapChunkData mapChunkData) {
         this.centrePosition = centrePosition;
@@ -23,6 +27,12 @@ public class MapChunkController : MonoBehaviour
         // 初始化地图块数据
         this.mapChunkData = mapChunkData;
         this.mapObjectDict = new Dictionary<ulong, MapObjectBase>(mapChunkData.mapObjectDict.dictionary.Count);
+        this.wantDestoryMapObjectDict = new Dictionary<ulong, MapObjectData>();
+        foreach (var item in mapChunkData.mapObjectDict.dictionary.Values) {
+            if (item.destoryDay > 0) {
+                this.wantDestoryMapObjectDict.Add(item.id, item);
+            }
+        }
         this.isAllForest = isAllForest;
         this.isInitialized = true;
         // 添加地图块刷新事件
@@ -64,6 +74,9 @@ public class MapChunkController : MonoBehaviour
     public void AddMapObject(MapObjectData mapObjectData) {
         // 添加存档数据
         mapChunkData.mapObjectDict.dictionary.Add(mapObjectData.id, mapObjectData);
+        if (mapObjectData.destoryDay > 0) {
+            this.wantDestoryMapObjectDict.Add(mapObjectData.id, mapObjectData);
+        }
         // 实例化物品
         if (isActive == true) {
             InstantiateMapObject(mapObjectData);
@@ -72,10 +85,14 @@ public class MapChunkController : MonoBehaviour
 
     // 移除一个地图对象
     public void RemoveMapObject(ulong mapObjectId) {
-        // 显示层面移除
-        mapObjectDict.Remove(mapObjectId);
         // 数据层面移除(控制器层面)
-        mapChunkData.mapObjectDict.dictionary.Remove(mapObjectId);
+        mapChunkData.mapObjectDict.dictionary.Remove(mapObjectId, out MapObjectData removeMapObjectData);
+        removeMapObjectData.JKObjectPushPool();
+        // 显示层面移除
+        if (mapObjectDict.TryGetValue(mapObjectId, out MapObjectBase mapObjectBase)) {
+            mapObjectBase.JKGameObjectPushPool();
+            mapObjectDict.Remove(mapObjectId);
+        }
         // UI层面移除
         MapManager.Instance.RemoveMapObject(mapObjectId);
     }
@@ -88,8 +105,22 @@ public class MapChunkController : MonoBehaviour
     #region 监听事件
     // 当早晨时需要触发事件刷新物体
     private void OnMorning() {
+        // 遍历可能需要销毁的地图对象, 更新销毁时间
+        foreach (var item in wantDestoryMapObjectDict.Values) {
+            item.destoryDay -= 1;
+            if (item.destoryDay == 0) {
+                UnityEngine.Debug.Log("需要销毁物品id:" + item.id);
+                UnityEngine.Debug.Log("需要销毁物品config id:" + item.configId);
+                wantDestoryMapObjectId.Add(item.id);
+            }
+        }
+        for (int i = 0; i < wantDestoryMapObjectId.Count; i++) {
+            RemoveMapObject(wantDestoryMapObjectId[i]);
+        }
+        wantDestoryMapObjectId.Clear();
+
         // 获得刷新后新增的地图块中包含的地图对象
-        List<MapObjectData> mapObjectDatas = MapManager.Instance.SpawnMapObjectDataOnMapChunkRefresh(chunkIndex);
+        List<MapObjectData> mapObjectDatas = MapManager.Instance.GenerateMapObjectDataOnMapChunkRefresh(chunkIndex);
         for (int i = 0; i < mapObjectDatas.Count; i++) {
             AddMapObject(mapObjectDatas[i]);
         }

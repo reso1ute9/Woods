@@ -227,8 +227,8 @@ public class MapManager : SingletonMono<MapManager>
     }
 
     // 在地图块刷新时生成地图对象列表, 为了让MapChunkController能访问到, 因此在这里生成了同名/同功能函数
-    public List<MapObjectData> SpawnMapObjectDataOnMapChunkRefresh(Vector2Int chunkIndex) {
-        return mapGenerator.SpawnMapObjectDataOnMapChunkRefresh(chunkIndex);
+    public List<MapObjectData> GenerateMapObjectDataOnMapChunkRefresh(Vector2Int chunkIndex) {
+        return mapGenerator.GenerateMapObjectDataOnMapChunkRefresh(chunkIndex);
     }
     #endregion
 
@@ -276,15 +276,15 @@ public class MapManager : SingletonMono<MapManager>
     }
 
     // 生成一个地图对象
-    public void SpawnMapObject(int mapObjectConfigId, Vector3 position) {
+    public void GenerateMapObject(int mapObjectConfigId, Vector3 position) {
         Vector2Int currChunkIndex = GetMapChunkIndexByWorldPosition(position);
-        SpawnMapObject(mapChunkDict[currChunkIndex], mapObjectConfigId, position);
+        GenerateMapObject(mapChunkDict[currChunkIndex], mapObjectConfigId, position);
     }
 
     // 生成一个地图对象
-    public void SpawnMapObject(MapChunkController mapChunkController, int mapObjectConfigId, Vector3 position) {
+    public void GenerateMapObject(MapChunkController mapChunkController, int mapObjectConfigId, Vector3 position) {
         // 生成数据
-        MapObjectData mapObjectData = mapGenerator.SpawnMapObject(mapObjectConfigId, position);
+        MapObjectData mapObjectData = mapGenerator.GenerateMapObjectData(mapObjectConfigId, position);
         if (mapObjectData == null) {
             return;
         }

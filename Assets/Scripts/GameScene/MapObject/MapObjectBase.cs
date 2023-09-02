@@ -41,8 +41,6 @@ public abstract class MapObjectBase : MonoBehaviour {
     public virtual void RemoveOnMap() {
         // 通知地图块控制器移除当前地图对象
         mapChunk.RemoveMapObject(mapObjectId);
-        // 将当地图对象放到对象池
-        this.JKGameObjectPushPool();
         // TODO: 掉落物品
     }
 

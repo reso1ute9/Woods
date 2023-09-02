@@ -27,3 +27,4 @@ MonoBehaviour:
   mapIconSprite: {fileID: 0}
   mapIconSpriteSize: 1
   probability: 0
+  destoryDay: 2

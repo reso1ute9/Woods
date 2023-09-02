@@ -27,6 +27,7 @@ public class MapData {
 public class MapObjectData {
     public ulong id;                                // 地图中地图对象id
     public int configId;                            // 地图物体配置id
+    public int destoryDay;                          // 地图对象销毁天数, -1代表无效
     private Serialization_Vector3 sv_position;      // 坐标: sv_postion存档用, position外部调用用
     public Vector3 position { 
         get => sv_position.ConverToVector3(); 
