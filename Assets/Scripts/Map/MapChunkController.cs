@@ -109,8 +109,6 @@ public class MapChunkController : MonoBehaviour
         foreach (var item in wantDestoryMapObjectDict.Values) {
             item.destoryDay -= 1;
             if (item.destoryDay == 0) {
-                UnityEngine.Debug.Log("需要销毁物品id:" + item.id);
-                UnityEngine.Debug.Log("需要销毁物品config id:" + item.configId);
                 wantDestoryMapObjectId.Add(item.id);
             }
         }

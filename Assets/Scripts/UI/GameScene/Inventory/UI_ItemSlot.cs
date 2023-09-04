@@ -43,6 +43,8 @@ public class  UI_ItemSlot : MonoBehaviour
             bgImg.sprite = ownerWindow.bgSprite[0];
         }
         weaponSlotDefaultSprite = weaponSlot.bgImg.sprite;
+        // 设置鼠标进入后放大鼠标指针
+        UITool.BindMouseEffect(this);
     }
 
     private void OnEnable() {
