@@ -5,12 +5,6 @@ using JKFrame;
 using UnityEngine;
 using UnityEngine.UI;
 
-public enum BuildType 
-{
-    Weapon,         // 武器/工具
-    Building,       // 建筑物
-    Crop,           // 农作物
-}
 
 [UIElement(false, "UI/UI_BuildWindow", 1)]
 public class UI_BuildWindow : UI_WindowBase

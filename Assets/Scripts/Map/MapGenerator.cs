@@ -202,7 +202,7 @@ public class MapGenerator
                 // 利用协程实现分帧绘制像素, 一帧只绘制一列像素, 利用多帧时间完成整个格子内的像素绘制
                 yield return null;
                 int pixelOffsetZ = z * textureCellSize;
-                for (int x = 0; x < mapConfig.mapChunkSize; x++) {
+                 for (int x = 0; x < mapConfig.mapChunkSize; x++) {
                     int pixelOffsetX = x * textureCellSize;
                     int textureIndex = mapGrid.GetCell(x + cellOffsetX, z + cellOffsetZ).textureIndex - 1; // -1代表forestTexture, >=0代表marshTextures
                     // 绘制每一个格子内的像素
