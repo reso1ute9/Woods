@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using JKFrame;
+using Unity.VisualScripting;
 
 
 // 合成窗口的二级菜单
@@ -16,6 +17,7 @@ public class UI_BuildWindow_SecondaryMenu : MonoBehaviour
     private List<UI_BuildWindow_SecondaryMenuItem> currentSecondaryMenuItemList;    // 当前显示的二级菜单列表
     private List<BuildConfig> meetTheConditionList;                                 // 当前满足条件的配置
     private List<BuildConfig> failToMeetConditionList;                              // 当前不满足条件的配置
+    public UI_BuildWindow_BuildPanel currentBuildPanel;                            // 当前三级窗口(二级菜单选项说明窗口)
 
     public void Init() {
         // 构建配置文件
@@ -74,6 +76,8 @@ public class UI_BuildWindow_SecondaryMenu : MonoBehaviour
             AddSecondaryMenuItem(failToMeetConditionList[i], false);
         }
         gameObject.SetActive(true);
+        // 关闭三级窗口
+        currentBuildPanel.Close();
     }
 
     // 获取二级菜单选项
@@ -92,10 +96,13 @@ public class UI_BuildWindow_SecondaryMenu : MonoBehaviour
         }
         currentSecondaryMenuItem = secondaryMenuItem;
         currentSecondaryMenuItem.Select();
-        // TODO: 显示三级窗口
+        // 显示三级窗口
+        currentBuildPanel.Show(currentSecondaryMenuItem.buildConfig, currentSecondaryMenuItem.isMeetCondition);
     }
 
     public void Close() {
         gameObject.SetActive(false);
+        // 关闭三级窗口
+        currentBuildPanel.Close();
     }
 }
