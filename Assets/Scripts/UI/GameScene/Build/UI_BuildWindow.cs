@@ -10,6 +10,7 @@ using UnityEngine.UI;
 public class UI_BuildWindow : UI_WindowBase
 {
     [SerializeField] UI_BuildWindow_MainMenuItem[] mainMenuItems;   // 所有的一级菜单选项
+    [SerializeField] UI_BuildWindow_SecondaryMenu  secondaryMenu;   // 二级菜单
     private UI_BuildWindow_MainMenuItem currentMenuItem;            // 当前被选中的菜单选项
 
     public override void Init() {
@@ -18,6 +19,8 @@ public class UI_BuildWindow : UI_WindowBase
         for (int i = 0; i < mainMenuItems.Length; i++) {
             mainMenuItems[i].Init((BuildType)i, this);
         }
+        // 初始化二级菜单
+        secondaryMenu.Init();
     }
 
     // 选择一级菜单选项
@@ -28,7 +31,8 @@ public class UI_BuildWindow : UI_WindowBase
         currentMenuItem = mainMenuItem;
         currentMenuItem.Select();
 
-        // TODO: 开启二级菜单
+        // 开启二级菜单
         UnityEngine.Debug.Log("开启二级菜单:" + currentMenuItem.MenuType.ToString());
+        secondaryMenu.Show(mainMenuItem.MenuType);
     }
 }

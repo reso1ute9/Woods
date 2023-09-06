@@ -10,5 +10,6 @@ public static class ConfigName
     public static string Time = "Time";
     public static string Player = "Player";
     public static string Loot = "Loot";
+    public static string Build = "Build";
 }
 
