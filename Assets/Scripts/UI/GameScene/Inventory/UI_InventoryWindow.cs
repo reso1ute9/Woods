@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using JKFrame;
+using Unity.VisualScripting;
 
 
 [UIElement(true, "UI/UI_InventoryWindow", 1)]
@@ -259,5 +260,20 @@ public class UI_InventoryWindow : UI_WindowBase
     // 取消监听事件
     protected override void CancelEventListener() {
         base.CancelEventListener();
+    }
+
+    // 获取某个物品的数量
+    public int GetItemCount(int configId) {
+        int count = 0;
+        for (int i = 0; i < inventoryData.itemDatas.Length; i++) {
+            if (inventoryData.itemDatas[i] != null && inventoryData.itemDatas[i].configId == configId) {
+                if (inventoryData.itemDatas[i].itemTypeData is PileItemTypeDataBase) {
+                    count += ((PileItemTypeDataBase)inventoryData.itemDatas[i].itemTypeData).count;
+                } else {
+                    count += 1;
+                }
+            }
+        }
+        return count;
     }
 }

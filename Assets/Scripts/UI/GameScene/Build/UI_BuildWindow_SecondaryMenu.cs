@@ -14,6 +14,8 @@ public class UI_BuildWindow_SecondaryMenu : MonoBehaviour
     private Dictionary<BuildType, List<BuildConfig>> buildConfigDict;               // 所有的BuildConfig按照类型分类 
     private UI_BuildWindow_SecondaryMenuItem currentSecondaryMenuItem;              // 当前选中的二级菜单选项
     private List<UI_BuildWindow_SecondaryMenuItem> currentSecondaryMenuItemList;    // 当前显示的二级菜单列表
+    private List<BuildConfig> meetTheConditionList;                                 // 当前满足条件的配置
+    private List<BuildConfig> failToMeetConditionList;                              // 当前不满足条件的配置
 
     public void Init() {
         // 构建配置文件
@@ -29,6 +31,8 @@ public class UI_BuildWindow_SecondaryMenu : MonoBehaviour
         }
 
         currentSecondaryMenuItemList = new List<UI_BuildWindow_SecondaryMenuItem>(10);
+        meetTheConditionList = new List<BuildConfig>(10);
+        failToMeetConditionList = new List<BuildConfig>(10);
         Close();
     }
 
@@ -39,11 +43,35 @@ public class UI_BuildWindow_SecondaryMenu : MonoBehaviour
             currentSecondaryMenuItemList[i].JKGameObjectPushPool();
         }
         currentSecondaryMenuItemList.Clear();
+        meetTheConditionList.Clear();
+        failToMeetConditionList.Clear();
         // 当前类型的配置
         List<BuildConfig> buildConfigList = buildConfigDict[buildType];
-        // TODO: 对配置进行分类显示, 分为满足条件和不满足条件
+        // 对配置进行分类显示, 分为满足条件和不满足条件
         for (int i = 0; i < buildConfigList.Count; i++) {
-            AddSecondaryMenuItem(buildConfigList[i], true);
+            List<BuildConfigCondition> conditions = buildConfigList[i].buildConfigConditions;
+            bool isMeet = true;
+            for (int j = 0; j < conditions.Count; j++) {
+                int currentCount = UI_InventoryWindow.Instance.GetItemCount(conditions[j].itemId);
+                if (currentCount < conditions[j].count) {
+                    isMeet = false;
+                    break;
+                }
+            }
+            if (isMeet == true) {
+                meetTheConditionList.Add(buildConfigList[i]);
+            } else {
+                failToMeetConditionList.Add(buildConfigList[i]);
+            }
+        }
+        UnityEngine.Debug.Log("meetTheConditionList count:" + meetTheConditionList.Count);
+        UnityEngine.Debug.Log("failToMeetConditionList count:" + failToMeetConditionList.Count);
+        // 添加满足条件和不满足条件对应的二级菜单选项
+        for (int i = 0; i < meetTheConditionList.Count; i++) {
+            AddSecondaryMenuItem(meetTheConditionList[i], true);
+        }
+        for (int i = 0; i < failToMeetConditionList.Count; i++) {
+            AddSecondaryMenuItem(failToMeetConditionList[i], false);
         }
         gameObject.SetActive(true);
     }
