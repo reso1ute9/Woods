@@ -11,17 +11,26 @@ public class UI_BuildWindow_BuildPanel : MonoBehaviour
     [SerializeField] Text descriptionText;
     [SerializeField] Button button;
     private BuildConfig buildConfig;
+    private UI_BuildWindow_SecondaryMenu ownerWindow;
 
-    public void Init() {
+    public void Init(UI_BuildWindow_SecondaryMenu ownerWindow) {
+        this.ownerWindow = ownerWindow;
         button.onClick.AddListener(OnClick);
         Close();
     }
 
     private void OnClick() {
-
+        if (UI_InventoryWindow.Instance.AddItemAndPlayAudio(buildConfig.targetId)) {
+            // 根据建造配置减少背包中的物品
+            UI_InventoryWindow.Instance.UpdateItemsForBuild(buildConfig);
+            // 刷新当前二三级窗口状态
+            RefreshView();
+        } else {
+            UIManager.Instance.AddTips("背包没有空间了");
+        }
     }
 
-    public void Show(BuildConfig buildConfig, bool isMeetCondition) {
+    public void Show(BuildConfig buildConfig) {
         this.buildConfig = buildConfig;
         // 显示合成需要物品
         for (int i = 0; i < buildConfig.buildConfigConditions.Count; i++) {
@@ -31,10 +40,15 @@ public class UI_BuildWindow_BuildPanel : MonoBehaviour
             buildPanelItems[i].Show(configId, currentCount, needCount);
         }
         descriptionText.text = ConfigManager.Instance.GetConfig<ItemConfig>(ConfigName.Item, buildConfig.targetId).descript;
-        if (isMeetCondition == false) {
-            button.interactable = false;
-        }
+        button.interactable = buildConfig.CheckBuildConfigCondition();
         gameObject.SetActive(true);
+        
+    }
+
+    public void RefreshView() {
+        Show(buildConfig);
+        // 刷新二级窗口
+        ownerWindow.RefreshView();
     }
 
     public void Close() {

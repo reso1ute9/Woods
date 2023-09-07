@@ -16,20 +16,18 @@ public class UI_BuildWindow_SecondaryMenuItem : MonoBehaviour
 
     public BuildConfig buildConfig { get; private set; }    // 当前选项代表的建造配置
     private UI_BuildWindow_SecondaryMenu ownerWindow;       // 合成窗口二级菜单
-    public bool isMeetCondition { get; private set; }       // 是否满足建造/合成条件
-
+    
     private void Start() {
         UITool.BindMouseEffect(this);
         button.onClick.AddListener(OnClick);
     }
 
-    public void Init(BuildConfig buildConfig, UI_BuildWindow_SecondaryMenu ownerWindow, bool isMeetCondition) {
+    public void Init(BuildConfig buildConfig, UI_BuildWindow_SecondaryMenu ownerWindow) {
         this.buildConfig = buildConfig;
         this.ownerWindow = ownerWindow;
-        this.isMeetCondition = isMeetCondition;
         // TODO: 未来可能存在配置类型的问题
         iconImage.sprite = ConfigManager.Instance.GetConfig<ItemConfig>(ConfigName.Item, buildConfig.targetId).itemIcon;
-        if (isMeetCondition) {
+        if (buildConfig.CheckBuildConfigCondition()) {
             iconImage.color = Color.white;
         } else {
             iconImage.color = Color.black;

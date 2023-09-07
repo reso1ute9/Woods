@@ -15,6 +15,17 @@ public class BuildConfig : ConfigBase
     public List<BuildConfigCondition> buildConfigConditions = new List<BuildConfigCondition>();
     [LabelText("合成产物")]
     public int targetId;
+
+    // 检查是否满足当前监造/合成配置
+    public bool CheckBuildConfigCondition() {
+        for (int j = 0; j < buildConfigConditions.Count; j++) {
+            int currentCount = UI_InventoryWindow.Instance.GetItemCount(buildConfigConditions[j].itemId);
+            if (currentCount < buildConfigConditions[j].count) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
 
 

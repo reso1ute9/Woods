@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using JKFrame;
 using Unity.VisualScripting;
+using System.Linq;
 
 
 [UIElement(true, "UI/UI_InventoryWindow", 1)]
@@ -13,7 +14,7 @@ public class UI_InventoryWindow : UI_WindowBase
     private InventoryData inventoryData;
     [SerializeField] public UI_ItemSlot[] slots;          // 物品槽
     [SerializeField] public UI_ItemSlot weaponSlot;       // 装备槽
-    public Sprite[] bgSprite;                       // 框图
+    public Sprite[] bgSprite;                             // 框图
     
     public override void Init() {
         // TODO: 临时修复bug策略, 待重构
@@ -275,5 +276,44 @@ public class UI_InventoryWindow : UI_WindowBase
             }
         }
         return count;
+    }
+
+    // 使用合成/建造功能时更新物品数量
+    public void UpdateItemsForBuild(BuildConfig buildConfig) {
+        for (int i = 0; i < buildConfig.buildConfigConditions.Count; i++) {
+            UpdateItemForBuild(buildConfig.buildConfigConditions[i]);
+        }
+    }
+
+    private void UpdateItemForBuild(BuildConfigCondition buildConfigCondition) {
+        int configId = buildConfigCondition.itemId;
+        int count = buildConfigCondition.count;
+        for (int i = 0; i < inventoryData.itemDatas.Length; i++) {
+            ItemData itemData = inventoryData.itemDatas[i];
+            if (itemData != null && itemData.configId == configId) {
+                if (itemData.itemTypeData is PileItemTypeDataBase) {
+                    PileItemTypeDataBase pileItemTypeData = itemData.itemTypeData as PileItemTypeDataBase;
+                    int quantity = pileItemTypeData.count - count;
+                    if (quantity > 0) {
+                        pileItemTypeData.count -= count;
+                        slots[i].UpdateNumTextView();
+                        return;
+                    } else {
+                        count -= pileItemTypeData.count;
+                        RemoveItem(i);
+                        if (count == 0) {
+                            return;
+                        } 
+                    }
+                } else {
+                    count -= 1;
+                    RemoveItem(i);
+                    if (count == 0) {
+                        return;
+                    } 
+                }
+            }
+        }
+        UnityEngine.Debug.LogError("建造条件背包不满足");
     }
 }
