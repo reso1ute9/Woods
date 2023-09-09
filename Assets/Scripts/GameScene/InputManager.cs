@@ -18,7 +18,6 @@ public class InputManager : SingletonMono<InputManager> {
 
     public void Update() {
         if (GameSceneManager.Instance.IsInitialized == false) return;
-        if (wantCheck == false) return;
         CheckSelectMapObject();
     }
 
@@ -28,6 +27,7 @@ public class InputManager : SingletonMono<InputManager> {
 
     // 检查鼠标选中地图对象是否可以进行互动
     private void CheckSelectMapObject() {
+        if (wantCheck == false) return;
         // 如果鼠标一直按下
         bool mouseButton = Input.GetMouseButton(0);
         bool mouseButtonDown = Input.GetMouseButtonDown(0);

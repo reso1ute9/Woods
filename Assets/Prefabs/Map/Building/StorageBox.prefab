@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5015330889653025216}
   - component: {fileID: 295245829161276174}
   - component: {fileID: 9186599625240029914}
-  m_Layer: 9
+  m_Layer: 10
   m_Name: "\u76D6\u5B50"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -96,7 +96,7 @@ GameObject:
   - component: {fileID: 5696907228185656687}
   - component: {fileID: 2052436353775676913}
   - component: {fileID: 5212207878949055132}
-  m_Layer: 9
+  m_Layer: 10
   m_Name: "\u8EAB\u4F53"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -179,7 +179,8 @@ GameObject:
   m_Component:
   - component: {fileID: 8803035822276537991}
   - component: {fileID: 6182817579133670695}
-  m_Layer: 9
+  - component: {fileID: 870085455667184961}
+  m_Layer: 10
   m_Name: StorageBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -216,3 +217,20 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.8331622, y: 0.4258816, z: 0.4700447}
   m_Center: {x: 0, y: 0.24780326, z: 0.000000044703484}
+--- !u!114 &870085455667184961
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8169946284361561149}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26f48b33dbe0921488c7072c11960514, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectType: 10
+  touchDistance: 1
+  canPickUp: 0
+  pickUpItemConfigId: -1
+  collider: {fileID: 6182817579133670695}

@@ -15,4 +15,6 @@ public static class EventName
     public static string PlayerWeaponAttackSucceed = "PlayerWeaponAttackSucceed";
     // 玩家拾取事件
     public static string AddItem = "AddItem";
+    // 建造事件
+    public static string BuildBuilding = "BuildBuilding";
 }

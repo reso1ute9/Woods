@@ -20,13 +20,20 @@ public class UI_BuildWindow_BuildPanel : MonoBehaviour
     }
 
     private void OnClick() {
-        if (UI_InventoryWindow.Instance.AddItemAndPlayAudio(buildConfig.targetId)) {
-            // 根据建造配置减少背包中的物品
-            UI_InventoryWindow.Instance.UpdateItemsForBuild(buildConfig);
-            // 刷新当前二三级窗口状态
-            RefreshView();
+        if (buildConfig.buildType == BuildType.Weapon) {
+            if (UI_InventoryWindow.Instance.AddItemAndPlayAudio(buildConfig.targetId)) {
+                // 根据建造配置减少背包中的物品
+                UI_InventoryWindow.Instance.UpdateItemsForBuild(buildConfig);
+                // 刷新当前二三级窗口状态
+                RefreshView();
+            } else {
+                UIManager.Instance.AddTips("背包没有空间了");
+            }
         } else {
-            UIManager.Instance.AddTips("背包没有空间了");
+            // 进入建造模式
+            EventManager.EventTrigger<BuildConfig>(EventName.BuildBuilding, buildConfig);
+            // 关闭二三级菜单
+            ownerWindow.Close();
         }
     }
 

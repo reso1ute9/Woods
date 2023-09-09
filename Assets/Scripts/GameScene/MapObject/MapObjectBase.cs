@@ -9,14 +9,11 @@ using System.ComponentModel;
 public enum mapObjectType {
     Tree, 
     Stone, 
-    SamllStone,
     Bush,
-    Berry, 
-    MushRoom, 
-    Wood,
-    Twig,
-    Wildflower, 
-    Weapon, 
+    Material,               // 材料
+    Consumable,             // 消耗品
+    Weapon,                 // 武器
+    Building,               // 建筑
 }
 
 // 地图对象基类
@@ -41,7 +38,6 @@ public abstract class MapObjectBase : MonoBehaviour {
     public virtual void RemoveOnMap() {
         // 通知地图块控制器移除当前地图对象
         mapChunk.RemoveMapObject(mapObjectId);
-        // TODO: 掉落物品
     }
 
     // 当被捡起时需要消除地图上UI、数据并返回对应id

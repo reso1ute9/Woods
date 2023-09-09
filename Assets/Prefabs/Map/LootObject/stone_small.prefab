@@ -76,7 +76,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c339dcd887dc1774685b0eb2ec0baaa3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectType: 2
+  objectType: 3
   touchDistance: 0.5
   canPickUp: 1
   pickUpItemConfigId: 1
