@@ -39,7 +39,11 @@ public class UI_BuildWindow_BuildPanel : MonoBehaviour
             int needCount = buildConfig.buildConfigConditions[i].count;
             buildPanelItems[i].Show(configId, currentCount, needCount);
         }
-        descriptionText.text = ConfigManager.Instance.GetConfig<ItemConfig>(ConfigName.Item, buildConfig.targetId).descript;
+        if (buildConfig.buildType == BuildType.Weapon) {
+            descriptionText.text = ConfigManager.Instance.GetConfig<ItemConfig>(ConfigName.Item, buildConfig.targetId).descript;
+        } else {
+            descriptionText.text = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.MapObject, buildConfig.targetId).descript;
+        }        
         button.interactable = buildConfig.CheckBuildConfigCondition();
         gameObject.SetActive(true);
         

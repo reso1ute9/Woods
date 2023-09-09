@@ -14,10 +14,12 @@ public class MapObjectConfig : ConfigBase
     public MapVertexType mapVertexType;
     [LabelText("预制体")]
     public GameObject prefab;
-    [LabelText("UI地图中的icon")]
+    [LabelText("物体icon")]
     public Sprite mapIconSprite;
-    [LabelText("UI地图中的icon尺寸")]
+    [LabelText("物体icon尺寸")]
     public float mapIconSpriteSize = 1.0f;
+    [LabelText("描述"), MultiLineProperty] 
+    public string descript;
     [LabelText("生成概率(百分比类型)")]
     public int probability;
     [LabelText("腐烂天数")]

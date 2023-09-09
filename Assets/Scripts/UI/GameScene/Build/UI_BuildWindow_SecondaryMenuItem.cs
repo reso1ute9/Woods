@@ -25,8 +25,12 @@ public class UI_BuildWindow_SecondaryMenuItem : MonoBehaviour
     public void Init(BuildConfig buildConfig, UI_BuildWindow_SecondaryMenu ownerWindow) {
         this.buildConfig = buildConfig;
         this.ownerWindow = ownerWindow;
-        // TODO: 未来可能存在配置类型的问题
-        iconImage.sprite = ConfigManager.Instance.GetConfig<ItemConfig>(ConfigName.Item, buildConfig.targetId).itemIcon;
+
+        if (this.buildConfig.buildType == BuildType.Weapon) {
+            iconImage.sprite = ConfigManager.Instance.GetConfig<ItemConfig>(ConfigName.Item, buildConfig.targetId).itemIcon;
+        } else {
+            iconImage.sprite = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.MapObject, buildConfig.targetId).mapIconSprite;
+        }
         if (buildConfig.CheckBuildConfigCondition()) {
             iconImage.color = Color.white;
         } else {

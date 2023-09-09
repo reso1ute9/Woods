@@ -51,7 +51,7 @@ public class MapManager : SingletonMono<MapManager>
 
         // 确定配置
         mapConfig = ConfigManager.Instance.GetConfig<MapConfig>(ConfigName.Map);
-        Dictionary<int, ConfigBase> temp_dict = ConfigManager.Instance.GetConfigs(ConfigName.mapObject);
+        Dictionary<int, ConfigBase> temp_dict = ConfigManager.Instance.GetConfigs(ConfigName.MapObject);
         spawnConfigDict = new Dictionary<MapVertexType, List<int>>();
         spawnConfigDict.Add(MapVertexType.Forest, new List<int>());
         spawnConfigDict.Add(MapVertexType.Marsh, new List<int>());

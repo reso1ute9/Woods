@@ -41,7 +41,7 @@ public class MapChunkController : MonoBehaviour
 
     private void InstantiateMapObject(MapObjectData mapObjectData) {
         // 获取该地图对象配置信息
-        MapObjectConfig mapObjectConfig = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, mapObjectData.configId);
+        MapObjectConfig mapObjectConfig = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.MapObject, mapObjectData.configId);
         // 从对象池中获取
         // MapObjectBase mapObject = PoolManager.Instance.GetGameObject<MapObjectBase>(mapObjectConfig.prefab, transform);
         MapObjectBase mapObject = PoolManager.Instance.GetGameObject(mapObjectConfig.prefab, transform).GetComponent<MapObjectBase>();

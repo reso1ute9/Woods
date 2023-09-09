@@ -108,7 +108,7 @@ public class UI_MapWindow : UI_WindowBase
 
     // 添加地图对象icon
     public void AddMapObjectIcon(MapObjectData mapObjectData) {
-        MapObjectConfig mapObjectConfig = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, mapObjectData.configId);
+        MapObjectConfig mapObjectConfig = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.MapObject, mapObjectData.configId);
         if (mapObjectConfig.mapIconSprite == null) {
             return;
         }

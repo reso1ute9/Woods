@@ -72,12 +72,12 @@ public class MapGenerator
         this.forestSpawnWeightTotal = 0;
         List<int> temp = spawnConfigDict[MapVertexType.Forest];
         for (int i = 0; i < temp.Count; i++) {
-            this.forestSpawnWeightTotal += ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, temp[i]).probability;   
+            this.forestSpawnWeightTotal += ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.MapObject, temp[i]).probability;   
         }
         this.marshSpawnWeightTotal = 0;
         temp = spawnConfigDict[MapVertexType.Marsh];
         for (int i = 0; i < temp.Count; i++) {
-            this.marshSpawnWeightTotal += ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, temp[i]).probability;   
+            this.marshSpawnWeightTotal += ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.MapObject, temp[i]).probability;   
         }
     }
 
@@ -242,7 +242,7 @@ public class MapGenerator
         float prob_sum = 0.0f;
         int spawnConfigIndex = 0;
         for (int i = 0; i < configIds.Count; i++) {
-            prob_sum += ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, configIds[i]).probability;
+            prob_sum += ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.MapObject, configIds[i]).probability;
             if (prob_sum > randValue) {
                 spawnConfigIndex = i;
                 break;
@@ -265,7 +265,7 @@ public class MapGenerator
     // 生成一个地图对象的地图数据
     public MapObjectData GenerateMapObjectData(int mapObjectConfigId, Vector3 position) {
         MapObjectData mapObjectData = null;
-        MapObjectConfig mapObjectConfig = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, mapObjectConfigId);
+        MapObjectConfig mapObjectConfig = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.MapObject, mapObjectConfigId);
         if (mapObjectConfig.isEmpty == false) {
             return GenerateMapObjectData(mapObjectConfigId, position, mapObjectConfig.destoryDay);
         }
@@ -284,7 +284,7 @@ public class MapGenerator
                 MapVertex mapVertex = mapGrid.GetVertex(x + offsetX, z + offsetZ);
                 // 确定生成物品
                 int configId = GetMapObjectConfigIdForWeight(mapVertex.vertexType);
-                MapObjectConfig mapObjectConfig = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, configId);
+                MapObjectConfig mapObjectConfig = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.MapObject, configId);
                 if (mapObjectConfig.isEmpty == false) {
                     // 实例化物品
                     Vector3 offset = new Vector3(
@@ -323,7 +323,7 @@ public class MapGenerator
                 }
                 // 确定生成物品
                 int configId = GetMapObjectConfigIdForWeight(mapVertex.vertexType);
-                MapObjectConfig mapObjectConfig = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.mapObject, configId);
+                MapObjectConfig mapObjectConfig = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.MapObject, configId);
                 if (mapObjectConfig.isEmpty == false) {
                     // 实例化物品
                     Vector3 offset = new Vector3(
