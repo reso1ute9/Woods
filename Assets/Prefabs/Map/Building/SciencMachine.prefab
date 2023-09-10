@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1655200887685308805}
   - component: {fileID: 3466201334167683778}
   - component: {fileID: 7317570003580938092}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: "\u7EF3\u5B50"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,7 +94,7 @@ GameObject:
   - component: {fileID: 8292247373038299482}
   - component: {fileID: 3084631204110338310}
   - component: {fileID: 2966599291673024078}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: "\u8F6E\u5B502"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -177,7 +177,7 @@ GameObject:
   - component: {fileID: 7911604122152598595}
   - component: {fileID: 4521445824505457885}
   - component: {fileID: 7679107455522417584}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: "\u8EAB\u4F53"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -260,7 +260,7 @@ GameObject:
   - component: {fileID: 5252704354008584680}
   - component: {fileID: 2117712915306662988}
   - component: {fileID: 7950488914297043917}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: "\u77F3\u5934"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -343,7 +343,7 @@ GameObject:
   - component: {fileID: 1178679815723936749}
   - component: {fileID: 2437721826801444514}
   - component: {fileID: 6783346840145228035}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: "\u624B\u67C4"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -426,7 +426,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6408194045501468587}
   - component: {fileID: 7396393225743977150}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: SciencMachine
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -480,7 +480,7 @@ GameObject:
   - component: {fileID: 2235749926390380244}
   - component: {fileID: 1030123418939939334}
   - component: {fileID: 1751193807855127249}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: "\u8F6E\u5B501"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -563,7 +563,7 @@ GameObject:
   - component: {fileID: 1344284450067679624}
   - component: {fileID: 3681352618635068529}
   - component: {fileID: 8294805651940561918}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: "\u5F00\u5173\u57FA\u5EA7"
   m_TagString: Untagged
   m_Icon: {fileID: 0}

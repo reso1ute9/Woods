@@ -11,7 +11,6 @@ public class BuildingBase : MapObjectBase
     // 预览默认颜色红色和绿色
     public static Color Red = new Color(1, 0, 0, 0.5f);
     public static Color Green = new Color(0, 1, 0, 0.5f);
-    private MeshRenderer[] meshRenderers = null;
     private List<Material> materialList = null;
 
     // 初始化预览方法
@@ -19,7 +18,7 @@ public class BuildingBase : MapObjectBase
         // 预览时关闭碰撞体, 如果开启的话可能会存在问题
         collider.enabled = false;
         // 初始化材质球和MeshRender
-        meshRenderers = GetComponentsInChildren<MeshRenderer>();
+        MeshRenderer[] meshRenderers = GetComponentsInChildren<MeshRenderer>();
         materialList = new List<Material>();
         for (int i = 0; i < meshRenderers.Length; i++) {
             materialList.AddRange(meshRenderers[i].materials);
