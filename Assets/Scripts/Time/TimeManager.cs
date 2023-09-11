@@ -13,6 +13,7 @@ public class TimeManager : LogicManagerBase<TimeManager>
     private TimeData timeData;
     private TimeConfig timeConfig;
     private int nextIndex;
+    public int currentDayNum { get => timeData.dayNum; }
 
     [SerializeField,Range(0,30)] private float timeScale = 1;
     protected override void RegisterEventListener() {}

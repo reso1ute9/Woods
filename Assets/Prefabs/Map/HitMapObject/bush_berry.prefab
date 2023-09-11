@@ -76,6 +76,7 @@ MonoBehaviour:
   materials:
   - {fileID: 2100000, guid: 7b0c2fb0f9ba395479f59e9f5f983e25, type: 2}
   - {fileID: 2100000, guid: a17a0995f74ffba47bda4ec91417108e, type: 2}
+  bushBerryGrowDayNum: 2
 --- !u!1 &3633016648409740043
 GameObject:
   m_ObjectHideFlags: 0

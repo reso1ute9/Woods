@@ -6,13 +6,14 @@ using JKFrame;
 
 public class ArchiveManager : Singleton<ArchiveManager>
 {
-    public PlayerTransformData playerTransformData { get; private set; }    // 当前存档玩家位置数据
-    public PlayerMainData playerMainData { get; private set; }              // 当前存档玩家主要数据
-    public MapInitData mapInitData { get; private set; }                    // 当前存档地图初始化参数
-    public MapData mapData { get; private set; }                            // 当前存档地图数据
-    public InventoryData inventoryData { get; private set; }                // 当前存档物品快捷栏数据
-    public TimeData timeData { get; private set; }                          // 当前存档时间数据
-    public bool haveArchive { get; private set; }                           // 判断当前情况是否有存档
+    public PlayerTransformData playerTransformData { get; private set; }            // 当前存档玩家位置数据
+    public PlayerMainData playerMainData { get; private set; }                      // 当前存档玩家主要数据
+    public MapInitData mapInitData { get; private set; }                            // 当前存档地图初始化参数
+    public MapData mapData { get; private set; }                                    // 当前存档地图数据
+    public InventoryData inventoryData { get; private set; }                        // 当前存档物品快捷栏数据
+    public TimeData timeData { get; private set; }                                  // 当前存档时间数据
+    public bool haveArchive { get; private set; }                                   // 判断当前情况是否有存档
+    public Serialization_Dict<ulong, IMapObjectTypeData> mapObjectTypeDataDict;
     
 
     public ArchiveManager() {
@@ -48,6 +49,8 @@ public class ArchiveManager : Singleton<ArchiveManager>
 
     // 保存地图数据
     public void SaveMapData() {
+        // 保存地图对象类型数据字典
+        SaveMapObjectTypeData();
         SaveManager.SaveObject(mapData);
     }
 
@@ -105,6 +108,7 @@ public class ArchiveManager : Singleton<ArchiveManager>
 
         // 3. 地图数据
         mapData = new MapData();
+        mapObjectTypeDataDict = new Serialization_Dict<ulong, IMapObjectTypeData>();
         SaveMapData();
         // 4. 初始化物品快捷栏数据, 默认14个快捷栏
         inventoryData = new InventoryData(14);
@@ -144,9 +148,35 @@ public class ArchiveManager : Singleton<ArchiveManager>
         playerMainData = SaveManager.LoadObject<PlayerMainData>(0);
         // 地图数据
         mapData = SaveManager.LoadObject<MapData>(0);
+        mapObjectTypeDataDict = SaveManager.LoadObject<Serialization_Dict<ulong, IMapObjectTypeData>>(0);
         // 物品快捷栏
         inventoryData = SaveManager.LoadObject<InventoryData>(0);
         // 时间数据
         timeData = SaveManager.LoadObject<TimeData>(0);
+    }
+
+    // 获取地图对象类型数据
+    public IMapObjectTypeData GetMapObjectTypeData(ulong Id) {
+        return mapObjectTypeDataDict.dictionary[Id];
+    }
+
+    // 尝试获取地图对象类型数据
+    public bool TryGetMapObjectTypeData(ulong Id, out IMapObjectTypeData mapObjectTypeData) {
+        return mapObjectTypeDataDict.dictionary.TryGetValue(Id, out mapObjectTypeData);
+    }
+
+    // 添加地图对象类型数据
+    public void AddMapObjectTypeData(ulong Id, IMapObjectTypeData mapObjectTypeData) {
+        mapObjectTypeDataDict.dictionary.Add(Id, mapObjectTypeData);
+    }
+
+    // 删除地图对象类型数据
+    public void RemoveMapObjectTypeData(ulong Id) {
+        mapObjectTypeDataDict.dictionary.Remove(Id);
+    }
+
+    // 保存地图对象类型数据
+    public void SaveMapObjectTypeData() {
+        SaveManager.SaveObject(mapObjectTypeDataDict);
     }
 }

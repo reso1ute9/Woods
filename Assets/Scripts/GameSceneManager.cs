@@ -35,11 +35,7 @@ public class GameSceneManager : LogicManagerBase<GameSceneManager>
     private void StartGame() {
         // 如果运行到这里一定所有存档都准备好了
         IsInitialized = false;
-        /*** 显示游戏页面中昼夜/血量/饥饿值显示UI
-        * 依赖关系:
-        * 1. TimeManager.Instance.Init(): 初始化时间相关UI
-        * 2. Player_Controller.Instance.Init(mapSizeOnWorld): 初始化角色相关UI
-        ***/
+        // 显示游戏页面中昼夜/血量/饥饿值显示UI
         UIManager.Instance.Show<UI_MainInfoWindow>();
         // 确定地图初始化配置数据
         MapConfig mapConfig = ConfigManager.Instance.GetConfig<MapConfig>(ConfigName.Map);
@@ -47,13 +43,13 @@ public class GameSceneManager : LogicManagerBase<GameSceneManager>
         // 初始化角色
         Player_Controller.Instance.Init(mapSizeOnWorld);
         UIManager.Instance.Show<UI_InventoryWindow>();
+        // 初始化时间系统
+        TimeManager.Instance.Init();
         // 初始化地图+更新观察者位置
         MapManager.Instance.UpdateView(Player_Controller.Instance.transform);
         MapManager.Instance.Init();
         // 初始化相机
         Camera_Controller.Instance.Init(mapSizeOnWorld);
-        // 初始化时间系统
-        TimeManager.Instance.Init();
         // 加载进度条
         loadingWindow = UIManager.Instance.Show<UI_GameLoadingWindow>();
         loadingWindow.UpdateProgress(0);
