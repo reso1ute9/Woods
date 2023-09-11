@@ -4,13 +4,22 @@ using UnityEngine;
 
 
 // 浆果灌木丛控制器
-public class BushBerry_Controller : Bush_Controller
+public class BushBerry_Controller : Bush_Controller, IBuilding
 {   
     [SerializeField] MeshRenderer meshRenderer;
-    [SerializeField] Material[] materials;                  // 0: 有浆果的材质; 1. 没有浆果的材质
+    [SerializeField] new Collider collider;
+    [SerializeField] List<Material> materials;              // 0: 有浆果的材质; 1. 没有浆果的材质
     [SerializeField] int bushBerryGrowDayNum;               // 浆果成长天数
 
     private BushBerryTypeData bushBerryTypeData;            // 浆果动态数据
+
+    // 实现建筑物接口
+    GameObject IBuilding.gameObject => gameObject;
+    Collider IBuilding.Collider => collider;
+    List<Material> IBuilding.materialList { 
+        get => materials; 
+        set => materials = value; 
+    }
 
     public override void Init(MapChunkController mapChunk, ulong mapObjectId) {
         base.Init(mapChunk, mapObjectId);

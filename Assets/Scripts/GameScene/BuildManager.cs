@@ -9,16 +9,16 @@ public class BuildManager : SingletonMono<BuildManager>
     private float virtualCellSize = 0.25f;
     [SerializeField]
     private LayerMask buildLayerMask;
-    private Dictionary<string, BuildingBase> buildPreviewDict = new Dictionary<string, BuildingBase>();     // 预览游戏物体字典
+    private Dictionary<string, IBuilding> buildPreviewDict = new Dictionary<string, IBuilding>();     // 预览游戏物体字典
 
     public void Init() {
         // 初始化建造UI面板
         UIManager.Instance.Show<UI_BuildWindow>();
         // 添加建造事件
-        EventManager.AddEventListener<BuildConfig>(EventName.BuildBuilding, BuildBuiding);
+        EventManager.AddEventListener<BuildConfig>(EventName.BuildBuilding, BuildBuilding);
     }
 
-    private void BuildBuiding(BuildConfig buildConfig) {
+    private void BuildBuilding(BuildConfig buildConfig) {
         // 进入建造状态
         StartCoroutine(DoBuildBuilding(buildConfig));
         // 开启鼠标与地图对象交互功能
@@ -32,8 +32,8 @@ public class BuildManager : SingletonMono<BuildManager>
         UIManager.Instance.DisableUIRaycaster();
         // 生成预览物体
         GameObject prefab = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.MapObject, buildConfig.targetId).prefab;
-        if (buildPreviewDict.TryGetValue(prefab.name, out BuildingBase previewBuilding) == false) {
-            previewBuilding = GameObject.Instantiate(prefab, transform).GetComponent<BuildingBase>();
+        if (buildPreviewDict.TryGetValue(prefab.name, out IBuilding previewBuilding) == false) {
+            previewBuilding = GameObject.Instantiate(prefab, transform).GetComponent<IBuilding>();
             previewBuilding.InitOnPreview();
             buildPreviewDict.Add(prefab.name, previewBuilding);
         }
@@ -56,7 +56,7 @@ public class BuildManager : SingletonMono<BuildManager>
                 Vector3 virtualCellPosition = worldPosition;
                 virtualCellPosition.x = Mathf.RoundToInt(worldPosition.x / virtualCellSize) * virtualCellSize;
                 virtualCellPosition.z = Mathf.RoundToInt(worldPosition.z / virtualCellSize) * virtualCellSize;
-                previewBuilding.transform.position = virtualCellPosition;
+                previewBuilding.gameObject.transform.position = virtualCellPosition;
             }
             // 碰撞检测, 如果可以建造, 材质球设置为绿色, 否则为红色
             bool isOverlap = true;
@@ -102,7 +102,7 @@ public class BuildManager : SingletonMono<BuildManager>
                     // 开启游戏UI交互功能
                     UIManager.Instance.EnableUIRaycaster();
                     // 放置建筑物
-                    MapManager.Instance.GenerateMapObject(buildConfig.targetId, previewBuilding.transform.position);              
+                    MapManager.Instance.GenerateMapObject(buildConfig.targetId, previewBuilding.gameObject.transform.position);              
                     // 根据建造配置减少背包中的物品
                     UI_InventoryWindow.Instance.UpdateItemsForBuild(buildConfig);
                     yield break;
