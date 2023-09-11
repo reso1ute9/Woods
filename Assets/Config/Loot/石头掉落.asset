@@ -33,7 +33,7 @@ MonoBehaviour:
       Data: 1|LootConfigModel, Assembly-CSharp
     - Name: LootObjectConfigId
       Entry: 3
-      Data: 21
+      Data: 7
     - Name: Probability
       Entry: 3
       Data: 100
@@ -45,7 +45,7 @@ MonoBehaviour:
       Data: 2|LootConfigModel, Assembly-CSharp
     - Name: LootObjectConfigId
       Entry: 3
-      Data: 21
+      Data: 7
     - Name: Probability
       Entry: 3
       Data: 20
