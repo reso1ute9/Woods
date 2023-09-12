@@ -21,9 +21,9 @@ public class UI_BuildWindow_BuildPanel : MonoBehaviour
 
     private void OnClick() {
         if (buildConfig.buildType == BuildType.Weapon) {
-            if (UI_InventoryWindow.Instance.AddItemAndPlayAudio(buildConfig.targetId)) {
+            if (InventoryManager.Instance.AddItemAndPlayAudio(buildConfig.targetId)) {
                 // 根据建造配置减少背包中的物品
-                UI_InventoryWindow.Instance.UpdateItemsForBuild(buildConfig);
+                InventoryManager.Instance.UpdateItemsForBuild(buildConfig);
                 // 刷新当前二三级窗口状态
                 RefreshView();
             } else {
@@ -42,7 +42,7 @@ public class UI_BuildWindow_BuildPanel : MonoBehaviour
         // 显示合成需要物品
         for (int i = 0; i < buildConfig.buildConfigConditions.Count; i++) {
             int configId = buildConfig.buildConfigConditions[i].itemId;
-            int currentCount = UI_InventoryWindow.Instance.GetItemCount(configId);
+            int currentCount = InventoryManager.Instance.GetItemCount(configId);
             int needCount = buildConfig.buildConfigConditions[i].count;
             buildPanelItems[i].Show(configId, currentCount, needCount);
         }

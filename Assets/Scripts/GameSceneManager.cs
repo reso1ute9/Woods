@@ -42,10 +42,11 @@ public class GameSceneManager : LogicManagerBase<GameSceneManager>
         float mapSizeOnWorld = ArchiveManager.Instance.mapInitData.mapSize * mapConfig.mapChunkSize * mapConfig.cellSize;
         // 初始化角色
         Player_Controller.Instance.Init(mapSizeOnWorld);
-        UIManager.Instance.Show<UI_InventoryWindow>();
-        // 初始化时间系统
+        // 初始化背包管理器
+        InventoryManager.Instance.Init();
+        // 初始化时间管理器
         TimeManager.Instance.Init();
-        // 初始化地图+更新观察者位置
+        // 初始化地图管理器
         MapManager.Instance.UpdateView(Player_Controller.Instance.transform);
         MapManager.Instance.Init();
         // 初始化相机

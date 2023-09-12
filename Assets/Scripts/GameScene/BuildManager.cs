@@ -104,7 +104,7 @@ public class BuildManager : SingletonMono<BuildManager>
                     // 放置建筑物
                     MapManager.Instance.GenerateMapObject(buildConfig.targetId, previewBuilding.gameObject.transform.position, true);              
                     // 根据建造配置减少背包中的物品
-                    UI_InventoryWindow.Instance.UpdateItemsForBuild(buildConfig);
+                    InventoryManager.Instance.UpdateItemsForBuild(buildConfig);
                     yield break;
                 }
             }

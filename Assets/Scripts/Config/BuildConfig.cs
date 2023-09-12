@@ -19,7 +19,7 @@ public class BuildConfig : ConfigBase
     // 检查是否满足当前监造/合成配置
     public bool CheckBuildConfigCondition() {
         for (int j = 0; j < buildConfigConditions.Count; j++) {
-            int currentCount = UI_InventoryWindow.Instance.GetItemCount(buildConfigConditions[j].itemId);
+            int currentCount = InventoryManager.Instance.GetItemCount(buildConfigConditions[j].itemId);
             if (currentCount < buildConfigConditions[j].count) {
                 return false;
             }

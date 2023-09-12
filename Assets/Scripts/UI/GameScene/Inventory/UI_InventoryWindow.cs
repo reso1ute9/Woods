@@ -10,15 +10,12 @@ using System.Linq;
 [UIElement(true, "UI/UI_InventoryWindow", 1)]
 public class UI_InventoryWindow : UI_WindowBase
 {
-    public static UI_InventoryWindow Instance;
     private InventoryData inventoryData;
     [SerializeField] public UI_ItemSlot[] slots;          // 物品槽
     [SerializeField] public UI_ItemSlot weaponSlot;       // 装备槽
     public Sprite[] bgSprite;                             // 框图
     
     public override void Init() {
-        // TODO: 临时修复bug策略, 待重构
-        Instance = this;
         EventManager.AddEventListener(EventName.PlayerWeaponAttackSucceed, OnPlayerWeaponAttackSucceed);
 
         base.Init();

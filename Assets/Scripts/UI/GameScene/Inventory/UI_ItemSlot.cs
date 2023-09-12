@@ -183,6 +183,7 @@ public class  UI_ItemSlot : MonoBehaviour
         } else {
             // 拖拽到格子后的图标需要复原
             iconTransform.SetParent(slotTransform);
+            iconTransform.localScale = Vector3.one;
             iconTransform.localPosition = Vector3.zero;
             // 如果拖拽到自己原本格子中
             if (currentMouseEnterSlot == this) return;
