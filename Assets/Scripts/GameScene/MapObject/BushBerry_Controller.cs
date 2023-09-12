@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using JKFrame;
 using UnityEngine;
 
 
@@ -21,8 +22,8 @@ public class BushBerry_Controller : Bush_Controller, IBuilding
         set => materials = value; 
     }
 
-    public override void Init(MapChunkController mapChunk, ulong mapObjectId) {
-        base.Init(mapChunk, mapObjectId);
+    public override void Init(MapChunkController mapChunk, ulong mapObjectId, bool isFromBuild) {
+        base.Init(mapChunk, mapObjectId, isFromBuild);
         // 获取类型数据存档
         if (ArchiveManager.Instance.TryGetMapObjectTypeData(mapObjectId, out IMapObjectTypeData tempData)) {
             bushBerryTypeData = (BushBerryTypeData)tempData;
@@ -30,8 +31,13 @@ public class BushBerry_Controller : Bush_Controller, IBuilding
             bushBerryTypeData = new BushBerryTypeData();
             ArchiveManager.Instance.AddMapObjectTypeData(mapObjectId, bushBerryTypeData);
         }
+        // 如果来自建筑物建造的情况则视为刚刚采摘
+        if (isFromBuild == true) {
+            bushBerryTypeData.lastPickUpDayNum = TimeManager.Instance.currentDayNum;
+        }
         // 检测和设置当前浆果状态
         CheckAndSetState();
+        EventManager.AddEventListener(EventName.OnMorning, OnMorning);
     }
 
     // 重写摘取方法, 当摘取浆果后灌木丛变为可收集状态
@@ -60,5 +66,13 @@ public class BushBerry_Controller : Bush_Controller, IBuilding
                 meshRenderer.sharedMaterial = materials[1];
             }
         }
+    }
+
+    // 每天都检查浆果是否满足成熟条件, 如果满足则长出果子
+    private void OnMorning() {
+        if (canPickUp == true) {
+            return;
+        }
+        CheckAndSetState();
     }
 }

@@ -30,7 +30,7 @@ public abstract class MapObjectBase : MonoBehaviour {
     protected MapChunkController mapChunk;                      // 当前所在的地图块控制器
     ulong mapObjectId;                                          // 当前地图物品id
 
-    public virtual void Init(MapChunkController mapChunk, ulong mapObjectId) {
+    public virtual void Init(MapChunkController mapChunk, ulong mapObjectId, bool isFromBuild) {
         this.mapChunk = mapChunk;
         this.mapObjectId = mapObjectId;
     }

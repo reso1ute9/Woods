@@ -276,20 +276,25 @@ public class MapManager : SingletonMono<MapManager>
     }
 
     // 生成一个地图对象
-    public void GenerateMapObject(int mapObjectConfigId, Vector3 position) {
+    public void GenerateMapObject(int mapObjectConfigId, Vector3 position, bool isFromBuild) {
         Vector2Int currChunkIndex = GetMapChunkIndexByWorldPosition(position);
-        GenerateMapObject(mapChunkDict[currChunkIndex], mapObjectConfigId, position);
+        GenerateMapObject(mapChunkDict[currChunkIndex], mapObjectConfigId, position, isFromBuild);
     }
 
     // 生成一个地图对象
-    public void GenerateMapObject(MapChunkController mapChunkController, int mapObjectConfigId, Vector3 position) {
+    public void GenerateMapObject(
+        MapChunkController mapChunkController, 
+        int mapObjectConfigId, 
+        Vector3 position,
+        bool isFromBuild
+    ) {
         // 生成数据
         MapObjectData mapObjectData = mapGenerator.GenerateMapObjectData(mapObjectConfigId, position);
         if (mapObjectData == null) {
             return;
         }
         // 将数据绑定到地图块
-        mapChunkController.AddMapObject(mapObjectData);
+        mapChunkController.AddMapObject(mapObjectData, isFromBuild);
         // 添加UI icon
         if (mapUI == null) {
             return;

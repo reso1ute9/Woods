@@ -174,7 +174,7 @@ public class  UI_ItemSlot : MonoBehaviour
             // 从存档里去除这份数据
             // 物品掉落在地上: 在地面生成物品, 并将y值设置为1
             worldPosition.y = 1;
-            MapManager.Instance.GenerateMapObject(itemData.config.mapObjectConfigId, worldPosition);
+            MapManager.Instance.GenerateMapObject(itemData.config.mapObjectConfigId, worldPosition, false);
             UnityEngine.Debug.Log("物品掉落在地上" + itemData.config.itemName);
             // 丢弃一件物品, 注意数据/UI/音效需要同步
             ProjectTool.PlayerAudio(AudioType.Bag);

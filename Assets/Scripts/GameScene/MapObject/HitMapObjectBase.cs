@@ -11,8 +11,8 @@ public abstract class HitMapObjectBase : MapObjectBase
     [SerializeField] private int lootObjectConfigId = -1;   // 死亡时掉落物品id, -1默认为无效掉落
     private float hp;
 
-    public override void Init(MapChunkController mapChunk, ulong mapObjectId) {
-        base.Init(mapChunk, mapObjectId);
+    public override void Init(MapChunkController mapChunk, ulong mapObjectId, bool isFromBuild) {
+        base.Init(mapChunk, mapObjectId, isFromBuild);
         hp = maxHp;
     }
 
@@ -51,7 +51,9 @@ public abstract class HitMapObjectBase : MapObjectBase
                 float randomX = 1.0f * Random.Range(-10, 10) / 20;
                 float randomZ = 1.0f * Random.Range(-10, 10) / 20;
                 Vector3 pos = transform.position + new Vector3(randomX, 1, randomZ);
-                MapManager.Instance.GenerateMapObject(mapChunk, lootConfig.Configs[i].LootObjectConfigId, pos);
+                MapManager.Instance.GenerateMapObject(
+                    mapChunk, lootConfig.Configs[i].LootObjectConfigId, pos, false
+                );
             }
         }
     }

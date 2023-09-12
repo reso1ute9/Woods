@@ -61,8 +61,6 @@ public class UI_BuildWindow_SecondaryMenu : MonoBehaviour
                 failToMeetConditionList.Add(buildConfigList[i]);
             }
         }
-        UnityEngine.Debug.Log("meetTheConditionList count:" + meetTheConditionList.Count);
-        UnityEngine.Debug.Log("failToMeetConditionList count:" + failToMeetConditionList.Count);
         // 添加满足条件和不满足条件对应的二级菜单选项
         for (int i = 0; i < meetTheConditionList.Count; i++) {
             AddSecondaryMenuItem(meetTheConditionList[i]);

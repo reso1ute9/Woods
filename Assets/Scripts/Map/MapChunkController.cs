@@ -39,14 +39,14 @@ public class MapChunkController : MonoBehaviour
         EventManager.AddEventListener(EventName.OnMorning, OnMorning);
     }
 
-    private void InstantiateMapObject(MapObjectData mapObjectData) {
+    private void InstantiateMapObject(MapObjectData mapObjectData, bool isFromBuild) {
         // 获取该地图对象配置信息
         MapObjectConfig mapObjectConfig = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.MapObject, mapObjectData.configId);
         // 从对象池中获取
         // MapObjectBase mapObject = PoolManager.Instance.GetGameObject<MapObjectBase>(mapObjectConfig.prefab, transform);
         MapObjectBase mapObject = PoolManager.Instance.GetGameObject(mapObjectConfig.prefab, transform).GetComponent<MapObjectBase>();
         mapObject.transform.position = mapObjectData.position;
-        mapObject.Init(this, mapObjectData.id);
+        mapObject.Init(this, mapObjectData.id, isFromBuild);
         mapObjectDict.Add(mapObjectData.id, mapObject);
     }
 
@@ -58,7 +58,7 @@ public class MapChunkController : MonoBehaviour
             // 从对象池生成/回收所有对象
             if (isActive == true) {
                 foreach (var mapObject in mapChunkData.mapObjectDict.dictionary.Values) {
-                    InstantiateMapObject(mapObject);
+                    InstantiateMapObject(mapObject, false);
                 }
             } else {
                 // 注意放回的时候放的时mapObjectList中的对象
@@ -71,7 +71,7 @@ public class MapChunkController : MonoBehaviour
     }
 
     // 添加一个地图对象: 默认仅MapManager调用该方法
-    public void AddMapObject(MapObjectData mapObjectData) {
+    public void AddMapObject(MapObjectData mapObjectData, bool isFromBuild) {
         // 添加存档数据
         mapChunkData.mapObjectDict.dictionary.Add(mapObjectData.id, mapObjectData);
         if (mapObjectData.destoryDay > 0) {
@@ -79,7 +79,7 @@ public class MapChunkController : MonoBehaviour
         }
         // 实例化物品
         if (isActive == true) {
-            InstantiateMapObject(mapObjectData);
+            InstantiateMapObject(mapObjectData, isFromBuild);
         }
     }
 
@@ -120,7 +120,7 @@ public class MapChunkController : MonoBehaviour
         // 获得刷新后新增的地图块中包含的地图对象
         List<MapObjectData> mapObjectDatas = MapManager.Instance.GenerateMapObjectDataOnMapChunkRefresh(chunkIndex);
         for (int i = 0; i < mapObjectDatas.Count; i++) {
-            AddMapObject(mapObjectDatas[i]);
+            AddMapObject(mapObjectDatas[i], false);
         }
     }
     #endregion
