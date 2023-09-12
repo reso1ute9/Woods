@@ -45,10 +45,12 @@ public abstract class HitMapObjectBase : MapObjectBase
         // 根据概率决定是否实例化
         for (int i = 0; i < lootConfig.Configs.Count; i++) {
             int randValue = Random.Range(1, 101);
-            if (randValue < lootConfig.Configs[i].Probability) {
+            if (randValue <= lootConfig.Configs[i].Probability) {
                 // 生成掉落物品
                 // 1. 掉落物品在父物体的上方一些
-                Vector3 pos = transform.position + new Vector3(0, 1, 0);
+                float randomX = 1.0f * Random.Range(-10, 10) / 20;
+                float randomZ = 1.0f * Random.Range(-10, 10) / 20;
+                Vector3 pos = transform.position + new Vector3(randomX, 1, randomZ);
                 MapManager.Instance.GenerateMapObject(mapChunk, lootConfig.Configs[i].LootObjectConfigId, pos);
             }
         }
