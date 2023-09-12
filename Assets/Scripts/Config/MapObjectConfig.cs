@@ -14,14 +14,14 @@ public class MapObjectConfig : ConfigBase
     public MapVertexType mapVertexType;
     [LabelText("预制体")]
     public GameObject prefab;
-    [LabelText("物体icon")]
+    [LabelText("物体icon")]             
     public Sprite mapIconSprite;
     [LabelText("物体icon尺寸")]
-    public float mapIconSpriteSize = 1.0f;
+    public float mapIconSize = 1.0f;            // 0代表不生成物品
     [LabelText("描述"), MultiLineProperty] 
     public string descript;
     [LabelText("生成概率(百分比类型)")]
     public int probability;
     [LabelText("腐烂天数")]
-    public int destoryDay = -1;         // -1代表无效
+    public int destoryDay = -1;                 // -1代表无效
 }

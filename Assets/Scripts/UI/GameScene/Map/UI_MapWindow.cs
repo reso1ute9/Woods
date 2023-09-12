@@ -109,13 +109,13 @@ public class UI_MapWindow : UI_WindowBase
     // 添加地图对象icon
     public void AddMapObjectIcon(MapObjectData mapObjectData) {
         MapObjectConfig mapObjectConfig = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.MapObject, mapObjectData.configId);
-        if (mapObjectConfig.mapIconSprite == null) {
+        if (mapObjectConfig.mapIconSprite == null || mapObjectConfig.mapIconSize <= 0) {
             return;
         }
         GameObject tempObject = PoolManager.Instance.GetGameObject(mapIconPrefab, content);
         Image iconImage = tempObject.GetComponent<Image>();
         iconImage.sprite = mapObjectConfig.mapIconSprite;
-        iconImage.transform.localScale = Vector3.one * mapObjectConfig.mapIconSpriteSize;
+        iconImage.transform.localScale = Vector3.one * mapObjectConfig.mapIconSize;
         // 因为整个content的尺寸在初始化的时候已经乘上mapScaleFactorNum了, 所以在计算icon位置时
         // 也需要乘上相同的系数
         float x = mapObjectData.position.x * mapScaleFactorNum;
