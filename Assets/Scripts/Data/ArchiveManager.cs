@@ -10,7 +10,7 @@ public class ArchiveManager : Singleton<ArchiveManager>
     public PlayerMainData playerMainData { get; private set; }                      // 当前存档玩家主要数据
     public MapInitData mapInitData { get; private set; }                            // 当前存档地图初始化参数
     public MapData mapData { get; private set; }                                    // 当前存档地图数据
-    public InventoryData inventoryData { get; private set; }                        // 当前存档物品快捷栏数据
+    public MainInventoryData mainInventoryData { get; private set; }                        // 当前存档物品快捷栏数据
     public TimeData timeData { get; private set; }                                  // 当前存档时间数据
     public bool haveArchive { get; private set; }                                   // 判断当前情况是否有存档
     public Serialization_Dict<ulong, IMapObjectTypeData> mapObjectTypeDataDict;
@@ -33,8 +33,8 @@ public class ArchiveManager : Singleton<ArchiveManager>
     }
 
     // 保存物品快捷栏数据
-    public void SaveInventoryData() {
-        SaveManager.SaveObject(inventoryData);
+    public void SaveMainInventoryData() {
+        SaveManager.SaveObject(mainInventoryData);
     }
 
     // 保存玩家位置数据存档到磁盘上
@@ -111,23 +111,23 @@ public class ArchiveManager : Singleton<ArchiveManager>
         mapObjectTypeDataDict = new Serialization_Dict<ulong, IMapObjectTypeData>();
         SaveMapData();
         // 4. 初始化物品快捷栏数据, 默认14个快捷栏
-        inventoryData = new InventoryData(14);
+        mainInventoryData = new MainInventoryData(14);
 
         #region 物品快捷栏测试数据
-        inventoryData.itemDatas[0] = ItemData.CreateItemData(0);
-        (inventoryData.itemDatas[0].itemTypeData as ItemMaterialData).count = 3;
-        inventoryData.itemDatas[1] = ItemData.CreateItemData(1);
-        inventoryData.itemDatas[2] = ItemData.CreateItemData(2);
-        (inventoryData.itemDatas[2].itemTypeData as ItemWeaponData).durability = 60;
-        inventoryData.itemDatas[3] = ItemData.CreateItemData(3);
-        (inventoryData.itemDatas[3].itemTypeData as ItemConsumableData).count = 4;
-        inventoryData.itemDatas[4] = ItemData.CreateItemData(4);
-        (inventoryData.itemDatas[4].itemTypeData as ItemWeaponData).durability = 30;
-        inventoryData.itemDatas[5] = ItemData.CreateItemData(5);
-        (inventoryData.itemDatas[5].itemTypeData as ItemWeaponData).durability = 20;
+        mainInventoryData.itemDatas[0] = ItemData.CreateItemData(0);
+        (mainInventoryData.itemDatas[0].itemTypeData as ItemMaterialData).count = 3;
+        mainInventoryData.itemDatas[1] = ItemData.CreateItemData(1);
+        mainInventoryData.itemDatas[2] = ItemData.CreateItemData(2);
+        (mainInventoryData.itemDatas[2].itemTypeData as ItemWeaponData).durability = 60;
+        mainInventoryData.itemDatas[3] = ItemData.CreateItemData(3);
+        (mainInventoryData.itemDatas[3].itemTypeData as ItemConsumableData).count = 4;
+        mainInventoryData.itemDatas[4] = ItemData.CreateItemData(4);
+        (mainInventoryData.itemDatas[4].itemTypeData as ItemWeaponData).durability = 30;
+        mainInventoryData.itemDatas[5] = ItemData.CreateItemData(5);
+        (mainInventoryData.itemDatas[5].itemTypeData as ItemWeaponData).durability = 20;
         #endregion
         
-        SaveInventoryData();
+        SaveMainInventoryData();
         
         // 5. 初始化时间数据
         TimeConfig timeConfig = ConfigManager.Instance.GetConfig<TimeConfig>(ConfigName.Time);
@@ -150,7 +150,7 @@ public class ArchiveManager : Singleton<ArchiveManager>
         mapData = SaveManager.LoadObject<MapData>(0);
         mapObjectTypeDataDict = SaveManager.LoadObject<Serialization_Dict<ulong, IMapObjectTypeData>>(0);
         // 物品快捷栏
-        inventoryData = SaveManager.LoadObject<InventoryData>(0);
+        mainInventoryData = SaveManager.LoadObject<MainInventoryData>(0);
         // 时间数据
         timeData = SaveManager.LoadObject<TimeData>(0);
     }

@@ -361,7 +361,5 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
         playerTransformData.rotation = playerTransform.localRotation.eulerAngles;
         ArchiveManager.Instance.SavePlayerTransformData();
         ArchiveManager.Instance.SavePlayerMainData();
-        // 存储当前物品栏数据信息
-        ArchiveManager.Instance.SaveInventoryData();
     }
 }

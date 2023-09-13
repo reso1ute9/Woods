@@ -51,8 +51,6 @@ public static class UITool
             // 缩小
             Vector3 targetScale = normalScale;
             while (transform.localScale.x > targetScale.x) {
-                // 停留一帧
-                yield return null;  
                 if (transform == null) yield break;
                 currentScale -= Time.deltaTime * 2 * Vector3.one;
                 transform.localScale = currentScale;
@@ -60,10 +58,8 @@ public static class UITool
             transform.localScale = targetScale;
         } else {
             // 放大
-            Vector3 targetScale = normalScale * 1.2f;
+            Vector3 targetScale = normalScale * 1.1f;
             while (transform.localScale.x < targetScale.x) {
-                // 停留一帧
-                yield return null;
                 if (transform == null) yield break;
                 currentScale += Time.deltaTime * 2 * Vector3.one;
                 transform.localScale = currentScale;

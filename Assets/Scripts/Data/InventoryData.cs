@@ -4,13 +4,13 @@ using UnityEngine;
 using JKFrame;
 using System;
 
-// 物品快捷栏数据
+
+// 通用物品栏格子
 [Serializable]
 public class InventoryData
 {
-    // 物品快捷栏中装的物品
-    public ItemData[] itemDatas { get; private set; }
-    public ItemData weaponSlotItemData { get; private set; }
+    // 物品栏中装的物品
+    public ItemData[] itemDatas { get; protected set; }
 
     public InventoryData(int itemCount) {
         itemDatas = new ItemData[itemCount];
@@ -25,6 +25,17 @@ public class InventoryData
     public void SetItem(int index, ItemData itemData) {
         itemDatas[index] = itemData;
     }
+
+}
+
+// 物品快捷栏数据
+[Serializable]
+public class MainInventoryData : InventoryData
+{
+    public ItemData weaponSlotItemData { get; private set; }
+
+    // 物品快捷栏构造函数
+    public MainInventoryData(int itemCount) : base(itemCount) {}
 
     // 移除武器
     public void RemoveWeaponItem() {

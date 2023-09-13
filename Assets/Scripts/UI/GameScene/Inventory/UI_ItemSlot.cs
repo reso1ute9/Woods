@@ -12,22 +12,22 @@ using JKFrame;
 // 物品快捷栏中的格子
 public class  UI_ItemSlot : MonoBehaviour
 {
-    [SerializeField] public Image bgImg;                   // 格子背景图片
-    [SerializeField] Image iconImg;                 // 格子里图标
-    [SerializeField] Text countText;                // 格子中显示的数值
+    [SerializeField] public Image bgImg;                    // 格子背景图片
+    [SerializeField] Image iconImg;                         // 格子里图标
+    [SerializeField] Text countText;                        // 格子中显示的数值
     
-    public ItemData itemData { get; private set; }  // 格子中的数据
-    public int index { get; private set; }          // 格子编号
+    public ItemData itemData { get; private set; }          // 格子中的数据
+    public int index { get; private set; }                  // 格子编号
 
-    private UI_InventoryWindow ownerWindow;         // 宿主窗口: 物品栏/仓库
+    private UI_InventoryWindowBase ownerWindow;             // 宿主窗口: 物品栏/仓库
 
     private Transform iconTransform;
-    private Transform slotTransform;                // 保存当前格子的父物体
+    private Transform slotTransform;                        // 保存当前格子的父物体
 
-    public static UI_ItemSlot currentMouseEnterSlot;    // 当前鼠标进入/出入的格子
-    public static UI_ItemSlot weaponSlot;               // 记录一下当前的武器栏
+    public static UI_ItemSlot currentMouseEnterSlot;        // 当前鼠标进入/出入的格子
+    public static UI_ItemSlot weaponSlot;                   // 记录一下当前的武器栏
     
-    private static Sprite weaponSlotDefaultSprite;      // 记录默认的武器栏图标
+    private Func<int, AudioType> onUseAction;
 
     private void Start() {
         iconTransform = iconImg.transform;
@@ -38,11 +38,6 @@ public class  UI_ItemSlot : MonoBehaviour
         this.OnBeginDrag(BeginDrag);                  // 开始拖拽
         this.OnDrag(Drag);                            // 拖拽过程中
         this.OnEndDrag(EndDrag);                      // 拖拽结束
-        // 设置物品快捷栏默认背景
-        if (weaponSlot != this) {
-            bgImg.sprite = ownerWindow.bgSprite[0];
-        }
-        weaponSlotDefaultSprite = weaponSlot.bgImg.sprite;
         // 设置鼠标进入后放大鼠标指针
         UITool.BindMouseEffect(this);
     }
@@ -57,18 +52,21 @@ public class  UI_ItemSlot : MonoBehaviour
 
     // 检测鼠标右键是否可以使用物品
     private void CheckMouseRightClick() {
-        if (itemData == null) return;
+        if (itemData == null || onUseAction == null) return;
         if (isMouseStay && Input.GetMouseButtonDown(1)) {
             // 根据使用情况播放音效
-            AudioType resultAudioType = ownerWindow.UseItem(index);
+            AudioType resultAudioType = onUseAction.Invoke(index);
             ProjectTool.PlayerAudio(resultAudioType);
         }
     }
 
     // 初始化格子
-    public void Init(int index, UI_InventoryWindow ownerWindow) {
+    public void Init(int index, UI_InventoryWindowBase ownerWindow, Func<int, AudioType> onUseAction) {
         this.index = index;
         this.ownerWindow = ownerWindow;
+        this.onUseAction = onUseAction;
+        // 设置物品快捷栏默认背景
+        bgImg.sprite = ownerWindow.bgSprite[0];
     }
 
     // 初始化格子中的数据并刷新数值UI
@@ -125,11 +123,7 @@ public class  UI_ItemSlot : MonoBehaviour
 
     private void MouseExit(PointerEventData eventData, object[] arg2) {
         GameManager.Instance.SetCursorState(CursorState.Normal);
-        if (weaponSlot != this) {
-            bgImg.sprite = ownerWindow.bgSprite[0];
-        } else {
-            bgImg.sprite = weaponSlotDefaultSprite;
-        }
+        bgImg.sprite = ownerWindow.bgSprite[0];
         isMouseStay = false;
         currentMouseEnterSlot = null;
     }
@@ -158,6 +152,7 @@ public class  UI_ItemSlot : MonoBehaviour
             GameManager.Instance.SetCursorState(CursorState.Normal);
             // 物品图标复原
             iconTransform.SetParent(slotTransform);
+            iconTransform.localScale = Vector3.one;
             iconTransform.localPosition = Vector3.zero;
             // 如果目标没有格子, 但是是UI物体, 可以无视
             if (InputManager.Instance.CheckMouseOnUI()) {
@@ -218,7 +213,7 @@ public class  UI_ItemSlot : MonoBehaviour
             }
         }
         // 更新存档
-        ArchiveManager.Instance.SaveInventoryData();
+        ArchiveManager.Instance.SaveMainInventoryData();
     }
 
     // 交换物品槽中的数据并刷新物品槽UI

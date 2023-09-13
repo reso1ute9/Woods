@@ -6,10 +6,10 @@ using UnityEngine;
 
 public class InventoryManager : SingletonMono<InventoryManager>
 {
-    private UI_InventoryWindow mainInventoryWindow;     // 快捷栏窗口
+    private UI_MainInventoryWindow mainInventoryWindow;     // 快捷栏窗口
 
     public void Init() {
-        mainInventoryWindow = UIManager.Instance.Show<UI_InventoryWindow>();
+        mainInventoryWindow = UIManager.Instance.Show<UI_MainInventoryWindow>();
     }
 
     #region 快捷窗口栏
@@ -33,4 +33,9 @@ public class InventoryManager : SingletonMono<InventoryManager>
         return mainInventoryWindow.AddItem(configId);
     }
     #endregion
+
+    private void OnDestroy() {
+        // 存储当前物品快捷栏数据信息
+        ArchiveManager.Instance.SaveMainInventoryData();
+    }
 }
