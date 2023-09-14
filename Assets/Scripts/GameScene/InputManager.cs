@@ -8,7 +8,8 @@ using UnityEngine.EventSystems;
 public class InputManager : SingletonMono<InputManager> {
     private static List<RaycastResult> raycastResults = new List<RaycastResult>(); // 记录鼠标与UI碰撞的结果
     [SerializeField] LayerMask bigMapObjectLayer;           // 大型地图对象层(e.g. 树/石头)
-    [SerializeField] LayerMask mouseMapObjectLayer;         // 鼠标可交互的地图对象层
+    [SerializeField] LayerMask mouseMapObjectLayer;         // 鼠标可交互的地图对象层: 非建筑物层
+    [SerializeField] LayerMask BuildingObjectLayer;         // 鼠标可交互的地图对象层: 建筑物层
     [SerializeField] LayerMask groundLayer;                 // 地面层
     private bool wantCheck = false;                         // 是否需要检测
 
@@ -34,10 +35,14 @@ public class InputManager : SingletonMono<InputManager> {
         if (mouseButton || mouseButtonDown) {
             if (CheckMouseOnUI()) return;
             // 射线检测地图上的3d物体
+            RaycastHit hitInfo;
             Ray ray = Camera_Controller.Instance.Camera.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hitInfo, 100, mouseMapObjectLayer)) {
-                // 发送给玩家控制器去处理
+            if (Physics.Raycast(ray, out hitInfo, 100, mouseMapObjectLayer)) {
                 Player_Controller.Instance.OnSelectMapObject(hitInfo, mouseButtonDown);
+            }
+            // 特殊处理: 建筑物点击逻辑
+            if (mouseButtonDown && Physics.Raycast(ray, out hitInfo, 100, BuildingObjectLayer)) {
+                hitInfo.collider.GetComponent<BuildingBase>().OnSelect();
             }
         }
     }   

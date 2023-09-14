@@ -77,7 +77,7 @@ public class UI_MainInventoryWindow : UI_InventoryWindowBase
     // 丢掉一件物品
     public override void DiscardItem(int index) {
         // 如果是武器直接丢弃, 注意需要修改模型
-        if (index == slots.Length || slots[index].itemData.config.itemType == ItemType.Weapon) {
+        if (index == slots.Count || slots[index].itemData.config.itemType == ItemType.Weapon) {
             RemoveItem(index);
             Player_Controller.Instance.ChangeWeapon(null);
             return;
@@ -92,7 +92,7 @@ public class UI_MainInventoryWindow : UI_InventoryWindowBase
             return AudioType.PlayerConnot;
         }
         // 1. 武器物品栏
-        if (index == slots.Length) {
+        if (index == slots.Count) {
             int emptySlotIndex = GetEmptySlot();
             if (emptySlotIndex >= 0) {
                 UI_ItemSlot.SwapSlotItem(weaponSlot, slots[emptySlotIndex]);

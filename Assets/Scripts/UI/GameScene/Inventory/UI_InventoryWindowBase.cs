@@ -10,9 +10,9 @@ using System.Linq;
 public abstract class UI_InventoryWindowBase : UI_WindowBase
 {
     protected InventoryData inventoryData;
-    [SerializeField] protected UI_ItemSlot[] slots;          // 物品槽
+    [SerializeField] protected List<UI_ItemSlot> slots;             // 物品槽
     
-    public Sprite[] bgSprite;                             // 框图
+    public Sprite[] bgSprite;                                       // 框图
     
     public override void Init() {
         base.Init();
@@ -93,7 +93,7 @@ public abstract class UI_InventoryWindowBase : UI_WindowBase
 
     // 得到一个空格子, return -1代表没有空格子
     protected int GetEmptySlot() {
-        for (int i = 0; i < slots.Length; i++) {
+        for (int i = 0; i < slots.Count; i++) {
             if (slots[i].itemData == null) {
                 return i;
             }
@@ -114,7 +114,7 @@ public abstract class UI_InventoryWindowBase : UI_WindowBase
 
     // 检测并堆放物体到格子上
     private bool CheckAndPileItemForSlot(int configId) {
-        for (int i = 0; i < slots.Length; i++) {
+        for (int i = 0; i < slots.Count; i++) {
             // 当前格子不为空 & 物品类型一致
             if (slots[i].itemData != null && 
                 slots[i].itemData.configId == configId

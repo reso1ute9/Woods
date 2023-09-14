@@ -179,7 +179,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8803035822276537991}
   - component: {fileID: 6182817579133670695}
-  - component: {fileID: 870085455667184961}
+  - component: {fileID: -1366083631185073068}
   m_Layer: 10
   m_Name: StorageBox
   m_TagString: Untagged
@@ -217,7 +217,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.8331622, y: 0.4258816, z: 0.4700447}
   m_Center: {x: 0, y: 0.24780326, z: 0.000000044703484}
---- !u!114 &870085455667184961
+--- !u!114 &-1366083631185073068
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -229,8 +229,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26f48b33dbe0921488c7072c11960514, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectType: 10
+  objectType: 6
   touchDistance: 1
   canPickUp: 0
   pickUpItemConfigId: -1
   collider: {fileID: 6182817579133670695}
+  UIWindowGridSize: {x: 2, y: 3}

@@ -5,7 +5,7 @@ using UnityEngine;
 public class BuildingBase : MapObjectBase, IBuilding 
 {
     [SerializeField] protected new Collider collider;
-    public List<Material> materialList = null;
+    private List<Material> materialList = null;
 
     #region 预览模式
     GameObject IBuilding.gameObject => gameObject;
@@ -14,5 +14,10 @@ public class BuildingBase : MapObjectBase, IBuilding
         get => materialList;
         set => materialList = value; 
     }
+    #endregion
+
+    #region 运行模式
+    // 当建筑物被选中时
+    public virtual void OnSelect() {}
     #endregion
 }

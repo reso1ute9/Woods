@@ -36,6 +36,14 @@ public class InventoryManager : SingletonMono<InventoryManager>
     }
     #endregion
 
+    #region 储物箱
+    public void OpenStorageBoxWindow(StorageBox_Controller storageBox, InventoryData inventoryData, Vector2Int windowSize) {
+        // 先关闭窗口, 关闭窗口时会调用OnClose处理关闭逻辑
+        UIManager.Instance.Close<UI_StorageBoxInventoryWindow>();
+        UIManager.Instance.Show<UI_StorageBoxInventoryWindow>().Init(storageBox, inventoryData, windowSize);
+    }
+    #endregion
+
     private void OnDestroy() {
         // 存储当前物品快捷栏数据信息
         ArchiveManager.Instance.SaveMainInventoryData();
