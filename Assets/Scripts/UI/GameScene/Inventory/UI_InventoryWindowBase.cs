@@ -17,24 +17,6 @@ public abstract class UI_InventoryWindowBase : UI_WindowBase
     public override void Init() {
         base.Init();
     }
-
-    protected abstract void InitInventoryData();
-
-    public override void OnShow() {
-        base.OnShow();
-        // 根据存档复原物品快捷栏格子
-        InitData();
-    }
-
-    // 初始化数据
-    public virtual void InitData() {
-        // inventoryData = ArchiveManager.Instance.mainInventoryData;
-        // 初始化物品栏数据
-        InitInventoryData();
-        // 初始化格子: 每个槽对应的位置和父窗口信息
-        InitSlotData();
-        
-    }
     
     // 初始化物品快捷栏所有格子UI界面
     protected virtual void InitSlotData() {

@@ -9,7 +9,9 @@ public class InventoryManager : SingletonMono<InventoryManager>
     private UI_MainInventoryWindow mainInventoryWindow;     // 快捷栏窗口
 
     public void Init() {
+        // 初始化快捷栏窗口
         mainInventoryWindow = UIManager.Instance.Show<UI_MainInventoryWindow>();
+        mainInventoryWindow.InitData();
     }
 
     #region 快捷窗口栏

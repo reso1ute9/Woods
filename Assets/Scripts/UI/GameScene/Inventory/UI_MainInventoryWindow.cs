@@ -26,6 +26,17 @@ public class UI_MainInventoryWindow : UI_InventoryWindowBase
         base.Init();
         EventManager.AddEventListener(EventName.PlayerWeaponAttackSucceed, OnPlayerWeaponAttackSucceed);
     }
+
+    // 初始化数据
+    public void InitData() {
+        // 初始化快捷栏数据
+        inventoryData = ArchiveManager.Instance.mainInventoryData;
+        mainInventoryData = inventoryData as MainInventoryData;
+        // 初始化格子: 每个槽对应的位置和父窗口信息
+        InitSlotData();
+        // 将武器更新到角色模型上
+        Player_Controller.Instance.ChangeWeapon(mainInventoryData.weaponSlotItemData);
+    }
     
     // 初始化物品槽数据: 已重写该方法
     protected override void InitSlotData() {
@@ -38,21 +49,7 @@ public class UI_MainInventoryWindow : UI_InventoryWindowBase
             slots[i].InitData(mainInventoryData.itemDatas[i]);
         }
     }
-
-    // 初始化物品栏数据(来自存档)
-    protected override void InitInventoryData() {
-        // 确定物品快捷栏存档数据
-        inventoryData = ArchiveManager.Instance.mainInventoryData;
-        mainInventoryData = inventoryData as MainInventoryData;
-    }
-
-    public override void OnShow() {
-        base.OnShow();
-        // 将武器更新到角色模型上
-        Player_Controller.Instance.ChangeWeapon(mainInventoryData.weaponSlotItemData);
-    }
     
-
     // 设置格子中的内容
     public override void SetItem(int index, ItemData itemData) {
         // 判断是否为为武器还是普通格子

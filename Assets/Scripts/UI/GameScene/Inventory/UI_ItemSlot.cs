@@ -10,6 +10,7 @@ using JKFrame;
 
 
 // 物品快捷栏中的格子
+[Pool]
 public class  UI_ItemSlot : MonoBehaviour
 {
     [SerializeField] public Image bgImg;                    // 格子背景图片
@@ -61,7 +62,7 @@ public class  UI_ItemSlot : MonoBehaviour
     }
 
     // 初始化格子
-    public void Init(int index, UI_InventoryWindowBase ownerWindow, Func<int, AudioType> onUseAction) {
+    public void Init(int index, UI_InventoryWindowBase ownerWindow, Func<int, AudioType> onUseAction = null) {
         this.index = index;
         this.ownerWindow = ownerWindow;
         this.onUseAction = onUseAction;
