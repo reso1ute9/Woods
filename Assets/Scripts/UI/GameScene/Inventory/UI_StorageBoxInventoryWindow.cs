@@ -16,7 +16,7 @@ public class UI_StorageBoxInventoryWindow : UI_InventoryWindowBase
     public override void Init() {
         base.Init();
         slots = new List<UI_ItemSlot>(20);
-        closButton.onClick.AddListener(Close);
+        closButton.onClick.AddListener(CloseButtonClick);
     }
 
     // 初始化数据
@@ -33,6 +33,14 @@ public class UI_StorageBoxInventoryWindow : UI_InventoryWindowBase
             itemSlot.Init(i, this);
             itemSlot.InitData(inventoryData.itemDatas[i]);
             slots.Add(itemSlot);
+        }
+    }
+
+    public void Update() {
+        if (Player_Controller.Instance != null) {
+            if (Vector3.Distance(Player_Controller.Instance.playerTransform.position, storageBox.transform.position) > storageBox.TouchDistance) {
+                Close();
+            }
         }
     }
 
@@ -54,5 +62,11 @@ public class UI_StorageBoxInventoryWindow : UI_InventoryWindowBase
         }
         slots.Clear();
         inventoryData = null;
+    }
+
+    // 关闭按钮点击逻辑
+    public void CloseButtonClick() {
+        ProjectTool.PlayerAudio(AudioType.Bag);
+        Close();
     }
 }

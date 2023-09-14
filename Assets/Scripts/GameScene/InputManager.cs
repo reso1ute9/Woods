@@ -42,7 +42,16 @@ public class InputManager : SingletonMono<InputManager> {
             }
             // 特殊处理: 建筑物点击逻辑
             if (mouseButtonDown && Physics.Raycast(ray, out hitInfo, 100, BuildingObjectLayer)) {
-                hitInfo.collider.GetComponent<BuildingBase>().OnSelect();
+                BuildingBase building = hitInfo.collider.GetComponent<BuildingBase>();
+                // 检查当前玩家和箱子的距离是否符合要求
+                if (building.TouchDistance >= 0) {
+                    if (Vector3.Distance(Player_Controller.Instance.playerTransform.position, building.transform.position) < building.TouchDistance) {
+                        building.OnSelect();
+                    } else {
+                        UIManager.Instance.AddTips("距离建筑物太远");
+                        ProjectTool.PlayerAudio(AudioType.Fail);
+                    }
+                }
             }
         }
     }   
