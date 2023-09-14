@@ -230,7 +230,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectType: 6
-  touchDistance: 1
+  touchDistance: 3
   canPickUp: 0
   pickUpItemConfigId: -1
   collider: {fileID: 6182817579133670695}

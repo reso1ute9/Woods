@@ -40,6 +40,7 @@ public class UI_StorageBoxInventoryWindow : UI_InventoryWindowBase
         if (Player_Controller.Instance != null) {
             if (Vector3.Distance(Player_Controller.Instance.playerTransform.position, storageBox.transform.position) > storageBox.TouchDistance) {
                 Close();
+                ProjectTool.PlayerAudio(AudioType.Fail);
             }
         }
     }
