@@ -101,6 +101,9 @@ public class MapManager : SingletonMono<MapManager>
                 GameSceneManager.Instance.UpdateMapProgress(i + 1, mapChunkDataCount);
             }
         }
+        // 显示一次MapUI做初始化, 初始化后再关闭
+        ShowMapUI();
+        CloseMapUI();
     }
 
     public void UpdateView(Transform viewer) {

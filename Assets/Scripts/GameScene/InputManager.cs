@@ -44,7 +44,7 @@ public class InputManager : SingletonMono<InputManager> {
             if (mouseButtonDown && Physics.Raycast(ray, out hitInfo, 100, BuildingObjectLayer)) {
                 BuildingBase building = hitInfo.collider.GetComponent<BuildingBase>();
                 // 检查当前玩家和箱子的距离是否符合要求
-                if (building.TouchDistance >= 0) {
+                if (building.TouchDistance > 0) {
                     if (Vector3.Distance(Player_Controller.Instance.playerTransform.position, building.transform.position) < building.TouchDistance) {
                         building.OnSelect();
                     } else {
