@@ -58,6 +58,8 @@ public class GameSceneManager : LogicManagerBase<GameSceneManager>
         InputManager.Instance.Init();
         // 初始化建造管理器
         BuildManager.Instance.Init();
+        // 初始化科技管理器
+        ScienceManager.Instance.Init();
     }    
 
     #region  加载进度

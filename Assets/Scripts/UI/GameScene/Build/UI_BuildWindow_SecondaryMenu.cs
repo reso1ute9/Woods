@@ -55,6 +55,10 @@ public class UI_BuildWindow_SecondaryMenu : MonoBehaviour
         List<BuildConfig> buildConfigList = buildConfigDict[buildType];
         // 对配置进行分类显示, 分为满足条件和不满足条件
         for (int i = 0; i < buildConfigList.Count; i++) {
+            // 如果没有满足前置科技条件则不显示物品建造配置
+            if (buildConfigList[i].CheckPreconditionScienceId() == false) {
+                continue;
+            }
             if (buildConfigList[i].CheckBuildConfigCondition() == true) {
                 meetTheConditionList.Add(buildConfigList[i]);
             } else {

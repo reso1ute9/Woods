@@ -14,7 +14,7 @@ public class ArchiveManager : Singleton<ArchiveManager>
     public TimeData timeData { get; private set; }                                  // 当前存档时间数据
     public bool haveArchive { get; private set; }                                   // 判断当前情况是否有存档
     public Serialization_Dict<ulong, IMapObjectTypeData> mapObjectTypeDataDict;
-    
+    public ScienceData scienceData { get; private set; }
 
     public ArchiveManager() {
         LoadSaveData();
@@ -52,6 +52,10 @@ public class ArchiveManager : Singleton<ArchiveManager>
         // 保存地图对象类型数据字典
         SaveMapObjectTypeData();
         SaveManager.SaveObject(mapData);
+    }
+
+    public void SaveScienceData() {
+        SaveManager.SaveObject(scienceData);
     }
 
     // 添加并保存单个地图块数据
@@ -137,6 +141,9 @@ public class ArchiveManager : Singleton<ArchiveManager>
             dayNum = 1
         };
         SaveTimeData();
+
+        // 6. 初始化科技数据
+        scienceData = new ScienceData();
     }
 
     // 加载当前存档
@@ -153,6 +160,8 @@ public class ArchiveManager : Singleton<ArchiveManager>
         mainInventoryData = SaveManager.LoadObject<MainInventoryData>(0);
         // 时间数据
         timeData = SaveManager.LoadObject<TimeData>(0);
+        // 科技数据
+        scienceData = SaveManager.LoadObject<ScienceData>(0);
     }
 
     // 获取地图对象类型数据
