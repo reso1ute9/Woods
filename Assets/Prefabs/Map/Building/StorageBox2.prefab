@@ -9,6 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2376284674537645281}
+  - component: {fileID: 8370608748219325060}
+  - component: {fileID: 3178822740297151562}
   m_Layer: 10
   m_Name: StorageBox2
   m_TagString: Untagged
@@ -33,6 +35,38 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &8370608748219325060
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3148459237847678555}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.8331622, y: 0.4258816, z: 0.4700447}
+  m_Center: {x: 0, y: 0.1, z: 0.000000044703484}
+--- !u!114 &3178822740297151562
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3148459237847678555}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26f48b33dbe0921488c7072c11960514, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectType: 6
+  touchDistance: 2
+  canPickUp: 0
+  pickUpItemConfigId: -1
+  collider: {fileID: 8370608748219325060}
+  unlockScienceOnBuild: 
+  UIWindowGridSize: {x: 4, y: 3}
 --- !u!1 &5446027264616565361
 GameObject:
   m_ObjectHideFlags: 0

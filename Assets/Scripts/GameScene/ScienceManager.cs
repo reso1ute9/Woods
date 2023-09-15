@@ -24,4 +24,9 @@ public class ScienceManager : SingletonMono<ScienceManager>
             UnityEngine.Debug.Log("scienceData.UnlockScienceList:" + scienceData.UnlockScienceList[i]);
         }
     }
+
+    private void OnDestroy() {
+        // 保存科技数据存档
+        ArchiveManager.Instance.SaveScienceData();
+    }
 }

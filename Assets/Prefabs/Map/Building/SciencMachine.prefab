@@ -487,6 +487,7 @@ MonoBehaviour:
   canPickUp: 0
   pickUpItemConfigId: -1
   collider: {fileID: 7396393225743977150}
+  unlockScienceOnBuild: 1c00000000000000
 --- !u!1 &6638626172350195985
 GameObject:
   m_ObjectHideFlags: 0

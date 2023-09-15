@@ -17,7 +17,18 @@ public class BuildingBase : MapObjectBase, IBuilding
     #endregion
 
     #region 运行模式
+    [SerializeField] private List<ulong> unlockScienceOnBuild;     // 该建筑物能解锁的科技
+    
     // 当建筑物被选中时
     public virtual void OnSelect() {}
+
+    public override void Init(MapChunkController mapChunk, ulong mapObjectId, bool isFromBuild) {
+        base.Init(mapChunk, mapObjectId, isFromBuild);
+        if (isFromBuild == true) {
+            for (int i = 0; i < unlockScienceOnBuild.Count; i++) {
+                ScienceManager.Instance.AddScience(unlockScienceOnBuild[i]);
+            }
+        }
+    }
     #endregion
 }
