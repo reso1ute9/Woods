@@ -20,9 +20,6 @@ public class ScienceManager : SingletonMono<ScienceManager>
     // 添加科技
     public void AddScience(ulong configId) {
         scienceData.AddScience(configId);
-        for (int i = 0; i < scienceData.UnlockScienceList.Count; i++) {
-            UnityEngine.Debug.Log("scienceData.UnlockScienceList:" + scienceData.UnlockScienceList[i]);
-        }
     }
 
     private void OnDestroy() {

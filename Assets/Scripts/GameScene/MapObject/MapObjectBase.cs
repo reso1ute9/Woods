@@ -6,7 +6,8 @@ using System.ComponentModel;
 
 
 // 地图物品类型
-public enum mapObjectType {
+public enum mapObjectType 
+{
     Tree, 
     Stone, 
     Bush,
@@ -17,7 +18,8 @@ public enum mapObjectType {
 }
 
 // 地图对象基类
-public abstract class MapObjectBase : MonoBehaviour {
+public abstract class MapObjectBase : MonoBehaviour 
+{
     [SerializeField] mapObjectType objectType;                  // 地图对象类型
     public mapObjectType ObjectType { get => objectType; } 
     [SerializeField] protected float touchDistance;             // 交互距离

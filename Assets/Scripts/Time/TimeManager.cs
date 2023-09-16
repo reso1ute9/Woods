@@ -15,7 +15,7 @@ public class TimeManager : LogicManagerBase<TimeManager>
     private int nextIndex;
     public int currentDayNum { get => timeData.dayNum; }
 
-    [SerializeField,Range(0,30)] private float timeScale = 1;
+    [SerializeField,Range(0,30)] public float timeScale = 1;
     protected override void RegisterEventListener() {}
 
     protected override void CancelEventListener() {}
@@ -37,7 +37,7 @@ public class TimeManager : LogicManagerBase<TimeManager>
             StartCoroutine(ChangeBGAudio(timeConfig.timeStateConfig[timeData.stateIndex].bgAudioClip));
         }
         // 设置初始的nextIndex
-        nextIndex = timeData.stateIndex + 1;
+        nextIndex = (timeData.stateIndex + 1 >= timeConfig.timeStateConfig.Length) ? 0 : timeData.stateIndex + 1;
         // 触发是否为白天的状态
         EventManager.EventTrigger<bool>(EventName.UpdateTimeState, timeData.stateIndex <= 1);
         // 触发当前是否为第几天的状态

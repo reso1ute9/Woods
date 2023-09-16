@@ -9,15 +9,21 @@ public class Campfire_Conroller : BuildingBase
     [SerializeField] new Light light;
     [SerializeField] GameObject fire;
     private CampfireConfig campfireConfig;
-    private float currentFeulValue;
+    private CampfireData campfireData;
     private bool isOnGround;
 
     public override void Init(MapChunkController mapChunk, ulong mapObjectId, bool isFromBuild) {
         base.Init(mapChunk, mapObjectId, isFromBuild);
         campfireConfig = ConfigManager.Instance.GetConfig<CampfireConfig>(ConfigName.Campfire);
-        // TODO: 保存数据
-        currentFeulValue = campfireConfig.defaultFuelValue;
-        SetLight(currentFeulValue);
+        // 获取存档数据
+        if (isFromBuild == true) {
+            campfireData = new CampfireData();
+            campfireData.currentFeulValue = campfireConfig.defaultFuelValue;
+            ArchiveManager.Instance.AddMapObjectTypeData(mapObjectId, campfireData);
+        } else {
+            campfireData = ArchiveManager.Instance.GetMapObjectTypeData(mapObjectId) as CampfireData;
+        }
+        SetLight(campfireData.currentFeulValue);
         isOnGround = true;
     }
 
@@ -32,11 +38,15 @@ public class Campfire_Conroller : BuildingBase
 
     // 更新篝火燃料
     private void UpdateFeulValue() {
-        if (currentFeulValue == 0) {
+        if (campfireData.currentFeulValue == 0) {
             return;
         }
-        currentFeulValue = Mathf.Clamp(currentFeulValue - Time.deltaTime * campfireConfig.buringSpeed, 0, campfireConfig.maxFuelValue);
-        SetLight(currentFeulValue);
+        campfireData.currentFeulValue = Mathf.Clamp(
+            campfireData.currentFeulValue - Time.deltaTime * campfireConfig.buringSpeed * TimeManager.Instance.timeScale, 
+            0, 
+            campfireConfig.maxFuelValue
+        );
+        SetLight(campfireData.currentFeulValue);
     }
 
     // 预览模式额外设置
