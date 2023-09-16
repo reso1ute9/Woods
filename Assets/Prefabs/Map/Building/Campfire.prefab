@@ -45,7 +45,7 @@ Light:
   m_Shape: 0
   m_Color: {r: 1, g: 0.7490196, b: 0.121568635, a: 1}
   m_Intensity: 1
-  m_Range: 10
+  m_Range: 50
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
@@ -218,6 +218,8 @@ MonoBehaviour:
   pickUpItemConfigId: -1
   collider: {fileID: 7784151019283031295}
   unlockScienceOnBuild: 
+  light: {fileID: 8172024194155858730}
+  fire: {fileID: 17705958251098521}
 --- !u!1001 &17287591183738367
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -278,5 +280,10 @@ PrefabInstance:
 --- !u!4 &14459701371051911 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4000012166036088, guid: 28fbc97a4e7e92144af43a4bd05be737, type: 3}
+  m_PrefabInstance: {fileID: 17287591183738367}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &17705958251098521 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1000011671376998, guid: 28fbc97a4e7e92144af43a4bd05be737, type: 3}
   m_PrefabInstance: {fileID: 17287591183738367}
   m_PrefabAsset: {fileID: 0}

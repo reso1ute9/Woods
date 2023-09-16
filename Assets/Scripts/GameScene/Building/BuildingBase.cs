@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BuildingBase : MapObjectBase, IBuilding 
+public abstract class BuildingBase : MapObjectBase, IBuilding 
 {
     [SerializeField] protected new Collider collider;
     private List<Material> materialList = null;
@@ -14,6 +14,8 @@ public class BuildingBase : MapObjectBase, IBuilding
         get => materialList;
         set => materialList = value; 
     }
+    
+    public virtual void OnPreView() {}
     #endregion
 
     #region 运行模式
@@ -31,4 +33,4 @@ public class BuildingBase : MapObjectBase, IBuilding
         }
     }
     #endregion
-}
+}   

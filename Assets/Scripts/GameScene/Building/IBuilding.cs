@@ -27,7 +27,10 @@ public interface IBuilding
             // 设置成支持更改透明通道的rendering mode
             ProjectTool.SetMaterialRenderingMode(materialList[i], ProjectTool.RenderingMode.Fade);
         }
+        OnPreView();
     }
+
+    public void OnPreView() {}
 
     // 设置预览颜色
     public void SetColorOnPreview(bool isRed) {
