@@ -20,8 +20,14 @@ public class CampfireConfig : ConfigBase
     public float maxLightRange;
     [LabelText("燃料和物品对照关系")]
     public Dictionary<int, float> itemFuelDict;
+    [LabelText("可以烧烤的物品对照关系")]
+    public Dictionary<int, int> bakedItemDict; 
 
     public bool TryGetFuelValueByItemId(int itemId, out float fuelValue) {
         return itemFuelDict.TryGetValue(itemId, out fuelValue);
+    }
+
+    public bool TryGetBakedItemByItemId(int itemId, out int bakedItemId) {
+        return bakedItemDict.TryGetValue(itemId, out bakedItemId);
     }
 }

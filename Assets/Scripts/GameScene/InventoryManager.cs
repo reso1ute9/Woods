@@ -21,7 +21,7 @@ public class InventoryManager : SingletonMono<InventoryManager>
     }
 
     // 添加物品并播放音效
-    public bool AddItemAndPlayAudio(int configId) {
+    public bool AddMainInventoryWindowItemAndPlayAudio(int configId) {
         return mainInventoryWindow.AddItemAndPlayAudio(configId);
     }
 
@@ -31,7 +31,7 @@ public class InventoryManager : SingletonMono<InventoryManager>
     }
 
     // 逻辑层面添加物品
-    public bool AddItem(int configId) {
+    public bool AddMainInventoryWindowItem(int configId) {
         return mainInventoryWindow.AddItem(configId);
     }
     #endregion

@@ -179,7 +179,7 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
                     return;
                 }
                 // 将物品放回物品快捷栏, 注意如果背包满了则不应该将该物品放入背包
-                if (InventoryManager.Instance.AddItem(pickUpItemConfigId)) {
+                if (InventoryManager.Instance.AddMainInventoryWindowItem(pickUpItemConfigId)) {
                     // 拾取物品并销毁地图对象
                     mapObject.OnPickUp();
                     // 播放动画, 需要注意当前并未切换状态, 仅在执行动画

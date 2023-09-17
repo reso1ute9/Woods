@@ -83,7 +83,17 @@ public class Campfire_Conroller : BuildingBase
             SetLight(campfireData.currentFeulValue);
             return true;
         }
-        // TODO: 烧烤食物
+        // 检查是否能制作食物
+        if (campfireConfig.TryGetBakedItemByItemId(itemId, out int bakedItemId)) {
+            // 检查当前篝火是否有燃料
+            if (campfireData.currentFeulValue <= 0) {
+                UIManager.Instance.AddTips("需要点燃篝火");
+                return false;
+            }
+            // 生成制作后的食物
+            InventoryManager.Instance.AddMainInventoryWindowItem(bakedItemId);
+            return true;
+        }
         return false;
     } 
 }

@@ -21,7 +21,7 @@ public class UI_BuildWindow_BuildPanel : MonoBehaviour
 
     private void OnClick() {
         if (buildConfig.buildType == BuildType.Weapon) {
-            if (InventoryManager.Instance.AddItemAndPlayAudio(buildConfig.targetId)) {
+            if (InventoryManager.Instance.AddMainInventoryWindowItemAndPlayAudio(buildConfig.targetId)) {
                 // 根据建造配置减少背包中的物品
                 InventoryManager.Instance.UpdateItemsForBuild(buildConfig);
                 // 刷新当前二三级窗口状态
