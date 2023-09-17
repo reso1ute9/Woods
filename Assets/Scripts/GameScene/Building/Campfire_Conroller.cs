@@ -70,4 +70,20 @@ public class Campfire_Conroller : BuildingBase
             light.range = Mathf.Lerp(0, campfireConfig.maxLightRange, fuelRatio);
         }
     }
+
+    // 设置鼠标拖拽方法
+    public override bool OnSlotEndDragSelect(int itemId) {
+        // 木材/燃料作为燃料物品
+        if (campfireConfig.TryGetFuelValueByItemId(itemId, out float fuelValue)) {
+            campfireData.currentFeulValue = Mathf.Clamp(
+                campfireData.currentFeulValue + fuelValue, 
+                0, 
+                campfireConfig.maxFuelValue
+            );
+            SetLight(campfireData.currentFeulValue);
+            return true;
+        }
+        // TODO: 烧烤食物
+        return false;
+    } 
 }

@@ -18,4 +18,10 @@ public class CampfireConfig : ConfigBase
     public float maxLightIntensity;
     [LabelText("最大灯光范围")]
     public float maxLightRange;
+    [LabelText("燃料和物品对照关系")]
+    public Dictionary<int, float> itemFuelDict;
+
+    public bool TryGetFuelValueByItemId(int itemId, out float fuelValue) {
+        return itemFuelDict.TryGetValue(itemId, out fuelValue);
+    }
 }

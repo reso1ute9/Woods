@@ -89,4 +89,17 @@ public class InputManager : SingletonMono<InputManager> {
         worldPosition = Vector3.zero;
         return false;
     }
+
+    // 检查当停止拖拽格子上的物品时是否点击到了建筑物身上
+    public bool CheckSlotEndDragOnBuilding(int itemId) {
+        // 射线检测地图上的3d物体
+        RaycastHit hitInfo;
+        Ray ray = Camera_Controller.Instance.Camera.ScreenPointToRay(Input.mousePosition);
+        // 特殊处理: 建筑物点击逻辑
+        if (Physics.Raycast(ray, out hitInfo, 100, BuildingObjectLayer)) {
+            BuildingBase building = hitInfo.collider.GetComponent<BuildingBase>();
+            return building.OnSlotEndDragSelect(itemId);
+        }
+        return false;
+    }
 }

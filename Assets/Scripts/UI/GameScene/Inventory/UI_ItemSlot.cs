@@ -28,7 +28,7 @@ public class  UI_ItemSlot : MonoBehaviour
     public static UI_ItemSlot currentMouseEnterSlot;        // 当前鼠标进入/出入的格子
     public static UI_ItemSlot weaponSlot;                   // 记录一下当前的武器栏
     
-    private Func<int, AudioType> onUseAction;
+    private Func<int, AudioType> onUseAction;               // 是否允许使用动作
 
     private void Start() {
         iconTransform = iconImg.transform;
@@ -147,14 +147,24 @@ public class  UI_ItemSlot : MonoBehaviour
     private void EndDrag(PointerEventData eventData, object[] arg2) {
         // 格子中没有物体
         if (itemData == null) return;
-        // 当前是否拖拽结束时没有到其他格子里
+        // 格子与建筑物的交互: 当前是否拖拽物品到建筑物上
+        if (InputManager.Instance.CheckSlotEndDragOnBuilding(itemData.configId)) {
+            if (onUseAction != null) {
+                ResetIcon();
+                GameManager.Instance.SetCursorState(CursorState.Normal);
+                ProjectTool.PlayerAudio(AudioType.Bag);
+                ownerWindow.DiscardItem(index);
+                return;
+            } else {
+                UIManager.Instance.AddTips("无法使用非物品栏中的物品");
+            }
+        }
+        // 格子与格子的交互: 当前是否拖拽物品到其他格子里
         if (currentMouseEnterSlot == null) {
             // 鼠标形状恢复
             GameManager.Instance.SetCursorState(CursorState.Normal);
             // 物品图标复原
-            iconTransform.SetParent(slotTransform);
-            iconTransform.localScale = Vector3.one;
-            iconTransform.localPosition = Vector3.zero;
+            ResetIcon();
             // 如果目标没有格子, 但是是UI物体, 可以无视
             if (InputManager.Instance.CheckMouseOnUI()) {
                 return;
@@ -178,9 +188,7 @@ public class  UI_ItemSlot : MonoBehaviour
             return;
         } else {
             // 拖拽到格子后的图标需要复原
-            iconTransform.SetParent(slotTransform);
-            iconTransform.localScale = Vector3.one;
-            iconTransform.localPosition = Vector3.zero;
+            ResetIcon();
             // 如果拖拽到自己原本格子中
             if (currentMouseEnterSlot == this) return;
             // 判断拖入的格子类型
@@ -223,6 +231,12 @@ public class  UI_ItemSlot : MonoBehaviour
         ItemData itemData2 = slot2.itemData;
         slot1.ownerWindow.SetItem(slot1.index, itemData2);
         slot2.ownerWindow.SetItem(slot2.index, itemData1);
+    }
+
+    private void ResetIcon() {
+        iconTransform.SetParent(slotTransform);
+        iconTransform.localScale = Vector3.one;
+        iconTransform.localPosition = Vector3.zero;
     }
     #endregion 
 }
