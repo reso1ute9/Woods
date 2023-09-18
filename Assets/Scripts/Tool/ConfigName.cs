@@ -12,5 +12,6 @@ public static class ConfigName
     public static string Loot = "Loot";
     public static string Build = "Build";
     public static string Campfire = "Campfire";
+    public static string AI = "AI";
 }
 

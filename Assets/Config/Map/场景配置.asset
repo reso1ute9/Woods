@@ -44,3 +44,5 @@ MonoBehaviour:
   mapMaterial: {fileID: 2100000, guid: 162a3a0a39a63684496fc9d6bece7882, type: 2}
   viewDistance: 2
   mapChunkRefreshProbability: 100
+  maxAIOnChunk: 2
+  generateAIMinVertexCount: 5

@@ -24,4 +24,10 @@ public class MapConfig : ConfigBase {
     public int viewDistance;                // 玩家可视距离, 单位为ChunkSize
     [LabelText("地图块刷新概率")]        
     public int mapChunkRefreshProbability;  // 每天早晨地图块刷新地图物品的概率
+
+    [Header("AI")]
+    [LabelText("地图块AI数量限制")]
+    public int maxAIOnChunk;
+    [LabelText("森林/沼泽地图块生成AI最小顶点数")]
+    public int generateAIMinVertexCount;
 }

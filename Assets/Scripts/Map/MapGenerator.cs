@@ -14,12 +14,15 @@ public class MapGenerator
     private MapGrid mapGrid;            // 地图逻辑网格/顶点数据   
     private Material marshMaterial;     // 沼泽材质(非配置材质)
     private Mesh mapChunkMesh;          // 地图块mesh
-    private int forestSpawnWeightTotal;
-    private int marshSpawnWeightTotal;
+    private int mapObjectForestWeightTotal;    
+    private int mapObjectMarshWeightTotal;
+    private int AIObjectForestWeightTotal;    
+    private int AIObjectMarshWeightTotal;
     #endregion    
 
     #region 配置
-    private Dictionary<MapVertexType, List<int>> spawnConfigDict;   // 地图配置数据
+    private Dictionary<MapVertexType, List<int>> spawnMapObjectConfigDict;      // 地图配置数据
+    private Dictionary<MapVertexType, List<int>> spawnAIObjectConfigDict;       // AI配置数据: 某个类型可以生成哪些AI对象Id
     private MapConfig mapConfig;
     
     #endregion
@@ -31,12 +34,14 @@ public class MapGenerator
 
     public MapGenerator(
         MapConfig mapConfig, MapInitData mapInitData, MapData mapData, 
-        Dictionary<MapVertexType, List<int>> spawnConfigDict
+        Dictionary<MapVertexType, List<int>> spawnMapObjectConfigDict,
+        Dictionary<MapVertexType, List<int>> spawnAIObjectConfigDict
     ) {
         this.mapConfig = mapConfig;
         this.mapInitData = mapInitData;
         this.mapData = mapData;
-        this.spawnConfigDict = spawnConfigDict;
+        this.spawnMapObjectConfigDict = spawnMapObjectConfigDict;
+        this.spawnAIObjectConfigDict = spawnAIObjectConfigDict;
         this.GenerateMapData();
     }
     
@@ -69,15 +74,26 @@ public class MapGenerator
         // 设定地图物品随机种子
         UnityEngine.Random.InitState(mapInitData.spawnSeed);
         // 计算地图物品配置总权重
-        this.forestSpawnWeightTotal = 0;
-        List<int> temp = spawnConfigDict[MapVertexType.Forest];
+        this.mapObjectForestWeightTotal = 0;
+        List<int> temp = spawnMapObjectConfigDict[MapVertexType.Forest];
         for (int i = 0; i < temp.Count; i++) {
-            this.forestSpawnWeightTotal += ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.MapObject, temp[i]).probability;   
+            this.mapObjectForestWeightTotal += ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.MapObject, temp[i]).probability;   
         }
-        this.marshSpawnWeightTotal = 0;
-        temp = spawnConfigDict[MapVertexType.Marsh];
+        this.mapObjectMarshWeightTotal = 0;
+        temp = spawnMapObjectConfigDict[MapVertexType.Marsh];
         for (int i = 0; i < temp.Count; i++) {
-            this.marshSpawnWeightTotal += ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.MapObject, temp[i]).probability;   
+            this.mapObjectMarshWeightTotal += ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.MapObject, temp[i]).probability;   
+        }
+        // 计算AI对象配置总权重
+        this.AIObjectForestWeightTotal = 0;
+        temp = spawnAIObjectConfigDict[MapVertexType.Forest];
+        for (int i = 0; i < temp.Count; i++) {
+            this.AIObjectForestWeightTotal += ConfigManager.Instance.GetConfig<AIConfig>(ConfigName.AI, temp[i]).probability;   
+        }
+        this.AIObjectMarshWeightTotal = 0;
+        temp = spawnAIObjectConfigDict[MapVertexType.Marsh];
+        for (int i = 0; i < temp.Count; i++) {
+            this.AIObjectMarshWeightTotal += ConfigManager.Instance.GetConfig<AIConfig>(ConfigName.AI, temp[i]).probability;   
         }
     }
 
@@ -234,15 +250,35 @@ public class MapGenerator
     // 通过地图权重配置得到一个地图物品id
     private int GetMapObjectConfigIdForWeight(MapVertexType mapVertexType) {
         // 根据权重配置随机生成物品
-        List<int> configIds = spawnConfigDict[mapVertexType];
-        // 确定权重总和
-        int weightTotal = mapVertexType == MapVertexType.Forest ? forestSpawnWeightTotal : marshSpawnWeightTotal;
+        List<int> configIds = spawnMapObjectConfigDict[mapVertexType];
+        // 确定地图对象权重总和
+        int mapObjectWeightTotal = mapVertexType == MapVertexType.Forest ? mapObjectForestWeightTotal : mapObjectMarshWeightTotal;
         // 确定生成物品索引
-        int randValue = UnityEngine.Random.Range(1, weightTotal + 1);
+        int randValue = UnityEngine.Random.Range(1, mapObjectWeightTotal + 1);
         float prob_sum = 0.0f;
         int spawnConfigIndex = 0;
         for (int i = 0; i < configIds.Count; i++) {
             prob_sum += ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.MapObject, configIds[i]).probability;
+            if (prob_sum > randValue) {
+                spawnConfigIndex = i;
+                break;
+            }
+        }
+        return configIds[spawnConfigIndex];
+    }
+
+    // 通过AI权重配置得到一个AI对象id
+    private int GetAIObjectConfigIdForWeight(MapVertexType mapVertexType) {
+        // 根据权重配置随机生成物品
+        List<int> configIds = spawnAIObjectConfigDict[mapVertexType];
+        // 确定地图对象权重总和
+        int AIObjectWeightTotal = mapVertexType == MapVertexType.Forest ? AIObjectForestWeightTotal : AIObjectMarshWeightTotal;
+        // 确定生成物品索引
+        int randValue = UnityEngine.Random.Range(1, AIObjectWeightTotal + 1);
+        float prob_sum = 0.0f;
+        int spawnConfigIndex = 0;
+        for (int i = 0; i < configIds.Count; i++) {
+            prob_sum += ConfigManager.Instance.GetConfig<AIConfig>(ConfigName.AI, configIds[i]).probability;
             if (prob_sum > randValue) {
                 spawnConfigIndex = i;
                 break;

@@ -15,6 +15,7 @@ forst -- 3d survival type game demo
 - 2023.9.18:
     - AI系统:
         1. 添加导航烘焙
+        2. 添加AI物体配置
 
 - 2023.9.17:
     - 建筑系统:

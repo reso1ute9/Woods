@@ -32,7 +32,9 @@ public class MapManager : SingletonMono<MapManager>
     // 配置
     #region 配置
     private MapConfig mapConfig;                                    // 地图配置
-    private Dictionary<MapVertexType, List<int>> spawnConfigDict;   // 地图配置数据
+    private AIConfig aiConfig;                                      // AI配置
+    private Dictionary<MapVertexType, List<int>> spawnMapObjectConfigDict;      // 地图配置数据: 某个类型可以生成哪些地图对象Id
+    private Dictionary<MapVertexType, List<int>> spawnAIObjectConfigDict;       // AI配置数据: 某个类型可以生成哪些AI对象Id
     #endregion
 
     // 存档
@@ -50,22 +52,40 @@ public class MapManager : SingletonMono<MapManager>
         mapInitData = ArchiveManager.Instance.mapInitData;
         mapData = ArchiveManager.Instance.mapData;
 
-        // 确定配置
-        mapConfig = ConfigManager.Instance.GetConfig<MapConfig>(ConfigName.Map);
+        // 确定地图对象生成配置
         Dictionary<int, ConfigBase> temp_dict = ConfigManager.Instance.GetConfigs(ConfigName.MapObject);
-        spawnConfigDict = new Dictionary<MapVertexType, List<int>>();
-        spawnConfigDict.Add(MapVertexType.Forest, new List<int>());
-        spawnConfigDict.Add(MapVertexType.Marsh, new List<int>());
+        spawnMapObjectConfigDict = new Dictionary<MapVertexType, List<int>>();
+        spawnMapObjectConfigDict.Add(MapVertexType.Forest, new List<int>());
+        spawnMapObjectConfigDict.Add(MapVertexType.Marsh, new List<int>());
         foreach (var item in temp_dict) {
             MapVertexType mapVertexType = (item.Value as MapObjectConfig).mapVertexType;
             if (mapVertexType == MapVertexType.None) {
                 continue;
             }
-            spawnConfigDict[mapVertexType].Add(item.Key);
+            spawnMapObjectConfigDict[mapVertexType].Add(item.Key);
+        }
+
+        // 确定AI对象生成配置
+        aiConfig = ConfigManager.Instance.GetConfig<AIConfig>(ConfigName.AI);
+        temp_dict = ConfigManager.Instance.GetConfigs(ConfigName.AI);
+        spawnAIObjectConfigDict = new Dictionary<MapVertexType, List<int>>();
+        spawnAIObjectConfigDict.Add(MapVertexType.Forest, new List<int>());
+        spawnAIObjectConfigDict.Add(MapVertexType.Marsh, new List<int>());
+        foreach (var item in temp_dict) {
+            MapVertexType mapVertexType = (item.Value as AIConfig).mapVertexType;
+            if (mapVertexType == MapVertexType.None) {
+                continue;
+            }
+            spawnAIObjectConfigDict[mapVertexType].Add(item.Key);
         }
 
         // 初始化地图生成器
-        mapGenerator = new MapGenerator(mapConfig, mapInitData, mapData, spawnConfigDict);
+        mapConfig = ConfigManager.Instance.GetConfig<MapConfig>(ConfigName.Map);
+        mapGenerator = new MapGenerator(
+            mapConfig, mapInitData, mapData, 
+            spawnMapObjectConfigDict,
+            spawnAIObjectConfigDict
+        );
         mapGenerator.GenerateMapData();
         mapChunkDict = new Dictionary<Vector2Int, MapChunkController>();
         chunkSizeOnWorld = mapConfig.mapChunkSize * mapConfig.cellSize;
