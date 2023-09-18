@@ -39,5 +39,11 @@ public class MapObjectData {
 [Serializable]
 public class MapChunkData {
     // 当前地图上的所有地图对象
-    public Serialization_Dict<ulong, MapObjectData> mapObjectDict = new Serialization_Dict<ulong, MapObjectData>();
+    public Serialization_Dict<ulong, MapObjectData> mapObjectDataDict;
+    public Serialization_Dict<ulong, MapObjectData> AIDataDict;
+    // 记录当前地图块顶点数量
+    [NonSerialized]
+    public List<MapVertex> forestVertexList; 
+    [NonSerialized]
+    public List<MapVertex> marshVertexList; 
 }

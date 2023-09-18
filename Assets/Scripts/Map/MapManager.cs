@@ -278,7 +278,7 @@ public class MapManager : SingletonMono<MapManager>
             if (mapChunk.isAllForest == false) {
                 texture = (Texture2D)mapChunk.GetComponent<MeshRenderer>().material.mainTexture;
             }
-            mapUI.AddMapChunk(chunkIndex, mapChunk.mapChunkData.mapObjectDict, texture);
+            mapUI.AddMapChunk(chunkIndex, mapChunk.mapChunkData.mapObjectDataDict, texture);
         }
         // 当更新到UI中后就不需要当前存储的index了
         mapUIUpdateChunkIndexList.Clear();

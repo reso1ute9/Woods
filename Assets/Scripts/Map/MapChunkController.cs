@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using JKFrame;
 using UnityEngine.Rendering.PostProcessing;
+using UnityEngine.AI;
 
 
 
@@ -12,6 +13,7 @@ public class MapChunkController : MonoBehaviour
 {
     public MapChunkData mapChunkData { get; private set; }
     private Dictionary<ulong, MapObjectBase> mapObjectDict;                     // 记录当前数据块中的地图对象
+    private Dictionary<ulong, AIBase> AIObjectDict;    
     private Dictionary<ulong, MapObjectData> wantDestoryMapObjectDict;          // 记录当前需要销毁的地图对象
     private static List<ulong> wantDestoryMapObjectId = new List<ulong>(20);    // 记录当前需要销毁的地图对象id
 
@@ -26,9 +28,10 @@ public class MapChunkController : MonoBehaviour
         this.chunkIndex = chunkIndex;
         // 初始化地图块数据
         this.mapChunkData = mapChunkData;
-        this.mapObjectDict = new Dictionary<ulong, MapObjectBase>(mapChunkData.mapObjectDict.dictionary.Count);
+        this.mapObjectDict = new Dictionary<ulong, MapObjectBase>(mapChunkData.mapObjectDataDict.dictionary.Count);
+        this.AIObjectDict = new Dictionary<ulong, AIBase>(mapChunkData.AIDataDict.dictionary.Count);
         this.wantDestoryMapObjectDict = new Dictionary<ulong, MapObjectData>();
-        foreach (var item in mapChunkData.mapObjectDict.dictionary.Values) {
+        foreach (var item in mapChunkData.mapObjectDataDict.dictionary.Values) {
             if (item.destoryDay > 0) {
                 this.wantDestoryMapObjectDict.Add(item.id, item);
             }
@@ -39,6 +42,7 @@ public class MapChunkController : MonoBehaviour
         EventManager.AddEventListener(EventName.OnMorning, OnMorning);
     }
 
+    // 地图对象实例化方法
     private void InstantiateMapObject(MapObjectData mapObjectData, bool isFromBuild) {
         // 获取该地图对象配置信息
         MapObjectConfig mapObjectConfig = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.MapObject, mapObjectData.configId);
@@ -50,6 +54,38 @@ public class MapChunkController : MonoBehaviour
         mapObjectDict.Add(mapObjectData.id, mapObject);
     }
 
+    // AI对象实例化方法
+    private void InstantiateAIObject(MapObjectData AIObjectData) {
+        // 获取该地图对象配置信息
+        AIConfig AIObjectConfig = ConfigManager.Instance.GetConfig<AIConfig>(ConfigName.AI, AIObjectData.configId);
+        // 从对象池中获取
+        AIBase AIObject = PoolManager.Instance.GetGameObject(AIObjectConfig.prefab, transform).GetComponent<AIBase>();
+        // 未初始化坐标
+        if (AIObjectData.position == Vector3.zero) {
+            AIObject.transform.position = GetAIRandomPosition(AIObjectConfig.mapVertexType);
+        } else {
+            AIObject.transform.position = AIObjectData.position;
+        }
+        AIObject.Init(this, AIObjectData.id);
+        AIObjectDict.Add(AIObjectData.id, AIObject);
+    }
+
+    // 获取AI可以到达的随机坐标
+    public Vector3 GetAIRandomPosition(MapVertexType mapVertexType) {
+        List<MapVertex> mapVertexList = null;
+        if (mapVertexType == MapVertexType.Forest) {
+            mapVertexList = mapChunkData.forestVertexList;
+        } else if (mapVertexType == MapVertexType.Marsh) {
+            mapVertexList = mapChunkData.marshVertexList;
+        }
+        int index = Random.Range(0, mapVertexList.Count);
+        // 确保AI可以到达该位置
+        if (NavMesh.SamplePosition(mapVertexList[index].position, out NavMeshHit hitInfo, 1, NavMesh.AllAreas)) {
+            return hitInfo.position;
+        }
+        return GetAIRandomPosition(mapVertexType);
+    }
+
     // 当前chunk设置为可显示时需要显示出地图+地图中的对象(树, 石头...)
     public void SetActive(bool active) {
         if (isActive != active) {
@@ -57,15 +93,25 @@ public class MapChunkController : MonoBehaviour
             gameObject.SetActive(isActive);
             // 从对象池生成/回收所有对象
             if (isActive == true) {
-                foreach (var mapObject in mapChunkData.mapObjectDict.dictionary.Values) {
+                // 处理地图对象
+                foreach (var mapObject in mapChunkData.mapObjectDataDict.dictionary.Values) {
                     InstantiateMapObject(mapObject, false);
                 }
+                // 处理AI对象
+                foreach (var mapObject in mapChunkData.AIDataDict.dictionary.Values) {
+                    InstantiateAIObject(mapObject);
+                }
             } else {
-                // 注意放回的时候放的时mapObjectList中的对象
-                foreach (var mapObject in mapChunkData.mapObjectDict.dictionary) {
+                // 处理地图对象: 注意放回的时候放的时mapObjectList中的对象
+                foreach (var mapObject in mapChunkData.mapObjectDataDict.dictionary) {
                     mapObject.Value.JKObjectPushPool();
                 }
                 mapObjectDict.Clear();
+                // 处理AI对象
+                foreach (var AIObject in mapChunkData.AIDataDict.dictionary) {
+                    AIObject.Value.JKObjectPushPool();
+                }
+                AIObjectDict.Clear();
             }
         }
     }
@@ -73,7 +119,7 @@ public class MapChunkController : MonoBehaviour
     // 添加一个地图对象: 默认仅MapManager调用该方法
     public void AddMapObject(MapObjectData mapObjectData, bool isFromBuild) {
         // 添加存档数据
-        mapChunkData.mapObjectDict.dictionary.Add(mapObjectData.id, mapObjectData);
+        mapChunkData.mapObjectDataDict.dictionary.Add(mapObjectData.id, mapObjectData);
         if (mapObjectData.destoryDay > 0) {
             this.wantDestoryMapObjectDict.Add(mapObjectData.id, mapObjectData);
         }
@@ -86,7 +132,7 @@ public class MapChunkController : MonoBehaviour
     // 移除一个地图对象
     public void RemoveMapObject(ulong mapObjectId) {
         // 数据层面移除(控制器层面)
-        mapChunkData.mapObjectDict.dictionary.Remove(mapObjectId, out MapObjectData removeMapObjectData);
+        mapChunkData.mapObjectDataDict.dictionary.Remove(mapObjectId, out MapObjectData removeMapObjectData);
         removeMapObjectData.JKObjectPushPool();
         // 显示层面移除
         if (mapObjectDict.TryGetValue(mapObjectId, out MapObjectBase mapObjectBase)) {

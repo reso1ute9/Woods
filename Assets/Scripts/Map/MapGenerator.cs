@@ -131,11 +131,13 @@ public class MapGenerator
 
             // 如果没有指定地图块数据则说明是新建的, 需要生成默认数据
             if (mapChunkData == null) {
-                mapChunkData = new MapChunkData();
                 // 生成场景物体数据
-                mapChunkData.mapObjectDict = GenerateMapObjectDataOnMapChunkInit(chunkIndex);
+                mapChunkData = GenerateMapChunkDataOnMapChunkInit(chunkIndex);
                 // 生成以后进行持久化保存
                 ArchiveManager.Instance.AddAndSaveMapChunkData(chunkIndex, mapChunkData);
+            } else {
+                // 恢复mapChunkData中的VertexList数据
+                RecoverMapChunkData(chunkIndex, mapChunkData);
             }
             mapChunk.Init(
                 chunkIndex,
@@ -309,20 +311,28 @@ public class MapGenerator
     }
 
     // 生成各种地图对象, 需要根据配置和地图网格信息确定生成对象位置
-    private Serialization_Dict<ulong, MapObjectData> GenerateMapObjectDataOnMapChunkInit(Vector2Int chunkIndex) {
-        Serialization_Dict<ulong, MapObjectData> mapObjectDict = new Serialization_Dict<ulong, MapObjectData>();
-        
+    private MapChunkData GenerateMapChunkDataOnMapChunkInit(Vector2Int chunkIndex) {
+        MapChunkData mapChunkData = new MapChunkData();
+        mapChunkData.mapObjectDataDict = new Serialization_Dict<ulong, MapObjectData>();
+        mapChunkData.AIDataDict = new Serialization_Dict<ulong, MapObjectData>();
+        mapChunkData.forestVertexList = new List<MapVertex>();
+        mapChunkData.marshVertexList = new List<MapVertex>();
+
         int offsetX = chunkIndex.x * mapConfig.mapChunkSize;
         int offsetZ = chunkIndex.y * mapConfig.mapChunkSize;
-
+        // 生成地图对象数据
         for (int x = 1; x < mapConfig.mapChunkSize; x++) {
             for (int z = 1; z < mapConfig.mapChunkSize; z++) {
                 MapVertex mapVertex = mapGrid.GetVertex(x + offsetX, z + offsetZ);
-                // 确定生成物品
+                if (mapVertex.vertexType == MapVertexType.Forest) {
+                    mapChunkData.forestVertexList.Add(mapVertex);
+                } else if (mapVertex.vertexType == MapVertexType.Marsh) {
+                    mapChunkData.marshVertexList.Add(mapVertex);
+                }
+                // 确定生成数据
                 int configId = GetMapObjectConfigIdForWeight(mapVertex.vertexType);
                 MapObjectConfig mapObjectConfig = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.MapObject, configId);
                 if (mapObjectConfig.isEmpty == false) {
-                    // 实例化物品
                     Vector3 offset = new Vector3(
                         UnityEngine.Random.Range(-mapConfig.cellSize/2, mapConfig.cellSize/2), 
                         0,
@@ -330,14 +340,31 @@ public class MapGenerator
                     );
                     Vector3 position = mapVertex.position + offset;
                     mapVertex.mapObjectId = mapData.currentId;
-                    mapObjectDict.dictionary.Add(
+                    mapChunkData.mapObjectDataDict.dictionary.Add(
                         mapData.currentId, 
                         GenerateMapObjectData(configId, position, mapObjectConfig.destoryDay)
                     );
                 }
             }
         }
-        return mapObjectDict;
+        // 生成AI对象数据: 一个地图块森林或沼泽的顶点数要超过配置的才能生成AI对象
+        if (mapChunkData.forestVertexList.Count > mapConfig.generateAIMinVertexCount) {
+            for (int i = 0; i < mapConfig.maxAIOnChunk; i++) {
+                MapObjectData mapObjectData = GenerateMapAIData(MapVertexType.Forest);
+                if (mapObjectData != null) {
+                    mapChunkData.AIDataDict.dictionary.Add(mapData.currentId, mapObjectData);
+                }
+            }
+        }
+        if (mapChunkData.marshVertexList.Count > mapConfig.generateAIMinVertexCount) {
+            for (int i = 0; i < mapConfig.maxAIOnChunk; i++) {
+                MapObjectData mapObjectData = GenerateMapAIData(MapVertexType.Marsh);
+                if (mapObjectData != null) {
+                    mapChunkData.AIDataDict.dictionary.Add(mapData.currentId, mapObjectData);
+                }
+            }
+        }
+        return mapChunkData;
     }
 
     // 在地图块刷新时生成地图对象列表
@@ -378,5 +405,33 @@ public class MapGenerator
         return mapObjectDataList;
     }
 
+    // 生成地图块AI数据
+    public MapObjectData GenerateMapAIData(MapVertexType mapVertexType) {
+        int configId = GetAIObjectConfigIdForWeight(mapVertexType);
+        AIConfig aiConfig = ConfigManager.Instance.GetConfig<AIConfig>(ConfigName.AI, configId);
+        if (aiConfig.isEmpty == false) {
+            return GenerateMapObjectData(configId, Vector3.zero, aiConfig.destoryDay);
+        }
+        return null;
+    }
+    
+    // 恢复地图块数据: 目前只恢复VertexList结果, 其他数据都通过序列化/反序列化的方式获得了
+    private void RecoverMapChunkData(Vector2Int chunkIndex, MapChunkData mapChunkData) {
+        mapChunkData.forestVertexList = new List<MapVertex>();
+        mapChunkData.marshVertexList = new List<MapVertex>();
 
+        int offsetX = chunkIndex.x * mapConfig.mapChunkSize;
+        int offsetZ = chunkIndex.y * mapConfig.mapChunkSize;
+        
+        for (int x = 1; x < mapConfig.mapChunkSize; x++) {
+            for (int z = 1; z < mapConfig.mapChunkSize; z++) {
+                MapVertex mapVertex = mapGrid.GetVertex(x + offsetX, z + offsetZ);
+                if (mapVertex.vertexType == MapVertexType.Forest) {
+                    mapChunkData.forestVertexList.Add(mapVertex);
+                } else if (mapVertex.vertexType == MapVertexType.Marsh) {
+                    mapChunkData.marshVertexList.Add(mapVertex);
+                }
+            }
+        }
+    }
 }
