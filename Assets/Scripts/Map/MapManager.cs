@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using JKFrame;
 
 
@@ -15,7 +16,7 @@ public class MapManager : SingletonMono<MapManager>
     private UI_MapWindow mapUI;
 
     // 运行时逻辑
-    #region 运行时逻辑
+    #region 运行时变量
     [SerializeField] MeshCollider meshCollider;
     private MapGenerator mapGenerator;                              // 地图生成器
     private Transform viewer;                                       // 观察者
@@ -72,6 +73,8 @@ public class MapManager : SingletonMono<MapManager>
         
         // 生成地面碰撞体的网格
         meshCollider.sharedMesh = GenerateGroundMesh(mapSizeOnWorld, mapSizeOnWorld);
+        // 烘焙导航网格
+        BakeNavMesh();
 
         // 需要判断是否需要加载之前的地图
         int mapChunkDataCount = mapData.MapChunkIndexList.Count;
@@ -306,6 +309,15 @@ public class MapManager : SingletonMono<MapManager>
     }
     #endregion
 
+    #region 地图导航相关
+    [SerializeField] NavMeshSurface navMeshSurface;
+
+    // 烘焙导航网格
+    public void BakeNavMesh() {
+        navMeshSurface.BuildNavMesh();
+    }
+
+    #endregion
     private void OnDestroy() {
         ArchiveManager.Instance.SaveMapData();
     }

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using JKFrame;
 using System.ComponentModel;
+using Unity.VisualScripting;
+using UnityEngine.AI;
 
 
 // 地图物品类型
@@ -46,5 +48,26 @@ public abstract class MapObjectBase : MonoBehaviour
     public virtual int OnPickUp() {
         RemoveOnMap();
         return pickUpItemConfigId;
+    }
+
+    // 添加导航
+    [Sirenix.OdinInspector.Button]
+    public void AddNavMeshObstacale() {
+        NavMeshObstacle navMeshObstacle = transform.AddComponent<NavMeshObstacle>();
+        BoxCollider boxCollider = GetComponent<BoxCollider>();
+        CapsuleCollider capsuleCollider = GetComponent<CapsuleCollider>();
+        if (boxCollider != null) {
+            navMeshObstacle.shape = NavMeshObstacleShape.Box;
+            navMeshObstacle.center = boxCollider.center;
+            navMeshObstacle.size = boxCollider.size;
+            navMeshObstacle.carving = true;
+        } else if (capsuleCollider != null) {
+            navMeshObstacle.shape = NavMeshObstacleShape.Capsule;
+            navMeshObstacle.center = capsuleCollider.center;
+            navMeshObstacle.height = capsuleCollider.height;
+            navMeshObstacle.radius = capsuleCollider.radius;
+            navMeshObstacle.carving = true;
+        } 
+        
     }
 }
