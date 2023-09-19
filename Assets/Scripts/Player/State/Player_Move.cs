@@ -18,7 +18,7 @@ public class Player_Move : PlayerStateBase
     }
 
     public override void Update() {
-        // 玩家如果有任意移动相关按键就切去move装;'[]
+        // 玩家如果有任意移动相关按键就切去move状态
         base.Update(); 
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");

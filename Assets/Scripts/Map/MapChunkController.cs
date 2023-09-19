@@ -62,11 +62,9 @@ public class MapChunkController : MonoBehaviour
         AIBase AIObject = PoolManager.Instance.GetGameObject(AIObjectConfig.prefab, transform).GetComponent<AIBase>();
         // 未初始化坐标
         if (AIObjectData.position == Vector3.zero) {
-            AIObject.transform.position = GetAIRandomPosition(AIObjectConfig.mapVertexType);
-        } else {
-            AIObject.transform.position = AIObjectData.position;
+            AIObjectData.position = GetAIRandomPosition(AIObjectConfig.mapVertexType);
         }
-        AIObject.Init(this, AIObjectData.id);
+        AIObject.Init(this, AIObjectData);
         AIObjectDict.Add(AIObjectData.id, AIObject);
     }
 
@@ -103,13 +101,13 @@ public class MapChunkController : MonoBehaviour
                 }
             } else {
                 // 处理地图对象: 注意放回的时候放的时mapObjectList中的对象
-                foreach (var mapObject in mapChunkData.mapObjectDataDict.dictionary) {
+                foreach (var mapObject in mapObjectDict) {
                     mapObject.Value.JKObjectPushPool();
                 }
                 mapObjectDict.Clear();
                 // 处理AI对象
-                foreach (var AIObject in mapChunkData.AIDataDict.dictionary) {
-                    AIObject.Value.JKObjectPushPool();
+                foreach (var AIObject in AIObjectDict) {
+                    AIObject.Value.Destroy();
                 }
                 AIObjectDict.Clear();
             }

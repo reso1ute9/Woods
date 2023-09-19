@@ -797,6 +797,7 @@ GameObject:
   - component: {fileID: 7341956147000290892}
   - component: {fileID: 7341956147007609646}
   - component: {fileID: 6999737221564747471}
+  - component: {fileID: 9198177185552314663}
   m_Layer: 0
   m_Name: Bora_1
   m_TagString: Untagged
@@ -833,7 +834,7 @@ Animator:
   m_GameObject: {fileID: 7341956147007708646}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 84c9193c80c29ab41b50fc21b68205ef, type: 3}
-  m_Controller: {fileID: 9100000, guid: 5f64e87ed83a50246aa7a17fdb30d3e9, type: 2}
+  m_Controller: {fileID: 9100000, guid: 1b5dbe900786cd549b0244bdf492eca8, type: 2}
   m_CullingMode: 2
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -869,6 +870,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a83dabf834dadb2438f425f2fd5f645b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  animator: {fileID: 7341956147000290892}
+  navMeshAgent: {fileID: 9198177185552314663}
+  mapVertexType: 1
+--- !u!195 &9198177185552314663
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7341956147007708646}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 800
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 1
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1 &7341956147007708648
 GameObject:
   m_ObjectHideFlags: 0
