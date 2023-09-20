@@ -9,14 +9,16 @@ using System;
 // AI基类
 public abstract class AIBase : SerializedMonoBehaviour, IStateMachineOwner
 {
-    [SerializeField] Animator animator;
-    [SerializeField] NavMeshAgent navMeshAgent;
+    [SerializeField] protected Animator animator;
+    [SerializeField] protected NavMeshAgent navMeshAgent;
     [SerializeField] protected Dictionary<string, AudioClip> audioClipDict = new Dictionary<string, AudioClip>();
     public NavMeshAgent NavMeshAgent { get => navMeshAgent; }
-    [SerializeField] MapVertexType mapVertexType;               // AI物体活动的地图类型
-    private AIState currentAIState;                             // 当前动画状态
+    protected float hp;
+    [SerializeField] public float maxHP;
+    [SerializeField] protected MapVertexType mapVertexType;               // AI物体活动的地图类型
+    protected AIState currentAIState;                             // 当前动画状态
     protected MapChunkController mapChunk;                      // 当前所在的地图块控制器
-    private MapObjectData aiData;                               // 当前地图物品id
+    protected MapObjectData aiData;                               // 当前地图物品id
     public MapObjectData AIData { get => aiData; }
     [SerializeField] protected float radius;             // 交互半径
     public float Radius { get => radius; }
@@ -35,6 +37,7 @@ public abstract class AIBase : SerializedMonoBehaviour, IStateMachineOwner
     public virtual void Init(MapChunkController mapChunk, MapObjectData aiData) {
         this.mapChunk = mapChunk;
         this.aiData = aiData;
+        this.hp = maxHP;
         transform.position = aiData.position;
         ChangeState(AIState.Idle);
     }
@@ -49,6 +52,7 @@ public abstract class AIBase : SerializedMonoBehaviour, IStateMachineOwner
                 StateMachine.ChangeState<AI_Patrol>((int)aiState);
                 break;
             case AIState.Hurt:
+                StateMachine.ChangeState<AI_Hurt>((int)aiState);
                 break;
             case AIState.Pursue:
                 break;
@@ -61,8 +65,19 @@ public abstract class AIBase : SerializedMonoBehaviour, IStateMachineOwner
         }
     }
 
-    public virtual void Hurt(float attackValue) {
-        UnityEngine.Debug.Log("attackValue:" + attackValue);
+    public virtual void Hurt(float damage) {
+        UnityEngine.Debug.Log("damage:" + damage);
+        if (hp <= 0) {
+            return;
+        }
+        hp -= damage;
+        UnityEngine.Debug.Log("hp:" + hp);
+        if (hp <= 0) {
+            // TODO: 死亡逻辑
+            ChangeState(AIState.Dead);
+        } else {
+            ChangeState(AIState.Hurt);
+        }
     }
 
     // 播放动画

@@ -966,6 +966,7 @@ MonoBehaviour:
       Data: 
   animator: {fileID: 7341956147000290892}
   navMeshAgent: {fileID: 9198177185552314663}
+  maxHP: 10
   mapVertexType: 1
   radius: 0.5
 --- !u!195 &9198177185552314663
