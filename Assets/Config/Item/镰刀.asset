@@ -74,6 +74,9 @@ MonoBehaviour:
     - Name: attackDurabilityCost
       Entry: 4
       Data: 1
+    - Name: attackDistance
+      Entry: 4
+      Data: 2
     - Name: 
       Entry: 8
       Data: 

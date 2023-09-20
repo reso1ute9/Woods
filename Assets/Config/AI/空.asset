@@ -25,4 +25,5 @@ MonoBehaviour:
   mapVertexType: 1
   prefab: {fileID: 0}
   descript: 
-  probability: 80
+  probability: 95
+  destoryDay: -1

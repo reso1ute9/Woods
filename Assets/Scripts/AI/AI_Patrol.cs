@@ -12,6 +12,8 @@ public class AI_Patrol : AIStateBase
         AI.NavMeshAgent.enabled = true;
         target = AI.GetAIRandomPotion();
         AI.PlayAnimation("Move");
+        // 添加脚步声事件
+        AI.AddAnimationEvent("FootStep", FootStep);
         AI.NavMeshAgent.SetDestination(target);
     }
 
@@ -22,9 +24,16 @@ public class AI_Patrol : AIStateBase
             AI.ChangeState(AIState.Idle);
         }
     }
+    
+    public void FootStep() {
+        int index = Random.Range(1, 3);
+        AI.PlayAudio("FootStep" + index.ToString(), 0.15f);
+    }
 
     public override void Exit() {
         AI.SavePosition();
         AI.NavMeshAgent.enabled = false;
+        // 移除脚步声事件
+        AI.RemoveAnimationEvent("FoodStep", FootStep);
     }
 }

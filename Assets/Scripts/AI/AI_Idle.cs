@@ -10,6 +10,10 @@ public class AI_Idle : AIStateBase
     public override void Enter() {
         // 播放待机动画
         AI.PlayAnimation("Idle");
+        // 播放音效: 有一定概率(1/30)发出声音
+        if (Random.Range(0, 30) == 0) {
+            AI.PlayAudio("Idle", 0.5f);
+        }
         // 休息一段时间后去巡逻
         goPatorlCoroutin = MonoManager.Instance.StartCoroutine(GoPatorlCoroutin());
     }

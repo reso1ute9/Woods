@@ -155,7 +155,7 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
     private int attackSucceedCount = 0;                         // 攻击时成功命中地图对象数量
     private MapObjectBase lastHitMapObject = null;              // 最后攻击地图对象
 
-    // 选择地图对象
+    // 选择地图对象或AI时
     public void OnSelectMapObject(RaycastHit hitInfo, bool isMouseButtonDown) {
         if (hitInfo.collider.TryGetComponent<MapObjectBase>(out MapObjectBase mapObject)) {
             // 检查地图对象触碰距离是否合法
@@ -226,6 +226,23 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
                 }
                 return;
             }
+        } else if (currentWeaponItemData != null && hitInfo.collider.TryGetComponent<AIBase>(out AIBase aiObject)) {
+            // 检查地图对象触碰距离是否合法
+            float dis = Vector3.Distance(playerTransform.position, aiObject.transform.position);
+            // 交互距离: 武器长度 + AI半径
+            ItemWeaponInfo itemWeaponInfo = (currentWeaponItemData.config.itemTypeInfo as ItemWeaponInfo);
+            if (dis <= itemWeaponInfo.attackDistance + aiObject.Radius) {
+                // 防止立刻进行攻击
+                canAttack = false;
+                // 禁止使用物品
+                canUseItem = false;
+                // 计算方向
+                attackDirection = Quaternion.LookRotation(aiObject.transform.position - transform.position);
+                // 切换状态
+                ChangeState(PlayerState.Attack);
+                // 记录最后一个攻击对象
+                lastHitMapObject = mapObject;
+            }
         }
     }
 
@@ -257,7 +274,7 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
         ChangeState(PlayerState.Idle);
     }
 
-    // 武器触发器: 当武器碰到物体时
+    // 武器触发器: 当武器碰到物体(地图对象/AI)时
     private void OnWeaponTriggerEnter(Collider other, object[] arg2) {
         // 判断对方是否为地图对象
         if (other.TryGetComponent<MapObjectBase>(out MapObjectBase mapObject)) {
@@ -282,6 +299,11 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
                 default:
                     break;
             }
+        } else if (other.TryGetComponent<AIBase>(out AIBase AIObject)) {
+            ItemWeaponInfo itemWeaponInfo = (currentWeaponItemData.config.itemTypeInfo as ItemWeaponInfo);
+            AIObject.Hurt(itemWeaponInfo.attackValue);
+            // TODO: 打击粒子、声音等
+            attackSucceedCount += 1;
         }
     }
 

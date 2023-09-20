@@ -69,6 +69,7 @@ public class ItemWeaponInfo: IItemTypeInfo {
     [LabelText("动画状态机")] public AnimatorOverrideController animatorController;
     [LabelText("攻击力")] public float attackValue;
     [LabelText("每次攻击损耗耐久度")] public float attackDurabilityCost;
+    [LabelText("攻击距离")] public float attackDistance;
     // TODO: 攻击音效
 }
 

@@ -38,6 +38,7 @@ public class InputManager : SingletonMono<InputManager> {
             RaycastHit hitInfo;
             Ray ray = Camera_Controller.Instance.Camera.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out hitInfo, 100, mouseMapObjectLayer)) {
+                // 发送给玩家处理
                 Player_Controller.Instance.OnSelectMapObject(hitInfo, mouseButtonDown);
             }
             // 特殊处理: 建筑物点击逻辑
