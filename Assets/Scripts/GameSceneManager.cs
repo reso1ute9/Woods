@@ -10,6 +10,8 @@ public class GameSceneManager : LogicManagerBase<GameSceneManager>
     #region 测试逻辑
     public bool isTest = true;
     public bool isCreatNewArchive = true;
+    private bool isGameOver = false;
+    public bool IsGameOver { get => isGameOver; }
     #endregion
 
     public bool IsInitialized { get; private set; }
