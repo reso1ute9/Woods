@@ -72,9 +72,19 @@ public class MapChunkController : MonoBehaviour
     public Vector3 GetAIRandomPosition(MapVertexType mapVertexType) {
         List<MapVertex> mapVertexList = null;
         if (mapVertexType == MapVertexType.Forest) {
-            mapVertexList = mapChunkData.forestVertexList;
+            // 顶点不够时会出现bug, 因此判断当顶点不够时使用另一份数据
+            if (mapChunkData.forestVertexList.Count < MapManager.Instance.MapConfig.generateAIMinVertexCount) {
+                mapVertexList = mapChunkData.marshVertexList;
+            } else {
+                mapVertexList = mapChunkData.forestVertexList;
+            }
         } else if (mapVertexType == MapVertexType.Marsh) {
-            mapVertexList = mapChunkData.marshVertexList;
+            // 顶点不够时会出现bug, 因此判断当顶点不够时使用另一份数据
+            if (mapChunkData.marshVertexList.Count < MapManager.Instance.MapConfig.generateAIMinVertexCount) {
+                mapVertexList = mapChunkData.forestVertexList;
+            } else {
+                mapVertexList = mapChunkData.marshVertexList;
+            }
         }
         int index = Random.Range(0, mapVertexList.Count);
         // 确保AI可以到达该位置
@@ -139,6 +149,20 @@ public class MapChunkController : MonoBehaviour
         }
         // UI层面移除
         MapManager.Instance.RemoveMapObject(mapObjectId);
+    }
+
+    // 添加一个AI物体(物体迁移)
+    public void AddAIOjbectOnTransfer(MapObjectData aiObjectData, AIBase aiObject) {
+        mapChunkData.AIDataDict.dictionary.Add(aiObjectData.id, aiObjectData);
+        AIObjectDict.Add(aiObjectData.id, aiObject);
+        aiObject.transform.SetParent(transform);
+        aiObject.InitOnTransfer(this);
+    }
+
+    // 删除一个AI物体(物体迁移): 只删除数据不删除AI对象
+    public void RemoveAIObjectOnTransfer(ulong AIObjectId) {
+        mapChunkData.AIDataDict.dictionary.Remove(AIObjectId);
+        AIObjectDict.Remove(AIObjectId);
     }
 
     // 当整个地图块数据被销毁时(例如关闭游戏), 需要将当前新的地图块数据保存到磁盘上

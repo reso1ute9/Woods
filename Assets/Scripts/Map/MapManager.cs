@@ -32,6 +32,7 @@ public class MapManager : SingletonMono<MapManager>
     // 配置
     #region 配置
     private MapConfig mapConfig;                                    // 地图配置
+    public MapConfig MapConfig { get => mapConfig; }
     private AIConfig aiConfig;                                      // AI配置
     private Dictionary<MapVertexType, List<int>> spawnMapObjectConfigDict;      // 地图配置数据: 某个类型可以生成哪些地图对象Id
     private Dictionary<MapVertexType, List<int>> spawnAIObjectConfigDict;       // AI配置数据: 某个类型可以生成哪些AI对象Id
@@ -233,9 +234,14 @@ public class MapManager : SingletonMono<MapManager>
     
     // 通过世界坐标去获取地图块索引
     private Vector2Int GetMapChunkIndexByWorldPosition(Vector3 worldIndex) {
-        int x = Mathf.Clamp(Mathf.RoundToInt(worldIndex.x / chunkSizeOnWorld), 1, mapInitData.mapSize);
-        int z = Mathf.Clamp(Mathf.RoundToInt(worldIndex.z / chunkSizeOnWorld), 1, mapInitData.mapSize);
+        int x = Mathf.Clamp(Mathf.FloorToInt(worldIndex.x / chunkSizeOnWorld), 1, mapInitData.mapSize);
+        int z = Mathf.Clamp(Mathf.FloorToInt(worldIndex.z / chunkSizeOnWorld), 1, mapInitData.mapSize);
         return new Vector2Int(x, z);
+    }
+
+    // 通过世界坐标去获取地图块管理器
+    public MapChunkController GetMapChunkByWorldPosition(Vector3 worldIndex) {
+        return mapChunkDict[GetMapChunkIndexByWorldPosition(worldIndex)];
     }
 
     private MapChunkController GenerateMapChunk(Vector2Int index, MapChunkData mapChunkData = null) {

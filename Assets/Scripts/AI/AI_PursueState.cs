@@ -21,10 +21,23 @@ public class AI_PursueState : AIStateBase
             if (distance <= AI.Radius + AI.attackDistance) {
                 // TODO: 转化为攻击状态
                 UnityEngine.Debug.Log("到达目标附近");
-                AI.ChangeState(AIState.Idle);
             } else {
+                AI.SavePosition();
                 AI.NavMeshAgent.SetDestination(Player_Controller.Instance.playerTransform.position);
+                // 检测AI归属地图块
+                CheckAndTransferMapChunk();
             }
+        }
+    }
+
+    // 检查并迁移地图块
+    private void CheckAndTransferMapChunk() {
+        // 通过AI物体当前坐标获得AI所在的当前地图块管理器
+        MapChunkController newMapChunk = MapManager.Instance.GetMapChunkByWorldPosition(AI.transform.position);
+        // 发生AI物体地图块迁移
+        if (newMapChunk != AI.MapChunk) {
+            AI.MapChunk.RemoveAIObjectOnTransfer(AI.AIData.id);
+            newMapChunk.AddAIOjbectOnTransfer(AI.AIData, AI);
         }
     }
     

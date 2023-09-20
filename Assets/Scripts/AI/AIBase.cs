@@ -19,6 +19,7 @@ public abstract class AIBase : SerializedMonoBehaviour, IStateMachineOwner
     [SerializeField] protected MapVertexType mapVertexType;               // AI物体活动的地图类型
     protected AIState currentAIState;                             // 当前动画状态
     protected MapChunkController mapChunk;                      // 当前所在的地图块控制器
+    public MapChunkController MapChunk { get => mapChunk; }
     protected MapObjectData aiData;                               // 当前地图物品id
     public MapObjectData AIData { get => aiData; }
     [SerializeField] protected float radius;             // 交互半径
@@ -41,6 +42,11 @@ public abstract class AIBase : SerializedMonoBehaviour, IStateMachineOwner
         this.hp = maxHP;
         transform.position = aiData.position;
         ChangeState(AIState.Idle);
+    }
+
+    // 迁移时的初始化方法
+    public virtual void InitOnTransfer(MapChunkController mapChunk) {
+        this.mapChunk = mapChunk;
     }
 
     public virtual void ChangeState(AIState aiState) {
