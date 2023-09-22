@@ -21,6 +21,8 @@ public abstract class AIBase : SerializedMonoBehaviour, IStateMachineOwner
     public float AttackValue { get => attackValue; }
     [SerializeField] protected Transform weapon;
     public Transform Weapon { get => weapon; }
+    [SerializeField] protected Collider inputCheckCollider;               // 输入检测碰撞体
+    public Collider InputCheckCollider { get => inputCheckCollider; }
     [SerializeField] protected MapVertexType mapVertexType;               // AI物体活动的地图类型
     protected AIState currentAIState;                             // 当前动画状态
     protected MapChunkController mapChunk;                      // 当前所在的地图块控制器
@@ -73,6 +75,7 @@ public abstract class AIBase : SerializedMonoBehaviour, IStateMachineOwner
                 StateMachine.ChangeState<AI_AttackState>((int)aiState);
                 break;
             case AIState.Dead:
+                StateMachine.ChangeState<AI_DeadState>((int)aiState);
                 break;
             default:
                 break;
@@ -80,14 +83,12 @@ public abstract class AIBase : SerializedMonoBehaviour, IStateMachineOwner
     }
 
     public virtual void Hurt(float damage) {
-        UnityEngine.Debug.Log("damage:" + damage);
         if (hp <= 0) {
             return;
         }
         hp -= damage;
         UnityEngine.Debug.Log("hp:" + hp);
         if (hp <= 0) {
-            // TODO: 死亡逻辑
             ChangeState(AIState.Dead);
         } else {
             ChangeState(AIState.Hurt);
@@ -116,14 +117,18 @@ public abstract class AIBase : SerializedMonoBehaviour, IStateMachineOwner
         aiData.position = transform.position;
     }
 
-    public virtual void RemoveOnMap() {
-        // 通知地图块控制器移除当前AI对象
-    }
-
+    // 仅考虑自身游戏物体的销毁, 不考虑存档层面的问题
     public void Destroy() {
         this.JKGameObjectPushPool();
         currentAIState = AIState.None;
         stateMachine.Stop();
+    }
+
+    // 死亡逻辑: 数据、游戏物体层面都需要销毁
+    public void Dead() {
+        // 告知地图块移除数据
+        mapChunk.RemoveAIObject(AIData.id);
+        // TODO: 掉落物品
     }
 
     #region 动画事件

@@ -356,7 +356,7 @@ public class MapGenerator
             for (int i = 0; i < mapConfig.maxAIOnChunk; i++) {
                 MapObjectData mapObjectData = GenerateMapAIData(MapVertexType.Forest);
                 if (mapObjectData != null) {
-                    mapChunkData.AIDataDict.dictionary.Add(mapData.currentId, mapObjectData);
+                    mapChunkData.AIDataDict.dictionary.Add(mapObjectData.id, mapObjectData);
                 }
             }
         }
@@ -364,7 +364,7 @@ public class MapGenerator
             for (int i = 0; i < mapConfig.maxAIOnChunk; i++) {
                 MapObjectData mapObjectData = GenerateMapAIData(MapVertexType.Marsh);
                 if (mapObjectData != null) {
-                    mapChunkData.AIDataDict.dictionary.Add(mapData.currentId, mapObjectData);
+                    mapChunkData.AIDataDict.dictionary.Add(mapObjectData.id, mapObjectData);
                 }
             }
         }

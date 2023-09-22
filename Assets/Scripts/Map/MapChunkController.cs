@@ -159,9 +159,21 @@ public class MapChunkController : MonoBehaviour
         aiObject.InitOnTransfer(this);
     }
 
+    // 删除一个AI物体: AI游戏物体、数据存档都需要移除
+    public void RemoveAIObject(ulong AIObjectId) {
+        // 数据层面
+        mapChunkData.AIDataDict.dictionary.Remove(AIObjectId, out MapObjectData aiObjectData);
+        aiObjectData.JKObjectPushPool();
+        // AI游戏物体
+        if (AIObjectDict.Remove(AIObjectId, out AIBase aiObject)) {
+            aiObject.Destroy();
+        }
+    }
+
     // 删除一个AI物体(物体迁移): 只删除数据不删除AI对象
     public void RemoveAIObjectOnTransfer(ulong AIObjectId) {
-        mapChunkData.AIDataDict.dictionary.Remove(AIObjectId);
+        mapChunkData.AIDataDict.dictionary.Remove(AIObjectId, out MapObjectData aiObjectData);
+        aiObjectData.JKObjectPushPool();
         AIObjectDict.Remove(AIObjectId);
     }
 

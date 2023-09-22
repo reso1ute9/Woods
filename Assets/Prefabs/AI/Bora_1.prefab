@@ -1030,6 +1030,7 @@ MonoBehaviour:
   attackDistance: 0.5
   attackValue: 10
   weapon: {fileID: 8103166538835752123}
+  inputCheckCollider: {fileID: 7341956147007609646}
   mapVertexType: 1
   radius: 0.5
 --- !u!195 &9198177185552314663
