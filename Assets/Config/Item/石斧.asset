@@ -17,6 +17,8 @@ MonoBehaviour:
     SerializedBytes: 
     ReferencedUnityObjects:
     - {fileID: 7958945592178681526, guid: 0be6d44ec5272a749a8eff63ae430581, type: 3}
+    - {fileID: 8300000, guid: 252ed13875df0f74aa8e6cf2a4b7b3a0, type: 3}
+    - {fileID: 8300000, guid: f009e1439807d4b42adcd44d56186a31, type: 3}
     - {fileID: 22100000, guid: a98f345aa5bce4b4c8867ecbebe48fce, type: 2}
     SerializedBytesString: 
     Prefab: {fileID: 0}
@@ -62,12 +64,15 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: prefabOnMap
-      Entry: 6
-      Data: 
-    - Name: animatorController
+    - Name: attackAudio
       Entry: 10
       Data: 1
+    - Name: hitAudio
+      Entry: 10
+      Data: 2
+    - Name: animatorController
+      Entry: 10
+      Data: 3
     - Name: attackValue
       Entry: 4
       Data: 1

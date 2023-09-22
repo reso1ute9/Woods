@@ -65,12 +65,12 @@ public class ItemWeaponInfo: IItemTypeInfo {
     [LabelText("玩家手中的预制体")] public GameObject prefabOnPlayer;
     [LabelText("玩家手中武器坐标")] public Vector3 positionOnPlayer;
     [LabelText("玩家手中武器旋转")] public Vector3 rotationOnPlayer;
-    [LabelText("地图中的预制体")] public GameObject prefabOnMap;
+    [LabelText("攻击音效")] public AudioClip attackAudio;
+    [LabelText("命中音效")] public AudioClip hitAudio;
     [LabelText("动画状态机")] public AnimatorOverrideController animatorController;
     [LabelText("攻击力")] public float attackValue;
     [LabelText("每次攻击损耗耐久度")] public float attackDurabilityCost;
     [LabelText("攻击距离")] public float attackDistance;
-    // TODO: 攻击音效
 }
 
 // 消耗品类型信息

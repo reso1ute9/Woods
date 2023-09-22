@@ -240,6 +240,8 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
                 canUseItem = false;
                 // 计算方向
                 attackDirection = Quaternion.LookRotation(aiObject.transform.position - transform.position);
+                // 播放音效
+                AudioManager.Instance.PlayOnShot(itemWeaponInfo.attackAudio, transform.position, 0.5f);
                 // 切换状态
                 ChangeState(PlayerState.Attack);
                 // 记录最后一个攻击对象
@@ -308,8 +310,10 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
             }
         } else if (other.TryGetComponent<AIBase>(out AIBase AIObject)) {
             ItemWeaponInfo itemWeaponInfo = (currentWeaponItemData.config.itemTypeInfo as ItemWeaponInfo);
-            AIObject.Hurt(itemWeaponInfo.attackValue);
             // TODO: 打击粒子、声音等
+            // 播放音效
+            AudioManager.Instance.PlayOnShot(itemWeaponInfo.hitAudio, transform.position, 0.5f);
+            AIObject.Hurt(itemWeaponInfo.attackValue);
             attackSucceedCount += 1;
         }
     }
@@ -318,6 +322,8 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
     private void CheckMapObjectHurt(HitMapObjectBase hitMapObject, WeaponType weaponType) {
         ItemWeaponInfo itemWeaponInfo = (currentWeaponItemData.config.itemTypeInfo as ItemWeaponInfo);
         if (itemWeaponInfo.weaponType == weaponType) {
+            // 播放音效
+            AudioManager.Instance.PlayOnShot(itemWeaponInfo.hitAudio, transform.position, 0.5f);
             hitMapObject.Hurt(itemWeaponInfo.attackValue);
             attackSucceedCount += 1;
         }
@@ -330,12 +336,15 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
             currentWeaponItemData != null && 
             (currentWeaponItemData.config.itemTypeInfo as ItemWeaponInfo).weaponType == weaponType) 
         {   
+            ItemWeaponInfo itemWeaponInfo = (currentWeaponItemData.config.itemTypeInfo as ItemWeaponInfo);
             // 防止立刻进行攻击
             canAttack = false;
             // 禁止使用物品
             canUseItem = false;
             // 计算方向
             attackDirection = Quaternion.LookRotation(mapObject.transform.position - transform.position);
+            // 播放音效
+            AudioManager.Instance.PlayOnShot(itemWeaponInfo.attackAudio, transform.position, 0.5f);
             // 切换状态
             ChangeState(PlayerState.Attack);
             // 记录最后一个攻击对象
