@@ -100,34 +100,55 @@ public class MapManager : SingletonMono<MapManager>
         // 需要判断是否需要加载之前的地图
         int mapChunkDataCount = mapData.MapChunkIndexList.Count;
         if (mapChunkDataCount > 0) {
+            // 旧存档加载状态
+            GameSceneManager.Instance.SetProgressMapChunkCount(mapChunkDataCount);
             // 根据存档恢复整个地图状态
             for (int i = 0; i < mapChunkDataCount; i++) {
                 Serialization_Vector2 chunkIndex = mapData.MapChunkIndexList[i];
                 MapChunkData mapChunkData = ArchiveManager.Instance.GetMapChunkData(chunkIndex);
                 GenerateMapChunk(chunkIndex.ConverToSVector2Init(), mapChunkData).gameObject.SetActive(false);
-            }
-            // 更新目前可见地图块
-            DoUpdateVisibleChunk();
-            // 进度条时间需要跟地图块生成数量关联
-            for (int i = 0; i < mapChunkDataCount; i++) {
-                // 缓存一小段时间
-                yield return new WaitForSeconds(0.1f);
-                GameSceneManager.Instance.UpdateMapProgress(i + 1, mapChunkDataCount);
+                // 停留五帧
+                for (int f = 0; f < 5; f++) yield return null;
             }
         } else {
-            // 更新目前可见地图块
-            DoUpdateVisibleChunk();
-            // 进度条时间默认为加载九宫格时间
-            mapChunkDataCount = 10;
-            for (int i = 0; i < mapChunkDataCount; i++) {
-                // 缓存一小段时间
-                yield return new WaitForSeconds(0.1f);
-                GameSceneManager.Instance.UpdateMapProgress(i + 1, mapChunkDataCount);
+            // 新存档加载状态
+            GameSceneManager.Instance.SetProgressMapChunkCount(GetMapChunkCountOnGameInit());
+            // 当前观察者所在地图块
+            Vector2Int currChunkIndex = GetMapChunkIndexByWorldPosition(viewer.position);
+            // 开启需要显示的地图块
+            int startX = currChunkIndex.x - mapConfig.viewDistance;
+            int startY = currChunkIndex.y - mapConfig.viewDistance;
+            for (int x = 0; x < 2 * mapConfig.viewDistance + 1; x++) {
+                for (int y = 0; y < 2 * mapConfig.viewDistance + 1; y++) {
+                    Vector2Int chunkIndex = new Vector2Int(startX + x, startY + y);
+                    GenerateMapChunk(chunkIndex);
+                    // 停留五帧
+                    for (int f = 0; f < 5; f++) yield return null;
+                }
             }
         }
+        // 更新目前可见地图块
+        DoUpdateVisibleChunk();
         // 显示一次MapUI做初始化, 初始化后再关闭
         ShowMapUI();
         CloseMapUI();
+    }
+
+    // 游戏初始化时获得地图块的初始数量
+    private int GetMapChunkCountOnGameInit() {
+        int res = 0;
+        Vector2Int currChunkIndex = GetMapChunkIndexByWorldPosition(viewer.position);
+        int startX = currChunkIndex.x - mapConfig.viewDistance;
+        int startY = currChunkIndex.y - mapConfig.viewDistance;
+        for (int x = 0; x < 2 * mapConfig.viewDistance + 1; x++) {
+            for (int y = 0; y < 2 * mapConfig.viewDistance + 1; y++) {
+                Vector2Int chunkIndex = new Vector2Int(startX + x, startY + y);
+                if (chunkIndex.x > mapInitData.mapSize - 1 || chunkIndex.y > mapInitData.mapSize - 1) continue;
+                if (chunkIndex.x < 0 || chunkIndex.y < 0) continue;
+                res += 1;
+            }
+        }
+        return res;
     }
 
     public void UpdateView(Transform viewer) {

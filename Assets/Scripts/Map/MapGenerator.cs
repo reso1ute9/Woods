@@ -144,6 +144,10 @@ public class MapGenerator
                 position + new Vector3((mapConfig.mapChunkSize * mapConfig.cellSize) / 2, 0, (mapConfig.mapChunkSize * mapConfig.cellSize) / 2),
                 isAllForset, mapChunkData
             );
+            // 如果目前游戏没有完成初始化需要告知GameSceneManager更新进度
+            if (GameSceneManager.Instance.IsInitialized == false) {
+                GameSceneManager.Instance.OnGenerateMapChunkSucceed();
+            }
         }));
         return mapChunk;
     }

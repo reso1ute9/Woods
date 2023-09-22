@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using JKFrame;
 
-[UIElement(true, "UI/UI_GameLoadingWindow", 4)]
+[UIElement(false, "UI/UI_GameLoadingWindow", 4)]
 public class UI_GameLoadingWindow : UI_WindowBase
 {
     [SerializeField]

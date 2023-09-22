@@ -12,6 +12,9 @@ public class InventoryManager : SingletonMono<InventoryManager>
     public void Init() {
         // 初始化快捷栏窗口
         mainInventoryWindow = UIManager.Instance.Show<UI_MainInventoryWindow>();
+        if (mainInventoryWindow == null) {
+            UnityEngine.Debug.Log("mainInventoryWindow == null");
+        }
         mainInventoryWindow.InitData();
     }
 
