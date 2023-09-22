@@ -352,21 +352,9 @@ public class MapGenerator
             }
         }
         // 生成AI对象数据: 一个地图块森林或沼泽的顶点数要超过配置的才能生成AI对象
-        if (mapChunkData.forestVertexList.Count > mapConfig.generateAIMinVertexCount) {
-            for (int i = 0; i < mapConfig.maxAIOnChunk; i++) {
-                MapObjectData mapObjectData = GenerateMapAIData(MapVertexType.Forest);
-                if (mapObjectData != null) {
-                    mapChunkData.AIDataDict.dictionary.Add(mapObjectData.id, mapObjectData);
-                }
-            }
-        }
-        if (mapChunkData.marshVertexList.Count > mapConfig.generateAIMinVertexCount) {
-            for (int i = 0; i < mapConfig.maxAIOnChunk; i++) {
-                MapObjectData mapObjectData = GenerateMapAIData(MapVertexType.Marsh);
-                if (mapObjectData != null) {
-                    mapChunkData.AIDataDict.dictionary.Add(mapObjectData.id, mapObjectData);
-                }
-            }
+        List<MapObjectData> aiObjectDataList = GenerateAIObjectData(mapChunkData);
+        for (int i = 0; i < aiObjectDataList.Count; i++) {
+            mapChunkData.AIDataDict.dictionary.Add(aiObjectDataList[i].id, aiObjectDataList[i]);
         }
         return mapChunkData;
     }
@@ -403,6 +391,31 @@ public class MapGenerator
                     mapObjectDataList.Add(
                         GenerateMapObjectData(configId, position, mapObjectConfig.destoryDay)
                     );
+                }
+            }
+        }
+        return mapObjectDataList;
+    }
+
+    // 生成AI对象数据
+    public List<MapObjectData> GenerateAIObjectData(MapChunkData mapChunkData) {
+        mapObjectDataList.Clear();
+        // 生成AI对象数据: 一个地图块森林或沼泽的顶点数要超过配置的才能生成AI对象
+        int maxCount = mapConfig.maxAIOnChunk - mapChunkData.AIDataDict.dictionary.Count;
+        if (mapChunkData.forestVertexList.Count > mapConfig.generateAIMinVertexCount) {
+            for (int i = 0; i < maxCount; i++) {
+                MapObjectData mapObjectData = GenerateMapAIData(MapVertexType.Forest);
+                if (mapObjectData != null) {
+                    mapObjectDataList.Add(mapObjectData);
+                    maxCount -= 1;
+                }
+            }
+        }
+        if (mapChunkData.marshVertexList.Count > mapConfig.generateAIMinVertexCount) {
+            for (int i = 0; i < maxCount; i++) {
+                MapObjectData mapObjectData = GenerateMapAIData(MapVertexType.Marsh);
+                if (mapObjectData != null) {
+                    mapObjectDataList.Add(mapObjectData);
                 }
             }
         }

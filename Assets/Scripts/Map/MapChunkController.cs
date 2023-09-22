@@ -137,6 +137,16 @@ public class MapChunkController : MonoBehaviour
         }
     }
 
+    // 添加一个AI对象: 默认仅MapManager调用该方法
+    public void AddAIObject(MapObjectData mapObjectData) {
+        // 添加存档数据
+        mapChunkData.AIDataDict.dictionary.Add(mapObjectData.id, mapObjectData);
+        // 实例化物品
+        if (isActive == true) {
+            InstantiateAIObject(mapObjectData);
+        }
+    }
+
     // 移除一个地图对象
     public void RemoveMapObject(ulong mapObjectId) {
         // 数据层面移除(控制器层面)
@@ -203,7 +213,13 @@ public class MapChunkController : MonoBehaviour
             AddMapObject(mapObjectDatas[i], false);
         }
 
-        // TODO: 刷新AI
+        // 刷新AI: 每隔x天刷新一次AI
+        if (TimeManager.Instance.currentDayNum % 3 == 0) {
+            List<MapObjectData> aiObjectDataList = MapManager.Instance.GenerateAIObjectDataOnMapChunkRefresh(mapChunkData);
+            for (int i = 0; i < aiObjectDataList.Count; i++) {
+                AddAIObject(aiObjectDataList[i]);
+            }
+        }
     }
     #endregion
 }

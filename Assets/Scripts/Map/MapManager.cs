@@ -283,6 +283,11 @@ public class MapManager : SingletonMono<MapManager>
     public List<MapObjectData> GenerateMapObjectDataOnMapChunkRefresh(Vector2Int chunkIndex) {
         return mapGenerator.GenerateMapObjectDataOnMapChunkRefresh(chunkIndex);
     }
+
+    // 在地图块刷新时生成AI对象列表, 为了让MapChunkController能访问到, 因此在这里生成了同名/同功能函数
+    public List<MapObjectData> GenerateAIObjectDataOnMapChunkRefresh(MapChunkData mapChunkData) {
+        return mapGenerator.GenerateAIObjectData(mapChunkData);
+    }
     #endregion
 
     #region 地图UI相关
