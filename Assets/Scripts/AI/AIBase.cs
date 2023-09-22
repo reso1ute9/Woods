@@ -9,29 +9,15 @@ using System;
 // AI基类
 public abstract class AIBase : SerializedMonoBehaviour, IStateMachineOwner
 {
+    #region 组件
     [SerializeField] protected Animator animator;
     [SerializeField] protected NavMeshAgent navMeshAgent;
     [SerializeField] protected Dictionary<string, AudioClip> audioClipDict = new Dictionary<string, AudioClip>();
     public NavMeshAgent NavMeshAgent { get => navMeshAgent; }
-    protected float hp;
-    [SerializeField] public float maxHP;
-    [SerializeField] protected float attackDistance = 0.5f;
-    public float AttackDistance { get => attackDistance; }
-    [SerializeField] protected float attackValue = 10.0f;
-    public float AttackValue { get => attackValue; }
-    [SerializeField] protected Transform weapon;
-    public Transform Weapon { get => weapon; }
     [SerializeField] protected Collider inputCheckCollider;               // 输入检测碰撞体
     public Collider InputCheckCollider { get => inputCheckCollider; }
-    [SerializeField] protected MapVertexType mapVertexType;               // AI物体活动的地图类型
-    protected AIState currentAIState;                             // 当前动画状态
-    protected MapChunkController mapChunk;                      // 当前所在的地图块控制器
-    public MapChunkController MapChunk { get => mapChunk; }
-    protected MapObjectData aiData;                               // 当前地图物品id
-    public MapObjectData AIData { get => aiData; }
-    [SerializeField] protected float radius;             // 交互半径
-    public float Radius { get => radius; }
-
+    [SerializeField] protected Transform weapon;
+    public Transform Weapon { get => weapon; }
     protected StateMachine stateMachine;
     public StateMachine StateMachine { 
         get {
@@ -42,6 +28,28 @@ public abstract class AIBase : SerializedMonoBehaviour, IStateMachineOwner
             return stateMachine;
         } 
     }
+    #endregion
+    
+    #region 重要参数
+    protected float hp;
+    [SerializeField] public float maxHP;
+    [SerializeField] protected float attackDistance = 0.5f;
+    public float AttackDistance { get => attackDistance; }
+    [SerializeField] protected float attackValue = 10.0f;
+    public float AttackValue { get => attackValue; }
+    [SerializeField] protected MapVertexType mapVertexType;               // AI物体活动的地图类型
+    [SerializeField] protected float radius;             // 交互半径
+    public float Radius { get => radius; }
+    #endregion
+    
+    #region 数据
+    protected AIState currentAIState;                             // 当前动画状态
+    protected MapChunkController mapChunk;                      // 当前所在的地图块控制器
+    public MapChunkController MapChunk { get => mapChunk; }
+    protected MapObjectData aiData;                               // 当前地图物品id
+    public MapObjectData AIData { get => aiData; }
+    [SerializeField] private int lootObjectConfigId = -1;
+    #endregion
 
     public virtual void Init(MapChunkController mapChunk, MapObjectData aiData) {
         this.mapChunk = mapChunk;
@@ -128,7 +136,13 @@ public abstract class AIBase : SerializedMonoBehaviour, IStateMachineOwner
     public void Dead() {
         // 告知地图块移除数据
         mapChunk.RemoveAIObject(AIData.id);
-        // TODO: 掉落物品
+        // 掉落物品
+        if (lootObjectConfigId != -1) {
+            LootConfig lootConfig = ConfigManager.Instance.GetConfig<LootConfig>(ConfigName.Loot, lootObjectConfigId);
+            if (lootConfig != null) {
+                lootConfig.GenerateMapObject(mapChunk, transform.position);
+            }
+        }
     }
 
     #region 动画事件

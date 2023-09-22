@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a92d03be6949a4d49a97f91063e464b4, type: 3}
+  m_Name: "\u719F\u8089"
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: itemTypeInfo
+      Entry: 7
+      Data: 0|ItemConsumableInfo, Assembly-CSharp
+    - Name: maxCount
+      Entry: 3
+      Data: 10
+    - Name: recoverHP
+      Entry: 4
+      Data: 30
+    - Name: recoverHungry
+      Entry: 4
+      Data: 50
+    - Name: 
+      Entry: 8
+      Data: 
+  itemType: 1
+  itemName: "\u719F\u8089"
+  mapObjectConfigId: 34
+  descript: "\u7ECF\u8FC7\u70E7\u70E4\u540E\u7684\u9999\u55B7\u55B7\u7684\u8089"
+  itemIcon: {fileID: 21300000, guid: dd70504dfc1489047a08c48715a8812c, type: 3}

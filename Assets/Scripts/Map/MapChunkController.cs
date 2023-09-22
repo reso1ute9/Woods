@@ -202,6 +202,8 @@ public class MapChunkController : MonoBehaviour
         for (int i = 0; i < mapObjectDatas.Count; i++) {
             AddMapObject(mapObjectDatas[i], false);
         }
+
+        // TODO: 刷新AI
     }
     #endregion
 }

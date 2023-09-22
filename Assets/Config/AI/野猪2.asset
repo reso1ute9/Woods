@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cf13beb0b29b3504389539d980d20cee, type: 3}
-  m_Name: "\u91CE\u732A"
+  m_Name: "\u91CE\u732A2"
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -23,7 +23,7 @@ MonoBehaviour:
     SerializationNodes: []
   isEmpty: 0
   mapVertexType: 1
-  prefab: {fileID: 7341956147007708646, guid: 2b0492dd92abc0d4d9456c462e4e25f7, type: 3}
+  prefab: {fileID: 7341956147007708646, guid: 277e522e63415414a82ea4e41a7e8d95, type: 3}
   descript: "\u91CE\u751F\u52A8\u7269\u975E\u5E38\u5371\u9669"
   probability: 5
   destoryDay: -1

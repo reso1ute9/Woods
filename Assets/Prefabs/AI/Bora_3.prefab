@@ -607,7 +607,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 03d2174c64d54434e903a774f2c8eef4, type: 2}
+  - {fileID: 2100000, guid: 05fff7a7033c5d64b9e78ecb69278e56, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -708,7 +708,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 03d2174c64d54434e903a774f2c8eef4, type: 2}
+  - {fileID: 2100000, guid: 05fff7a7033c5d64b9e78ecb69278e56, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -797,7 +797,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 03d2174c64d54434e903a774f2c8eef4, type: 2}
+  - {fileID: 2100000, guid: 05fff7a7033c5d64b9e78ecb69278e56, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -845,7 +845,7 @@ GameObject:
   - component: {fileID: 6999737221564747471}
   - component: {fileID: 9198177185552314663}
   m_Layer: 11
-  m_Name: Bora_1
+  m_Name: Bora_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1030,7 +1030,7 @@ MonoBehaviour:
   weapon: {fileID: 8103166538835752123}
   maxHP: 10
   attackDistance: 0.5
-  attackValue: 10
+  attackValue: 14
   mapVertexType: 1
   radius: 0.5
   lootObjectConfigId: 4

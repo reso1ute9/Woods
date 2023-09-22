@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cf13beb0b29b3504389539d980d20cee, type: 3}
-  m_Name: "\u7A7A"
+  m_Script: {fileID: 11500000, guid: 3c52314092cb1264487d4d75cb1b3e65, type: 3}
+  m_Name: "\u719F\u8089"
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -21,9 +21,11 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  isEmpty: 1
+  isEmpty: 0
   mapVertexType: 1
-  prefab: {fileID: 0}
-  descript: 
-  probability: 80
-  destoryDay: -1
+  prefab: {fileID: 5349483433539073217, guid: 9b90f55349f91954ab9b01c61a4f6fc4, type: 3}
+  mapIconSprite: {fileID: 0}
+  mapIconSize: 0
+  descript: "\u719F\u8089"
+  probability: 0
+  destoryDay: 3
