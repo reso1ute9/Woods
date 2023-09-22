@@ -226,7 +226,9 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
                 }
                 return;
             }
-        } else if (currentWeaponItemData != null && hitInfo.collider.TryGetComponent<AIBase>(out AIBase aiObject)) {
+        }
+        // 检查是否攻击AI物体
+        if (canAttack == true && currentWeaponItemData != null && hitInfo.collider.TryGetComponent<AIBase>(out AIBase aiObject)) {
             // 检查地图对象触碰距离是否合法
             float dis = Vector3.Distance(playerTransform.position, aiObject.transform.position);
             // 交互距离: 武器长度 + AI半径
@@ -244,6 +246,11 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
                 lastHitMapObject = mapObject;
             }
         }
+    }
+
+    // 玩家受伤函数
+    public void Hurt(float damage) {
+        UnityEngine.Debug.Log("玩家受伤:" + damage);
     }
 
     // 开启攻击: 开启伤害检测

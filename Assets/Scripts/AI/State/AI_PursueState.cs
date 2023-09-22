@@ -18,9 +18,8 @@ public class AI_PursueState : AIStateBase
     public override void Update() {
         if (GameSceneManager.Instance.IsGameOver == false) {
             float distance = Vector3.Distance(AI.transform.position, Player_Controller.Instance.playerTransform.position);
-            if (distance <= AI.Radius + AI.attackDistance) {
-                // TODO: 转化为攻击状态
-                UnityEngine.Debug.Log("到达目标附近");
+            if (distance <= AI.Radius + AI.AttackDistance) {
+                AI.ChangeState(AIState.Attack);
             } else {
                 AI.SavePosition();
                 AI.NavMeshAgent.SetDestination(Player_Controller.Instance.playerTransform.position);

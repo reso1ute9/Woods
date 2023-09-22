@@ -15,7 +15,12 @@ public abstract class AIBase : SerializedMonoBehaviour, IStateMachineOwner
     public NavMeshAgent NavMeshAgent { get => navMeshAgent; }
     protected float hp;
     [SerializeField] public float maxHP;
-    [SerializeField] public float attackDistance = 0.5f;
+    [SerializeField] protected float attackDistance = 0.5f;
+    public float AttackDistance { get => attackDistance; }
+    [SerializeField] protected float attackValue = 10.0f;
+    public float AttackValue { get => attackValue; }
+    [SerializeField] protected Transform weapon;
+    public Transform Weapon { get => weapon; }
     [SerializeField] protected MapVertexType mapVertexType;               // AI物体活动的地图类型
     protected AIState currentAIState;                             // 当前动画状态
     protected MapChunkController mapChunk;                      // 当前所在的地图块控制器
@@ -65,6 +70,7 @@ public abstract class AIBase : SerializedMonoBehaviour, IStateMachineOwner
                 StateMachine.ChangeState<AI_PursueState>((int)aiState);
                 break;
             case AIState.Attack:
+                StateMachine.ChangeState<AI_AttackState>((int)aiState);
                 break;
             case AIState.Dead:
                 break;
