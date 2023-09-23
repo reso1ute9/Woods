@@ -12,10 +12,9 @@ public class InventoryManager : SingletonMono<InventoryManager>
     public void Init() {
         // 初始化快捷栏窗口
         mainInventoryWindow = UIManager.Instance.Show<UI_MainInventoryWindow>();
-        if (mainInventoryWindow == null) {
-            UnityEngine.Debug.Log("mainInventoryWindow == null");
-        }
         mainInventoryWindow.InitData();
+        
+        EventManager.AddEventListener(EventName.SaveGame, OnGameSave);
     }
 
     #region 快捷窗口栏
@@ -49,7 +48,7 @@ public class InventoryManager : SingletonMono<InventoryManager>
     }
     #endregion
 
-    private void OnDestroy() {
+    private void OnGameSave() {
         // 存储当前物品快捷栏数据信息
         ArchiveManager.Instance.SaveMainInventoryData();
     }

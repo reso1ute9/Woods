@@ -181,7 +181,6 @@ public class  UI_ItemSlot : MonoBehaviour
             // 物品掉落在地上: 在地面生成物品, 并将y值设置为1
             worldPosition.y = 1;
             MapManager.Instance.GenerateMapObject(itemData.config.mapObjectConfigId, worldPosition, false);
-            UnityEngine.Debug.Log("物品掉落在地上" + itemData.config.itemName);
             // 丢弃一件物品, 注意数据/UI/音效需要同步
             ProjectTool.PlayerAudio(AudioType.Bag);
             ownerWindow.DiscardItem(index);
@@ -199,24 +198,20 @@ public class  UI_ItemSlot : MonoBehaviour
                     UIManager.Instance.AddTips("只能放入武器");
                 } else {
                     ProjectTool.PlayerAudio(AudioType.TakeUpWeapon);
-                    UnityEngine.Debug.Log("可以装备物品:" + itemData.config.itemName);
                     SwapSlotItem(this, currentMouseEnterSlot);
                 }
             } else {
                 // 当前进入是普通格子
                 if (itemData.config.itemType != ItemType.Weapon) {
                     ProjectTool.PlayerAudio(AudioType.Bag);
-                    UnityEngine.Debug.Log("交换物品:" + itemData.config.itemName);
                     SwapSlotItem(this, currentMouseEnterSlot);
                 } else {
                     if (currentMouseEnterSlot.itemData == null) {
                         ProjectTool.PlayerAudio(AudioType.TakeDownWeapon);
-                        UnityEngine.Debug.Log("脱下装备:" + itemData.config.itemName);
                         SwapSlotItem(this, currentMouseEnterSlot);
                     }
                     else {
                         ProjectTool.PlayerAudio(AudioType.Fail);
-                        UnityEngine.Debug.Log("装备无法放入已经存在物品的格子中:" + itemData.config.itemName);
                     }
                 }
             }

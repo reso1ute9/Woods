@@ -16,7 +16,8 @@ public class UI_MapWindow : UI_WindowBase
     [SerializeField] private RectTransform playerIcon;  // 玩家所在位置的icon
 
     private Dictionary<ulong, Image> mapObjectIconDict = new Dictionary<ulong, Image>();        // 地图物品icon字典
-
+    private Dictionary<Vector2Int, Image> mapChunkImageDict = new Dictionary<Vector2Int, Image>();
+    
     private int mapChunkSize;           // 一个地图块有多少格子
     private float mapChunkImageSize;    // UI地图块图片的尺寸
     private float mapSizeOnWorld;       // 游戏内3D地图大小
@@ -100,6 +101,7 @@ public class UI_MapWindow : UI_WindowBase
         } else {
             mapChunkImage.sprite = CreateMapSprite(texture);
         }
+        mapChunkImageDict.Add(chunkIndex, mapChunkImage);
         // 添加物体icon
         foreach (var mapObjectData in mapObjectDict.dictionary.Values) {
             AddMapObjectIcon(mapObjectData);
@@ -133,5 +135,19 @@ public class UI_MapWindow : UI_WindowBase
             // 从字典中删除该id
             mapObjectIconDict.Remove(mapObjectId);
         }
+    }
+    
+    // 重置窗口, 回收UI窗口资源
+    public void ResetWindow() {
+        // 回收icon
+        foreach (Image icon in mapObjectIconDict.Values) {
+            icon.JKGameObjectPushPool();
+        }
+        mapObjectIconDict.Clear();
+        // 回收地图块地图图片
+        foreach (Image image in mapChunkImageDict.Values) {
+            Destroy(image.gameObject);
+        }
+        mapChunkImageDict.Clear();
     }
 }

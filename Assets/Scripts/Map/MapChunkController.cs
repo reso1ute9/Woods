@@ -40,6 +40,8 @@ public class MapChunkController : MonoBehaviour
         this.isInitialized = true;
         // 添加地图块刷新事件
         EventManager.AddEventListener(EventName.OnMorning, OnMorning);
+        
+        EventManager.AddEventListener(EventName.SaveGame, OnGameSave);
     }
 
     // 地图对象实例化方法
@@ -187,8 +189,13 @@ public class MapChunkController : MonoBehaviour
     }
 
     // 当整个地图块数据被销毁时(例如关闭游戏), 需要将当前新的地图块数据保存到磁盘上
-    private void OnDestroy() {
+    private void OnGameSave() {
         ArchiveManager.Instance.SaveMapChunkData(chunkIndex, mapChunkData);    
+    }
+    
+    // 当关闭游戏场景时释放资源
+    public void OnCloseGameScene() {
+        SetActive(false);
     }
 
     #region 监听事件

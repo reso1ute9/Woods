@@ -21,5 +21,10 @@ public class Player_Attack : PlayerStateBase
             Time.deltaTime * player.rotateSpeed * 2.0f
         );
     }
+
+    public override void Exit() {
+        // 避免攻击状态被打断但是伤害检测还在
+        player.OnStopHit();
+    }
 }
 

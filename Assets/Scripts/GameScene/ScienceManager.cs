@@ -10,6 +10,8 @@ public class ScienceManager : SingletonMono<ScienceManager>
 
     public void Init() {
         scienceData = ArchiveManager.Instance.scienceData;
+        
+        EventManager.AddEventListener(EventName.SaveGame, OnGameSave);
     }
 
     // 检测科技是否解锁
@@ -22,7 +24,7 @@ public class ScienceManager : SingletonMono<ScienceManager>
         scienceData.AddScience(configId);
     }
 
-    private void OnDestroy() {
+    private void OnGameSave() {
         // 保存科技数据存档
         ArchiveManager.Instance.SaveScienceData();
     }

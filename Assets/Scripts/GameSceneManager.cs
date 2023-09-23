@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,6 +13,7 @@ public class GameSceneManager : LogicManagerBase<GameSceneManager>
     public bool isCreatNewArchive = true;
     private bool isGameOver = false;
     public bool IsGameOver { get => isGameOver; }
+    private bool isPause = false;
     #endregion
 
     public bool IsInitialized { get; private set; }
@@ -31,6 +33,32 @@ public class GameSceneManager : LogicManagerBase<GameSceneManager>
 
         UIManager.Instance.CloseAll();
         StartGame();
+    }
+
+    private void Update() {
+        if (IsInitialized == false) {
+            return;
+        }
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            isPause = !isPause;
+            if (isPause) {
+                PauseGame();
+            } else {
+                UnPauseGame();
+            }
+        }
+    }
+
+    private void PauseGame() {
+        isPause = true;
+        UIManager.Instance.Show<UI_PauseWindow>();
+        TimeManager.Instance.timeScale = 0;
+    }
+
+    public void UnPauseGame() {
+        isPause = false;
+        UIManager.Instance.Close<UI_PauseWindow>();
+        TimeManager.Instance.timeScale = 1;
     }
 
     private void StartGame() {
@@ -91,5 +119,49 @@ public class GameSceneManager : LogicManagerBase<GameSceneManager>
         currentMapChunkCount += 1;
         UpdateMapProgress(currentMapChunkCount, maxMapChunkCount);
     }
+    #endregion
+
+    #region 存档管理
+
+    public void EnterMenuScene() {
+        // 恢复时间
+        TimeManager.Instance.timeScale = 1;
+        // 回收场景资源
+        MapManager.Instance.OnCloseGameScene();
+        // 清空所有事件
+        EventManager.Clear();
+        // 关闭所有UI
+        UIManager.Instance.CloseAll();
+        // 停止所有协程
+        MonoManager.Instance.StopAllCoroutines();
+        // 进入新场景
+        GameManager.Instance.EnterMenu();
+    }
+    
+    // 游戏结束
+    public void GameOver() {
+        isGameOver = true;
+        // 删除存档
+        ArchiveManager.Instance.CleanArchive();
+        // 延迟进入菜单场景
+        Invoke(nameof(EnterMenuScene), 2.0f);
+    }
+    
+    // 关闭游戏场景并保存存档后进入菜单场景
+    public void CloseAndSave() {
+        // 存档
+        EventManager.EventTrigger(EventName.SaveGame);
+        // 进入菜单场景
+        EnterMenuScene();
+    }
+    
+    // 意外监听
+    private void OnApplicationQuit() {
+        // 当玩家死亡需要紧急存档
+        if (isGameOver) {
+            EventManager.EventTrigger(EventName.SaveGame);
+        }
+    }
+
     #endregion
 }

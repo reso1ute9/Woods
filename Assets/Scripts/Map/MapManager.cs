@@ -46,6 +46,8 @@ public class MapManager : SingletonMono<MapManager>
 
     public void Init() {
         StartCoroutine(DoInit());
+        
+        EventManager.AddEventListener(EventName.SaveGame, OnGameSave);
     }
 
     private IEnumerator DoInit() {
@@ -370,7 +372,17 @@ public class MapManager : SingletonMono<MapManager>
     }
 
     #endregion
-    private void OnDestroy() {
+    private void OnGameSave() {
         ArchiveManager.Instance.SaveMapData();
+    }
+    
+    // 保留当前场景中的资源
+    public void OnCloseGameScene() {
+        // 地图UI
+        mapUI.ResetWindow();
+        // 地图块
+        foreach (MapChunkController item in mapChunkDict.Values) {
+            item.OnCloseGameScene();
+        }
     }
 }

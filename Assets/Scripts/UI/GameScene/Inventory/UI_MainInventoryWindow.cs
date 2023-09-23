@@ -14,12 +14,12 @@ public class UI_MainInventoryWindow : UI_InventoryWindowBase
     [SerializeField] public UI_ItemSlot weaponSlot;       // 装备槽
 
     public void Update() {
-        #region 测试逻辑
-        if (Input.GetKeyDown(KeyCode.Alpha0)) AddItemAndPlayAudio(0);
-        if (Input.GetKeyDown(KeyCode.Alpha1)) AddItemAndPlayAudio(1);
-        if (Input.GetKeyDown(KeyCode.Alpha2)) AddItemAndPlayAudio(2);
-        if (Input.GetKeyDown(KeyCode.Alpha3)) AddItemAndPlayAudio(3);
-        #endregion
+        // #region 测试逻辑
+        // if (Input.GetKeyDown(KeyCode.Alpha0)) AddItemAndPlayAudio(0);
+        // if (Input.GetKeyDown(KeyCode.Alpha1)) AddItemAndPlayAudio(1);
+        // if (Input.GetKeyDown(KeyCode.Alpha2)) AddItemAndPlayAudio(2);
+        // if (Input.GetKeyDown(KeyCode.Alpha3)) AddItemAndPlayAudio(3);
+        // #endregion
     }
 
     public override void Init() {
@@ -170,7 +170,6 @@ public class UI_MainInventoryWindow : UI_InventoryWindowBase
                 }
             }
         }
-        UnityEngine.Debug.LogError("建造条件背包不满足");
     }
 
     // 玩家使用武器成功攻击

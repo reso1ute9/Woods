@@ -97,7 +97,6 @@ public abstract class AIBase : SerializedMonoBehaviour, IStateMachineOwner
             return;
         }
         hp -= damage;
-        UnityEngine.Debug.Log("hp:" + hp);
         if (hp <= 0) {
             ChangeState(AIState.Dead);
         } else {

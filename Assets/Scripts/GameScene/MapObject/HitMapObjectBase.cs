@@ -17,7 +17,6 @@ public abstract class HitMapObjectBase : MapObjectBase
     }
 
     public void Hurt(float damage) {
-        UnityEngine.Debug.Log("当前攻击物体受伤了:" + damage);
         hp -= damage;
         if (hp <= 0) {
             Dead();

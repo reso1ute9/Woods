@@ -17,4 +17,6 @@ public static class EventName
     public static string AddItem = "AddItem";
     // 建造事件
     public static string BuildBuilding = "BuildBuilding";
+    // 保存游戏
+    public static string SaveGame = "SaveGame";
 }

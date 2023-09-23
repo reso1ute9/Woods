@@ -26,6 +26,8 @@ public class TimeManager : LogicManagerBase<TimeManager>
         timeConfig = ConfigManager.Instance.GetConfig<TimeConfig>(ConfigName.Time);
         // 触发事件
         InitState();
+        
+        EventManager.AddEventListener(EventName.SaveGame, OnGameSave);
     }
 
     // 每次读取存档时需要进行的初始化状态设置
@@ -34,7 +36,7 @@ public class TimeManager : LogicManagerBase<TimeManager>
         RenderSettings.fog = timeConfig.timeStateConfig[timeData.stateIndex].fog; 
         // 设置初始的背景音乐:
         if (timeConfig.timeStateConfig[timeData.stateIndex].bgAudioClip != null) {
-            StartCoroutine(ChangeBGAudio(timeConfig.timeStateConfig[timeData.stateIndex].bgAudioClip));
+            StartCoroutine(ChangeBgAudio(timeConfig.timeStateConfig[timeData.stateIndex].bgAudioClip));
         }
         // 设置初始的nextIndex
         nextIndex = (timeData.stateIndex + 1 >= timeConfig.timeStateConfig.Length) ? 0 : timeData.stateIndex + 1;
@@ -83,9 +85,9 @@ public class TimeManager : LogicManagerBase<TimeManager>
         RenderSettings.fog = timeConfig.timeStateConfig[timeData.stateIndex].fog; 
         // 背景音乐:
         if (timeConfig.timeStateConfig[timeData.stateIndex].bgAudioClip != null) {
-            StartCoroutine(ChangeBGAudio(timeConfig.timeStateConfig[timeData.stateIndex].bgAudioClip));
+            StartCoroutine(ChangeBgAudio(timeConfig.timeStateConfig[timeData.stateIndex].bgAudioClip));
         }
-        }
+    }
 
     private void SetLight(Quaternion rotation, Color color, float intensity) {
         // 设置阳光强度/角度/颜色
@@ -98,31 +100,31 @@ public class TimeManager : LogicManagerBase<TimeManager>
     }
 
     // 使用协程去切换背景音乐
-    private IEnumerator ChangeBGAudio(AudioClip audioClip) {
-        float old_volume = AudioManager.Instance.BGVolume;
+    private IEnumerator ChangeBgAudio(AudioClip audioClip) {
+        float oldVolume = AudioManager.Instance.BGVolume;
         // 音量<=0则不需要播放声音
-        if (old_volume <= 0) {
+        if (oldVolume <= 0) {
             yield break;
         }
         // 降低之前曲子的音量
-        float current_volume = old_volume;
-        while (current_volume > 0) {
+        float currentVolume = oldVolume;
+        while (currentVolume > 0) {
             yield return null;
-            current_volume -= Time.deltaTime / 2;
-            AudioManager.Instance.BGVolume = current_volume;
+            currentVolume -= Time.deltaTime / 2;
+            AudioManager.Instance.BGVolume = currentVolume;
         }
         AudioManager.Instance.PlayBGAudio(audioClip);
         // 恢复到之前的音量
-        while (current_volume < old_volume) {
+        while (currentVolume < oldVolume) {
             yield return null;
-            current_volume += Time.deltaTime / 2;
-            AudioManager.Instance.BGVolume = current_volume;
+            currentVolume += Time.deltaTime / 2;
+            AudioManager.Instance.BGVolume = currentVolume;
         }
-        AudioManager.Instance.BGVolume = old_volume;
+        AudioManager.Instance.BGVolume = oldVolume;
     }
 
     // 当游戏关闭时将时间数据写入磁盘即可
-    private void OnDestroy() {
+    private void OnGameSave() {
         ArchiveManager.Instance.SaveTimeData();
     }
 }
