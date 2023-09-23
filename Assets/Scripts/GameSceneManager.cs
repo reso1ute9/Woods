@@ -19,11 +19,10 @@ public class GameSceneManager : LogicManagerBase<GameSceneManager>
     protected override void RegisterEventListener() {}
 
     private void Start() {
-        
         #region 测试逻辑
         if (isTest) {
             if (isCreatNewArchive) {
-                ArchiveManager.Instance.CreateNewArchive(10, 1, 1, 0.75f);
+                ArchiveManager.Instance.CreateNewArchive(10, 1, 1, 0.6f);
             } else {
                 ArchiveManager.Instance.LoadCurrentArchive();
             }
@@ -43,25 +42,25 @@ public class GameSceneManager : LogicManagerBase<GameSceneManager>
         // 确定地图初始化配置数据
         MapConfig mapConfig = ConfigManager.Instance.GetConfig<MapConfig>(ConfigName.Map);
         float mapSizeOnWorld = ArchiveManager.Instance.mapInitData.mapSize * mapConfig.mapChunkSize * mapConfig.cellSize;
-        // 显示游戏页面中昼夜/血量/饥饿值显示UI
-        UIManager.Instance.Show<UI_MainInfoWindow>();
         // 初始化角色
         Player_Controller.Instance.Init(mapSizeOnWorld);
         // 初始化相机
         Camera_Controller.Instance.Init(mapSizeOnWorld);
         // 初始化时间管理器
         TimeManager.Instance.Init();
+        // 显示游戏页面中昼夜/血量/饥饿值显示UI
+        UIManager.Instance.Show<UI_MainInfoWindow>();
         // 初始化地图管理器
         MapManager.Instance.UpdateView(Player_Controller.Instance.transform);
         MapManager.Instance.Init();
-        // 初始化背包管理器
-        InventoryManager.Instance.Init();
         // 初始化输入管理器
         InputManager.Instance.Init();
         // 初始化建造管理器
         BuildManager.Instance.Init();
         // 初始化科技管理器
         ScienceManager.Instance.Init();
+        // 初始化背包管理器
+        InventoryManager.Instance.Init();
     }    
 
     #region  加载进度

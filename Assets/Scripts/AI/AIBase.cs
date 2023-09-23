@@ -18,7 +18,7 @@ public abstract class AIBase : SerializedMonoBehaviour, IStateMachineOwner
     public Collider InputCheckCollider { get => inputCheckCollider; }
     [SerializeField] protected Transform weapon;
     public Transform Weapon { get => weapon; }
-    protected StateMachine stateMachine;
+    private StateMachine stateMachine;
     public StateMachine StateMachine { 
         get {
             if (stateMachine == null) {
@@ -31,24 +31,26 @@ public abstract class AIBase : SerializedMonoBehaviour, IStateMachineOwner
     #endregion
     
     #region 重要参数
-    protected float hp;
+    private float hp;
     [SerializeField] public float maxHP;
     [SerializeField] protected float attackDistance = 0.5f;
     public float AttackDistance { get => attackDistance; }
     [SerializeField] protected float attackValue = 10.0f;
     public float AttackValue { get => attackValue; }
-    [SerializeField] protected MapVertexType mapVertexType;               // AI物体活动的地图类型
-    [SerializeField] protected float radius;             // 交互半径
+    [SerializeField] protected MapVertexType mapVertexType;                 // AI物体活动的地图类型
+    [SerializeField] protected float radius;                                // 交互半径
     public float Radius { get => radius; }
+    [SerializeField] private int lootObjectConfigId = -1;
+    [SerializeField] private float hostileDistance = -1;                    // 敌对距离, -1代表无效
+    public float HostileDistance { get => hostileDistance; }
     #endregion
     
     #region 数据
-    protected AIState currentAIState;                             // 当前动画状态
-    protected MapChunkController mapChunk;                      // 当前所在的地图块控制器
+    protected AIState currentAIState;                           // 当前动画状态
+    private MapChunkController mapChunk;                      // 当前所在的地图块控制器
     public MapChunkController MapChunk { get => mapChunk; }
-    protected MapObjectData aiData;                               // 当前地图物品id
-    public MapObjectData AIData { get => aiData; }
-    [SerializeField] private int lootObjectConfigId = -1;
+    private MapObjectData aiData;                             // 当前地图物品id
+    public MapObjectData AIData { get => aiData;}
     #endregion
 
     public virtual void Init(MapChunkController mapChunk, MapObjectData aiData) {
@@ -74,7 +76,7 @@ public abstract class AIBase : SerializedMonoBehaviour, IStateMachineOwner
                 StateMachine.ChangeState<AI_Patrol>((int)aiState);
                 break;
             case AIState.Hurt:
-                StateMachine.ChangeState<AI_Hurt>((int)aiState);
+                StateMachine.ChangeState<AI_Hurt>((int)aiState, true);
                 break;
             case AIState.Pursue:
                 StateMachine.ChangeState<AI_PursueState>((int)aiState);

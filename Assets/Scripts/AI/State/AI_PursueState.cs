@@ -30,7 +30,7 @@ public class AI_PursueState : AIStateBase
     }
 
     // 检查并迁移地图块
-    private void CheckAndTransferMapChunk() {
+    protected void CheckAndTransferMapChunk() {
         // 通过AI物体当前坐标获得AI所在的当前地图块管理器
         MapChunkController newMapChunk = MapManager.Instance.GetMapChunkByWorldPosition(AI.transform.position);
         // 发生AI物体地图块迁移
@@ -40,7 +40,7 @@ public class AI_PursueState : AIStateBase
         }
     }
     
-    public void FootStep() {
+    protected void FootStep() {
         int index = Random.Range(1, 3);
         AI.PlayAudio("FootStep" + index.ToString(), 0.15f);
     }

@@ -116,8 +116,8 @@ public class MapChunkController : MonoBehaviour
                 }
                 mapObjectDict.Clear();
                 // 处理AI对象
-                foreach (var AIObject in AIObjectDict) {
-                    AIObject.Value.Destroy();
+                foreach (var aiObject in AIObjectDict) {
+                    aiObject.Value.Destroy();
                 }
                 AIObjectDict.Clear();
             }
@@ -182,8 +182,7 @@ public class MapChunkController : MonoBehaviour
 
     // 删除一个AI物体(物体迁移): 只删除数据不删除AI对象
     public void RemoveAIObjectOnTransfer(ulong AIObjectId) {
-        mapChunkData.AIDataDict.dictionary.Remove(AIObjectId, out MapObjectData aiObjectData);
-        aiObjectData.JKObjectPushPool();
+        mapChunkData.AIDataDict.dictionary.Remove(AIObjectId);
         AIObjectDict.Remove(AIObjectId);
     }
 
