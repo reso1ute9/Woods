@@ -11,7 +11,7 @@ public enum PlayerState
     Idle,
     Move,
     Attack,
-    BeAttack,
+    Hurt,
     Dead
 }
 
@@ -20,6 +20,8 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
 {
     [SerializeField] public Player_Model playerModel;
     [SerializeField] Animator animator;
+    [SerializeField] private new Collider closeCollider;
+    public Collider CloseCollider { get => closeCollider; }
     public CharacterController characterController;
 
     private StateMachine stateMachine;
@@ -51,7 +53,10 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
         TriggerUpdateHungryEvent();
 
         // 初始化音效、位置、状态机
-        playerModel.Init(PlayAudioOnFootstep, OnStartHit, OnStopHit, OnAttackOver);
+        playerModel.Init(
+            PlayAudioOnFootstep, OnStartHit, OnStopHit, OnAttackOver,
+            OnHurtOver, OnDeadOver
+        );
         playerTransform = transform;
         stateMachine = ResManager.Load<StateMachine>();
         stateMachine.Init(this);
@@ -157,6 +162,9 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
 
     // 选择地图对象或AI时
     public void OnSelectMapObject(RaycastHit hitInfo, bool isMouseButtonDown) {
+        if (canUseItem == false) {
+            return;
+        }
         if (hitInfo.collider.TryGetComponent<MapObjectBase>(out MapObjectBase mapObject)) {
             // 检查地图对象触碰距离是否合法
             float dis = Vector3.Distance(playerTransform.position, mapObject.transform.position);
@@ -236,8 +244,6 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
             if (dis <= itemWeaponInfo.attackDistance + aiObject.Radius) {
                 // 防止立刻进行攻击
                 canAttack = false;
-                // 禁止使用物品
-                canUseItem = false;
                 // 计算方向
                 attackDirection = Quaternion.LookRotation(aiObject.transform.position - transform.position);
                 // 播放音效
@@ -252,7 +258,18 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
 
     // 玩家受伤函数
     public void Hurt(float damage) {
-        UnityEngine.Debug.Log("玩家受伤:" + damage);
+        // 更新玩家血量
+        if (playerMainData.hp <= 0) {
+            return;
+        }
+        playerMainData.hp -= damage;
+        if (playerMainData.hp <= 0) {
+            ChangeState(PlayerState.Dead);
+        }
+        else {
+            // 更新UI
+            ChangeState(PlayerState.Hurt);
+        }
     }
 
     // 开启攻击: 开启伤害检测
@@ -277,10 +294,18 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
         }
         // 可以开启新的攻击动作
         canAttack = true;
-        // 允许使用物品
-        canUseItem = true;
         // 切换状态到待机
         ChangeState(PlayerState.Idle);
+    }
+    
+    // 受伤动作结束
+    private void OnHurtOver() {
+        ChangeState(PlayerState.Idle);
+    }
+    
+    // 死亡动作结束
+    private void OnDeadOver() {
+        // TODO: 整个游戏结束
     }
 
     // 武器触发器: 当武器碰到物体(地图对象/AI)时
@@ -341,8 +366,6 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
             ItemWeaponInfo itemWeaponInfo = (currentWeaponItemData.config.itemTypeInfo as ItemWeaponInfo);
             // 防止立刻进行攻击
             canAttack = false;
-            // 禁止使用物品
-            canUseItem = false;
             // 计算方向
             attackDirection = Quaternion.LookRotation(mapObject.transform.position - transform.position);
             // 播放音效
@@ -363,18 +386,25 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
     public void ChangeState(PlayerState playerState) {
         switch (playerState) {
             case PlayerState.Idle:
+                canUseItem = true;
                 stateMachine.ChangeState<Player_Idle>((int)PlayerState.Idle);
                 break;
             case PlayerState.Move:
+                canUseItem = true;
                 stateMachine.ChangeState<Player_Move>((int)PlayerState.Move);
                 break;
             case PlayerState.Attack:
+                canUseItem = false;
                 stateMachine.ChangeState<Player_Attack>((int)PlayerState.Attack);
                 break;
-            case PlayerState.BeAttack:
+            case PlayerState.Hurt:
+                canUseItem = false;
+                stateMachine.ChangeState<Player_Hurt>((int)PlayerState.Hurt);
                 // stateMachine.ChangeState<Player_Move>(3);
                 break;
             case PlayerState.Dead:
+                canUseItem = false;
+                stateMachine.ChangeState<Player_Dead>((int)PlayerState.Dead);
                 // stateMachine.ChangeState<Player_Move>(4);
                 break;
         }

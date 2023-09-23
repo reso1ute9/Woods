@@ -86,7 +86,7 @@ public class UI_MainInventoryWindow : UI_InventoryWindowBase
     }
 
     // 使用物品
-    public AudioType UseItem(int index) {
+    private AudioType UseItem(int index) {
         // TODO: 玩家的状态不一定能使用物品
         if (Player_Controller.Instance.canUseItem == false) {
             return AudioType.PlayerConnot;

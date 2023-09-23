@@ -9,17 +9,23 @@ public class Player_Model : MonoBehaviour {
     private Action startHitAction;
     private Action stopHitAction;
     private Action attackOverAction;
+    private Action hurtOver;
+    private Action deadOver;
 
     public void Init(
         Action<int> footstepAction, 
         Action startHitAction,
         Action stopHitAction,
-        Action attackOverAction
-    ) {
+        Action attackOverAction,
+        Action hurtOver, 
+        Action deadOver
+        ) {
         this.footstepAction = footstepAction;
         this.startHitAction = startHitAction;
         this.stopHitAction = stopHitAction;
         this.attackOverAction = attackOverAction;
+        this.hurtOver = hurtOver;
+        this.deadOver = deadOver;
     }
 
     #region 动画事件
@@ -41,6 +47,16 @@ public class Player_Model : MonoBehaviour {
     // 攻击结束
     private void AttackOver() {
         attackOverAction?.Invoke();
+    }
+    
+    // 玩家受伤
+    private void HurtOver() {
+        hurtOver?.Invoke();
+    }
+    
+    // 玩家死亡
+    private void DeadOver() {
+        deadOver?.Invoke();
     }
     #endregion
 }
