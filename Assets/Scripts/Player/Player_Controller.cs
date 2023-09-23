@@ -310,7 +310,9 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
             }
         } else if (other.TryGetComponent<AIBase>(out AIBase AIObject)) {
             ItemWeaponInfo itemWeaponInfo = (currentWeaponItemData.config.itemTypeInfo as ItemWeaponInfo);
-            // TODO: 打击粒子、声音等
+            // 显示打击效果
+            GameObject effect = PoolManager.Instance.GetGameObject(itemWeaponInfo.hitEffect);
+            effect.transform.position = other.ClosestPoint(currentWeaponGameObject.transform.position);     // ClosestPoint: 返回一个碰撞体最近传入参数点的位置
             // 播放音效
             AudioManager.Instance.PlayOnShot(itemWeaponInfo.hitAudio, transform.position, 0.5f);
             AIObject.Hurt(itemWeaponInfo.attackValue);

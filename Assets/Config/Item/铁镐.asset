@@ -19,6 +19,7 @@ MonoBehaviour:
     - {fileID: 5828132043207799916, guid: 57ab68b7e4ff33d4785663a8f09fb888, type: 3}
     - {fileID: 8300000, guid: 20b9d47e01cf80e46b13f4631191b1dc, type: 3}
     - {fileID: 8300000, guid: 5c85168c7a790c44c9cc63e1afc77bb9, type: 3}
+    - {fileID: 3640298412947855441, guid: e6f93af0085f2cb4d88ae04e2aeed19e, type: 3}
     - {fileID: 22100000, guid: 03694932467335b478cfac8b658c56bd, type: 2}
     SerializedBytesString: 
     Prefab: {fileID: 0}
@@ -70,9 +71,12 @@ MonoBehaviour:
     - Name: hitAudio
       Entry: 10
       Data: 2
-    - Name: animatorController
+    - Name: hitEffect
       Entry: 10
       Data: 3
+    - Name: animatorController
+      Entry: 10
+      Data: 4
     - Name: attackValue
       Entry: 4
       Data: 1

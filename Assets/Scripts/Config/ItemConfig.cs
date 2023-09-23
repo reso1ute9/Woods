@@ -67,6 +67,7 @@ public class ItemWeaponInfo: IItemTypeInfo {
     [LabelText("玩家手中武器旋转")] public Vector3 rotationOnPlayer;
     [LabelText("攻击音效")] public AudioClip attackAudio;
     [LabelText("命中音效")] public AudioClip hitAudio;
+    [LabelText("命中效果")] public GameObject hitEffect;
     [LabelText("动画状态机")] public AnimatorOverrideController animatorController;
     [LabelText("攻击力")] public float attackValue;
     [LabelText("每次攻击损耗耐久度")] public float attackDurabilityCost;

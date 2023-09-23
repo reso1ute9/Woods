@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +9,7 @@ public class Campfire_Conroller : BuildingBase
 {
     [SerializeField] new Light light;
     [SerializeField] GameObject fire;
+    [SerializeField] private AudioSource audioSource;
     private CampfireConfig campfireConfig;
     private CampfireData campfireData;
     private bool isOnGround;
@@ -61,6 +63,7 @@ public class Campfire_Conroller : BuildingBase
     private void SetLight(float fuelValue) {
         light.gameObject.SetActive(fuelValue != 0);
         fire.gameObject.SetActive(fuelValue != 0);
+        audioSource.gameObject.SetActive((fuelValue != 0));
         if (fuelValue != 0) {
             // 计算当前燃料比例
             float fuelRatio = fuelValue / campfireConfig.maxFuelValue;
@@ -68,6 +71,8 @@ public class Campfire_Conroller : BuildingBase
             light.intensity = Mathf.Lerp(0, campfireConfig.maxLightIntensity, fuelRatio);
             // 设置灯光范围
             light.range = Mathf.Lerp(0, campfireConfig.maxLightRange, fuelRatio);
+            // 设置篝火音量
+            audioSource.volume = fuelRatio;
         }
     }
 
