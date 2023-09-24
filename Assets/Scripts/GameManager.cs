@@ -55,7 +55,7 @@ public class GameManager : SingletonMono<GameManager>
     
     // 进入菜单场景
     public void EnterMenu() {
-        SceneManager.LoadScene("MenuScene");   
+        SceneManager.LoadScene("MenuScene");
     }
     #endregion
 }

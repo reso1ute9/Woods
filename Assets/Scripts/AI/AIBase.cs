@@ -18,15 +18,17 @@ public abstract class AIBase : SerializedMonoBehaviour, IStateMachineOwner
     public Collider InputCheckCollider { get => inputCheckCollider; }
     [SerializeField] protected Transform weapon;
     public Transform Weapon { get => weapon; }
-    private StateMachine stateMachine;
-    public StateMachine StateMachine { 
+    
+    protected StateMachine stateMachine;
+    public StateMachine StateMachine {
         get {
-            if (stateMachine == null) {
+            if (stateMachine == null)
+            {
                 stateMachine = PoolManager.Instance.GetObject<StateMachine>();
                 StateMachine.Init(this);
             }
             return stateMachine;
-        } 
+        }
     }
     #endregion
     
@@ -76,7 +78,7 @@ public abstract class AIBase : SerializedMonoBehaviour, IStateMachineOwner
                 StateMachine.ChangeState<AI_Patrol>((int)aiState);
                 break;
             case AIState.Hurt:
-                StateMachine.ChangeState<AI_Hurt>((int)aiState, true);
+                StateMachine.ChangeState<AI_Hurt>((int)aiState);
                 break;
             case AIState.Pursue:
                 StateMachine.ChangeState<AI_PursueState>((int)aiState);
@@ -86,8 +88,6 @@ public abstract class AIBase : SerializedMonoBehaviour, IStateMachineOwner
                 break;
             case AIState.Dead:
                 StateMachine.ChangeState<AI_DeadState>((int)aiState);
-                break;
-            default:
                 break;
         }
     }
@@ -138,11 +138,12 @@ public abstract class AIBase : SerializedMonoBehaviour, IStateMachineOwner
         // 告知地图块移除数据
         mapChunk.RemoveAIObject(AIData.id);
         // 掉落物品
-        if (lootObjectConfigId != -1) {
-            LootConfig lootConfig = ConfigManager.Instance.GetConfig<LootConfig>(ConfigName.Loot, lootObjectConfigId);
-            if (lootConfig != null) {
-                lootConfig.GenerateMapObject(mapChunk, transform.position);
-            }
+        if (lootObjectConfigId == -1) {
+            return;
+        }
+        LootConfig lootConfig = ConfigManager.Instance.GetConfig<LootConfig>(ConfigName.Loot, lootObjectConfigId);
+        if (lootConfig != null) {
+            lootConfig.GenerateMapObject(mapChunk, transform.position);
         }
     }
 

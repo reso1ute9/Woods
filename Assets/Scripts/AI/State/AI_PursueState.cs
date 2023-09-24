@@ -17,12 +17,12 @@ public class AI_PursueState : AIStateBase
 
     public override void Update() {
         if (GameSceneManager.Instance.IsGameOver == false) {
-            float distance = Vector3.Distance(AI.transform.position, Player_Controller.Instance.playerTransform.position);
+            float distance = Vector3.Distance(AI.transform.position, Player_Controller.Instance.transform.position);
             if (distance <= AI.Radius + AI.AttackDistance) {
                 AI.ChangeState(AIState.Attack);
             } else {
                 AI.SavePosition();
-                AI.NavMeshAgent.SetDestination(Player_Controller.Instance.playerTransform.position);
+                AI.NavMeshAgent.SetDestination(Player_Controller.Instance.transform.position);
                 // 检测AI归属地图块
                 CheckAndTransferMapChunk();
             }

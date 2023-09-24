@@ -10,7 +10,7 @@ public class AI_AttackState : AIStateBase
         // 随机播放一个攻击动画
         int index = Random.Range(1, 3);
         AI.PlayAnimation("Attack_" + index.ToString());
-        AI.transform.LookAt(Player_Controller.Instance.playerTransform.position);
+        AI.transform.LookAt(Player_Controller.Instance.transform);
         // 播放音效
         AI.PlayAudio("Attack");
 

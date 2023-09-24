@@ -12,6 +12,9 @@ forst -- 3d survival type game demo
 ----
 
 更新日志:
+- 2023.9.25:
+    - fix bug: 修复状态机封装代码bug
+  
 - 2023.9.24:
     - 存档系统: 重构部分逻辑
         1. 玩家按ESC后进入暂停窗口并返回主菜单
@@ -266,6 +269,10 @@ TODO:
 ---
 
 Fixed:
+- 2023.9.25 ~~切换场景时AI执行Update时会访问到已经销毁的PlayerController.Instance导致出错~~
+    - 原因: 在状态机这里不注意给改成了"currStateObj == null"，这导致AI在Destory时停止状态机的时候状态机里的当前状态（currStateObje）没有退出和那些删除Update方法，所以后续在框架MonoManager里还会持续执行这些Update，然后访问了已经销毁的PlayerController.Instance才出的错
+    - 修复: 已修复并通过测试
+
 - 2023.9.11 ~~物品掉落配置可能出现了错误, 击打石头后掉落的是草莓~~
     - 原因: 物品掉落配置中配置Id错误
     - 修复: 已修改配置内容并通过测试

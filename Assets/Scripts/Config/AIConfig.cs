@@ -14,8 +14,6 @@ public class AIConfig : ConfigBase
     public MapVertexType mapVertexType;
     [LabelText("预制体")]
     public GameObject prefab;
-    [LabelText("描述"), MultiLineProperty] 
-    public string descript;
     [LabelText("生成概率(百分比类型)")]
     public int probability;
     [LabelText("腐烂天数")]

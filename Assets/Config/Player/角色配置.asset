@@ -140,7 +140,7 @@ MonoBehaviour:
   maxHP: 100
   maxHungry: 100
   hungryReduceSpeed: 1
-  hpReduceSpeedOnHungryIsZero: 1
+  hpReduceSpeedOnHungryIsZero: 0.5
   normalAnimatorController: {fileID: 9100000, guid: 5bbbaf2dbc406e14ca345470d941e229, type: 2}
   footstepAudioClips:
   - {fileID: 8300000, guid: b5a2c539e294a754e9538ff27233f6e3, type: 3}

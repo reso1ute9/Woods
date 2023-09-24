@@ -16,8 +16,8 @@ public class AI_Hurt : AIStateBase
     }
 
     // 受伤结束的动画事件
-    public void HurtOver() {
-        // TODO: 将状态转变为追击
+    private void HurtOver() {
+        // 将状态转变为追击
         AI.ChangeState(AIState.Pursue);
     }
 

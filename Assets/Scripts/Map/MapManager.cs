@@ -110,7 +110,7 @@ public class MapManager : SingletonMono<MapManager>
                 MapChunkData mapChunkData = ArchiveManager.Instance.GetMapChunkData(chunkIndex);
                 GenerateMapChunk(chunkIndex.ConverToSVector2Init(), mapChunkData).gameObject.SetActive(false);
                 // 停留五帧
-                for (int f = 0; f < 5; f++) yield return null;
+                for (int f = 0; f < 2; f++) yield return null;
             }
         } else {
             // 新存档加载状态
@@ -125,7 +125,7 @@ public class MapManager : SingletonMono<MapManager>
                     Vector2Int chunkIndex = new Vector2Int(startX + x, startY + y);
                     GenerateMapChunk(chunkIndex);
                     // 停留五帧
-                    for (int f = 0; f < 5; f++) yield return null;
+                    for (int f = 0; f < 2; f++) yield return null;
                 }
             }
         }

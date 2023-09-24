@@ -1,7 +1,8 @@
 using UnityEngine;
 using JKFrame;
 
-public class Spider_PursueState : AI_PursueState 
+public class 
+    Spider_PursueState : AI_PursueState 
 {
     private Spider_Controller spider;
 
@@ -23,12 +24,12 @@ public class Spider_PursueState : AI_PursueState
         if (GameSceneManager.Instance.IsGameOver) {
             return;
         }
-        float distance = Vector3.Distance(AI.transform.position, Player_Controller.Instance.playerTransform.position);
+        float distance = Vector3.Distance(AI.transform.position, Player_Controller.Instance.transform.position);
         if (distance <= AI.Radius + AI.AttackDistance) {
             AI.ChangeState(AIState.Attack);
         } else {
             AI.SavePosition();
-            AI.NavMeshAgent.SetDestination(Player_Controller.Instance.playerTransform.position);
+            AI.NavMeshAgent.SetDestination(Player_Controller.Instance.transform.position);
             // 如果当前AI物体
             if (distance >= spider.RetreatDistance) {
                 AI.ChangeState(AIState.Idle);

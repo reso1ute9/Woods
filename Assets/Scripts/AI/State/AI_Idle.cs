@@ -21,7 +21,7 @@ public class AI_Idle : AIStateBase
     public override void Update() {
         if (AI.HostileDistance > 0 && GameSceneManager.Instance.IsGameOver == false) {
             // 判断敌对距离
-            if (Vector3.Distance(AI.transform.position, Player_Controller.Instance.playerTransform.position) <
+            if (Vector3.Distance(AI.transform.position, Player_Controller.Instance.transform.position) <
                 AI.HostileDistance) {
                 // 进入追击状态
                 AI.ChangeState(AIState.Pursue);

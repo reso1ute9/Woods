@@ -123,19 +123,20 @@ public class ArchiveManager : Singleton<ArchiveManager>
         // 4. 初始化物品快捷栏数据, 默认14个快捷栏
         mainInventoryData = new MainInventoryData(14);
 
-        // #region 物品快捷栏测试数据
-        // mainInventoryData.itemDatas[0] = ItemData.CreateItemData(0);
-        // (mainInventoryData.itemDatas[0].itemTypeData as ItemMaterialData).count = 3;
-        // mainInventoryData.itemDatas[1] = ItemData.CreateItemData(1);
-        // mainInventoryData.itemDatas[2] = ItemData.CreateItemData(2);
-        // (mainInventoryData.itemDatas[2].itemTypeData as ItemWeaponData).durability = 60;
-        // mainInventoryData.itemDatas[3] = ItemData.CreateItemData(3);
-        // (mainInventoryData.itemDatas[3].itemTypeData as ItemConsumableData).count = 4;
-        // mainInventoryData.itemDatas[4] = ItemData.CreateItemData(4);
-        // (mainInventoryData.itemDatas[4].itemTypeData as ItemWeaponData).durability = 30;
-        // mainInventoryData.itemDatas[5] = ItemData.CreateItemData(5);
-        // (mainInventoryData.itemDatas[5].itemTypeData as ItemWeaponData).durability = 20;
-        // #endregion
+        #region 测试逻辑: 物品快捷栏测试数据
+        mainInventoryData.itemDatas[0] = ItemData.CreateItemData(0);
+        (mainInventoryData.itemDatas[0].itemTypeData as ItemMaterialData).count = 5;
+        mainInventoryData.itemDatas[1] = ItemData.CreateItemData(1);
+        (mainInventoryData.itemDatas[1].itemTypeData as ItemMaterialData).count = 5;
+        mainInventoryData.itemDatas[2] = ItemData.CreateItemData(2);
+        (mainInventoryData.itemDatas[2].itemTypeData as ItemWeaponData).durability = 60;
+        mainInventoryData.itemDatas[3] = ItemData.CreateItemData(3);
+        (mainInventoryData.itemDatas[3].itemTypeData as ItemConsumableData).count = 4;
+        mainInventoryData.itemDatas[4] = ItemData.CreateItemData(4);
+        (mainInventoryData.itemDatas[4].itemTypeData as ItemWeaponData).durability = 50;
+        mainInventoryData.itemDatas[5] = ItemData.CreateItemData(5);
+        (mainInventoryData.itemDatas[5].itemTypeData as ItemWeaponData).durability = 70;
+        #endregion
         
         SaveMainInventoryData();
         

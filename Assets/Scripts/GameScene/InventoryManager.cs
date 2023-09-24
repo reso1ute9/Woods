@@ -13,7 +13,6 @@ public class InventoryManager : SingletonMono<InventoryManager>
         // 初始化快捷栏窗口
         mainInventoryWindow = UIManager.Instance.Show<UI_MainInventoryWindow>();
         mainInventoryWindow.InitData();
-        
         EventManager.AddEventListener(EventName.SaveGame, OnGameSave);
     }
 

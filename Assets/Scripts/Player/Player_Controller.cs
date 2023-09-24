@@ -51,27 +51,28 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
         playerTransformData = ArchiveManager.Instance.playerTransformData;
         playerMainData = ArchiveManager.Instance.playerMainData;
 
-        // 触发角色数据初始化事件改变UI填充比例
-        TriggerUpdateHPEvent();
-        TriggerUpdateHungryEvent();
-
         // 初始化音效、位置、状态机
         playerModel.Init(
             PlayAudioOnFootstep, OnStartHit, OnStopHit, OnAttackOver,
             OnHurtOver, OnDeadOver
         );
         playerTransform = transform;
+        
         stateMachine = ResManager.Load<StateMachine>();
+        // stateMachine = PoolManager.Instance.GetObject<StateMachine>();
         stateMachine.Init(this);
-
         // 设置初始状态: 待机
-        stateMachine.ChangeState<Player_Idle>((int)PlayerState.Idle);
+        ChangeState(PlayerState.Idle);
         InitPositionScope(mapSizeOnWorld);
 
         // 初始化角色位置相关数据
         playerTransform.localPosition = playerTransformData.position;
         playerTransform.localRotation = Quaternion.Euler(playerTransformData.rotation);
 
+        // 触发角色数据初始化事件改变UI填充比例
+        TriggerUpdateHPEvent();
+        TriggerUpdateHungryEvent();
+        
         EventManager.AddEventListener(EventName.SaveGame, OnGameSave);
     }
 
@@ -154,18 +155,17 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
         if (newWeapon != null) {
             ItemWeaponInfo itemWeaponInfo = newWeapon.config.itemTypeInfo as ItemWeaponInfo;
             // 设置新武器模型: 武器位置、角度、动画
-            currentWeaponGameObject =
-                PoolManager.Instance.GetGameObject(itemWeaponInfo.prefabOnPlayer, playerModel.weaponRoot);
+            currentWeaponGameObject = PoolManager.Instance.GetGameObject(itemWeaponInfo.prefabOnPlayer, playerModel.weaponRoot);
             currentWeaponGameObject.transform.localPosition = itemWeaponInfo.positionOnPlayer;
             currentWeaponGameObject.transform.localRotation = Quaternion.Euler(itemWeaponInfo.rotationOnPlayer);
             animator.runtimeAnimatorController = itemWeaponInfo.animatorController;
             // 需要重新激活一次动画, 动画会出错, 例如在移动中突然切换AnimatorController会不播放动画
-            stateMachine.ChangeState<Player_Idle>((int)PlayerState.Idle, true);
+            ChangeState(PlayerState.Idle);
         }
         else {
             animator.runtimeAnimatorController = playerConfig.normalAnimatorController;
-            stateMachine.ChangeState<Player_Idle>((int)PlayerState.Idle, true);
         }
+        ChangeState(PlayerState.Idle);
     }
 
     #endregion
@@ -174,7 +174,7 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
     #region 战斗/伐木/采摘
 
     private bool canAttack = true;  // 玩家当前能否攻击
-    private bool canMove = true;    // 玩家当前是否能移动
+    // private bool canMove = true;    // 玩家当前是否能移动
     public Quaternion attackDirection { get; private set; } // 当前攻击方向
     private List<MapObjectBase> lastAttackMapObjectList = new List<MapObjectBase>();
     private int attackSucceedCount = 0; // 攻击时成功命中地图对象数量
@@ -313,16 +313,16 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
         currentWeaponGameObject.transform.RemoveTriggerEnter(OnWeaponTriggerEnter);
     }
     
-    // 采摘动作开始
-    private void OnStartPickUp() {
-        canMove = false;
-    }
-    
-    // 采摘动作结束
-    private void OnPickUpOver() {
-        // 可以移动
-        canMove = true;
-    }
+    // // 采摘动作开始
+    // private void OnStartPickUp() {
+    //     canMove = false;
+    // }
+    //
+    // // 采摘动作结束
+    // private void OnPickUpOver() {
+    //     // 可以移动
+    //     canMove = true;
+    // }
     
     // 攻击动作结束
     private void OnAttackOver() {
@@ -428,38 +428,40 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
                 canAttack = true;
                 canUseItem = true;
                 canPickUpItem = true;
-                stateMachine.ChangeState<Player_Idle>((int)PlayerState.Idle);
+                bool res = stateMachine.ChangeState<Player_Idle>((int)playerState);
                 break;
             case PlayerState.Move:
                 canAttack = true;
                 canUseItem = true;
                 canPickUpItem = false;
-                stateMachine.ChangeState<Player_Move>((int)PlayerState.Move);
+                stateMachine.ChangeState<Player_Move>((int)playerState);
                 break;
             case PlayerState.Attack:
                 canAttack = false;
                 canUseItem = false;
                 canPickUpItem = false;
-                stateMachine.ChangeState<Player_Attack>((int)PlayerState.Attack);
+                stateMachine.ChangeState<Player_Attack>((int)playerState);
                 break;
             case PlayerState.Hurt:
                 canAttack = false;
                 canUseItem = true;
                 canPickUpItem = false;
-                stateMachine.ChangeState<Player_Hurt>((int)PlayerState.Hurt);
+                stateMachine.ChangeState<Player_Hurt>((int)playerState);
                 break;
             case PlayerState.Dead:
                 canAttack = false;
                 canUseItem = false;
                 canPickUpItem = false;
-                stateMachine.ChangeState<Player_Dead>((int)PlayerState.Dead);
+                stateMachine.ChangeState<Player_Dead>((int)playerState);
                 break;
         }
     }
 
     private void PlayAudioOnFootstep(int index) {
-        AudioManager.Instance.PlayOnShot(playerConfig.footstepAudioClips[index], playerTransform.position,
-            playerConfig.footstepVolume);
+        AudioManager.Instance.PlayOnShot(
+            playerConfig.footstepAudioClips[index], playerTransform.position,
+            playerConfig.footstepVolume
+        );
     }
 
     // 播放动画

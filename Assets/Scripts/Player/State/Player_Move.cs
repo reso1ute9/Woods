@@ -31,7 +31,6 @@ public class Player_Move : PlayerStateBase
         Vector3 inputDir = new Vector3(h, 0, v);
         Quaternion targetQua = Quaternion.LookRotation(inputDir);
         
-        // player.playerTransform.localRotation = targetQua;
         // 使用插值计算保证转向时动作的流畅性
         player.playerTransform.localRotation = Quaternion.Lerp(
             player.playerTransform.localRotation, 

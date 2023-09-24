@@ -13,15 +13,6 @@ public class UI_MainInventoryWindow : UI_InventoryWindowBase
     private MainInventoryData mainInventoryData;
     [SerializeField] public UI_ItemSlot weaponSlot;       // 装备槽
 
-    public void Update() {
-        // #region 测试逻辑
-        // if (Input.GetKeyDown(KeyCode.Alpha0)) AddItemAndPlayAudio(0);
-        // if (Input.GetKeyDown(KeyCode.Alpha1)) AddItemAndPlayAudio(1);
-        // if (Input.GetKeyDown(KeyCode.Alpha2)) AddItemAndPlayAudio(2);
-        // if (Input.GetKeyDown(KeyCode.Alpha3)) AddItemAndPlayAudio(3);
-        // #endregion
-    }
-
     public override void Init() {
         base.Init();
         EventManager.AddEventListener(EventName.PlayerWeaponAttackSucceed, OnPlayerWeaponAttackSucceed);
@@ -87,7 +78,7 @@ public class UI_MainInventoryWindow : UI_InventoryWindowBase
 
     // 使用物品
     private AudioType UseItem(int index) {
-        // TODO: 玩家的状态不一定能使用物品
+        // 玩家的状态不一定能使用物品
         if (Player_Controller.Instance.canUseItem == false) {
             return AudioType.PlayerConnot;
         }

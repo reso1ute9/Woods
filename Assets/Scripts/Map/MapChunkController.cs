@@ -12,8 +12,8 @@ using UnityEngine.AI;
 public class MapChunkController : MonoBehaviour
 {
     public MapChunkData mapChunkData { get; private set; }
-    private Dictionary<ulong, MapObjectBase> mapObjectDict;                     // 记录当前数据块中的地图对象
-    private Dictionary<ulong, AIBase> AIObjectDict;    
+    public Dictionary<ulong, MapObjectBase> mapObjectDict;                     // 记录当前数据块中的地图对象
+    public Dictionary<ulong, AIBase> AIObjectDict;    
     private Dictionary<ulong, MapObjectData> wantDestoryMapObjectDict;          // 记录当前需要销毁的地图对象
     private static List<ulong> wantDestoryMapObjectId = new List<ulong>(20);    // 记录当前需要销毁的地图对象id
 
@@ -102,7 +102,7 @@ public class MapChunkController : MonoBehaviour
             isActive = active;
             gameObject.SetActive(isActive);
             // 从对象池生成/回收所有对象
-            if (isActive == true) {
+            if (isActive) {
                 // 处理地图对象
                 foreach (var mapObject in mapChunkData.mapObjectDataDict.dictionary.Values) {
                     InstantiateMapObject(mapObject, false);
@@ -114,13 +114,13 @@ public class MapChunkController : MonoBehaviour
             } else {
                 // 处理地图对象: 注意放回的时候放的时mapObjectList中的对象
                 foreach (var mapObject in mapObjectDict) {
-                    mapObject.Value.JKObjectPushPool();
+                    mapObject.Value.JKGameObjectPushPool();
                 }
-                mapObjectDict.Clear();
                 // 处理AI对象
                 foreach (var aiObject in AIObjectDict) {
                     aiObject.Value.Destroy();
                 }
+                mapObjectDict.Clear();
                 AIObjectDict.Clear();
             }
         }
@@ -140,12 +140,12 @@ public class MapChunkController : MonoBehaviour
     }
 
     // 添加一个AI对象: 默认仅MapManager调用该方法
-    public void AddAIObject(MapObjectData mapObjectData) {
+    public void AddAIObject(MapObjectData aiObjectData) {
         // 添加存档数据
-        mapChunkData.AIDataDict.dictionary.Add(mapObjectData.id, mapObjectData);
+        mapChunkData.AIDataDict.dictionary.Add(aiObjectData.id, aiObjectData);
         // 实例化物品
-        if (isActive == true) {
-            InstantiateAIObject(mapObjectData);
+        if (isActive) {
+            InstantiateAIObject(aiObjectData);
         }
     }
 
@@ -183,9 +183,9 @@ public class MapChunkController : MonoBehaviour
     }
 
     // 删除一个AI物体(物体迁移): 只删除数据不删除AI对象
-    public void RemoveAIObjectOnTransfer(ulong AIObjectId) {
-        mapChunkData.AIDataDict.dictionary.Remove(AIObjectId);
-        AIObjectDict.Remove(AIObjectId);
+    public void RemoveAIObjectOnTransfer(ulong aiObjectId) {
+        mapChunkData.AIDataDict.dictionary.Remove(aiObjectId);
+        AIObjectDict.Remove(aiObjectId);
     }
 
     // 当整个地图块数据被销毁时(例如关闭游戏), 需要将当前新的地图块数据保存到磁盘上

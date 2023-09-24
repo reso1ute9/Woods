@@ -22,8 +22,7 @@ public class AI_Patrol : AIStateBase
         // 检查是否进入警戒范围
         if (AI.HostileDistance > 0 && GameSceneManager.Instance.IsGameOver == false) {
             // 判断敌对距离
-            if (Vector3.Distance(AI.transform.position, Player_Controller.Instance.playerTransform.position) <
-                AI.HostileDistance) {
+            if (Vector3.Distance(AI.transform.position, Player_Controller.Instance.transform.position) < AI.HostileDistance) {
                 // 进入追击状态
                 AI.ChangeState(AIState.Pursue);
                 return;

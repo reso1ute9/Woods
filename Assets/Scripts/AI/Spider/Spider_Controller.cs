@@ -1,6 +1,7 @@
 using UnityEngine;
 
-public class Spider_Controller : AIBase {
+public class Spider_Controller : AIBase 
+{
     [SerializeField] private float walkSpeed = 3.0f;        // 移动速度
     [SerializeField] private float runSpeed = 4.0f;         // 奔跑速度
     [SerializeField] private float retreatDistance = 3.0f;  // 撤退距离
@@ -20,7 +21,7 @@ public class Spider_Controller : AIBase {
                 StateMachine.ChangeState<AI_Patrol>((int)aiState);
                 break;
             case AIState.Hurt:
-                StateMachine.ChangeState<AI_Hurt>((int)aiState, true);
+                StateMachine.ChangeState<AI_Hurt>((int)aiState);
                 break;
             case AIState.Pursue:
                 StateMachine.ChangeState<Spider_PursueState>((int)aiState);

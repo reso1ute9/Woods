@@ -9,10 +9,6 @@ public class Player_Idle : PlayerStateBase
         player.PlayAnimation("Idle");
     }
 
-    public override void Exit() {
-        base.Exit();
-    }
-
     public override void Update() {
         // 玩家有任何移动相关的按键就切换到Move状态
         float h = Input.GetAxis("Horizontal");
@@ -20,5 +16,9 @@ public class Player_Idle : PlayerStateBase
         if (h != 0 || v != 0) {
             player.ChangeState(PlayerState.Move);
         }
+    }
+    
+    public override void Exit() {
+        base.Exit();
     }
 }

@@ -6,7 +6,7 @@ using JKFrame;
 using Unity.VisualScripting;
 using System.Linq;
 
-
+[UIElement(false,"UI/UI_InventoryWindow",1)]
 public abstract class UI_InventoryWindowBase : UI_WindowBase
 {
     protected InventoryData inventoryData;
