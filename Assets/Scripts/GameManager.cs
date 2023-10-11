@@ -19,7 +19,6 @@ public class GameManager : SingletonMono<GameManager>
     private void  Init() {
         // 设置默认鼠标指针
         SetCursorState(CursorState.Normal);
-        // 加载存档数据
     }
 
     #region 鼠标指针

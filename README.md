@@ -8,6 +8,23 @@ forst -- 3d survival type game demo
 
 视频演示:【Unity个人自学demo】 https://www.bilibili.com/video/BV1Qc411c7xu/?share_source=copy_web&vd_source=cf326a22ef42c23caf731f27146e385a
 
+----
+
+整体设计
+1. 地图系统
+2. 角色系统
+3. 物品系统
+4. 输入系统
+5. 建造系统
+6. 时间系统
+7. UI系统
+8. 相机系统
+9. 游戏配置模块
+10. AI/战斗系统
+11. 科技树系统
+12. 音效系统
+13. 存档系统
+
 
 ----
 
