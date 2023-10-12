@@ -13,8 +13,8 @@ public class MapGrid
     // 格子数据
     public Dictionary<Vector2Int, MapCell> cellDict = new Dictionary<Vector2Int, MapCell>();
     // 地图信息
-    public int mapHeight { get; private set; }
-    public int mapWidth { get; private set; }
+    public int mapHeight { get; private set; }          // 注意mapHeight指的是MapCell的坐标, 传入的是mapInitData.mapSize * mapConfig.mapChunkSize
+    public int mapWidth { get; private set; }           // 注意mapWeight指的是MapCell的坐标, 传入的是mapInitData.mapSize * mapConfig.mapChunkSize
     public float cellSize { get; private set; }
 
     public MapGrid(int mapHeight, int mapWidth, float cellSize) {
@@ -22,7 +22,7 @@ public class MapGrid
         this.mapWidth = mapWidth;
         this.cellSize = cellSize;
 
-        // // 生成顶点数据和格子数据
+        // 生成顶点数据和格子数据
         for (int x = 0; x < this.mapWidth; x++) {
             for (int z = 0; z < this.mapHeight; z++) {
                 AddVertext(x, z);
@@ -33,6 +33,8 @@ public class MapGrid
 
     # region MapVertextCode
     // 根据输入的地图坐标点添加地图网格顶点
+    // Key: MapCell坐标体系中的具体坐标
+    // Value: 真实世界坐标
     private void AddVertext(int x, int z) {
         vertexDict.Add(
             new Vector2Int(x, z), 
@@ -87,6 +89,8 @@ public class MapGrid
 
     # region MapCellCode
     // 为顶点添加一个格子
+    // Key: MapCell坐标体系中的具体坐标
+    // Value: 真实世界坐标左下方的位置
     private void AddCell(int x, int z) {
         float offset = cellSize / 2;
         cellDict.Add(

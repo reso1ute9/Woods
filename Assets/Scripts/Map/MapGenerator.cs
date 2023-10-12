@@ -178,6 +178,8 @@ public class MapGenerator
     }
 
     // 生成perlin噪声图, 该噪声图是为确定顶点对应的位置是否为森林/沼泽
+    // width: mapInitData.mapSize * mapConfig.mapChunkSize, 横着看所有cell的个数
+    // height: mapInitData.mapSize * mapConfig.mapChunkSize, 竖着看所有cell的个数
     public float[,] GenerateNoiseMap(int width, int height, float lacunarity) {
         lacunarity += 0.1f;
         float[,] noiseMap = new float[width, height];

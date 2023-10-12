@@ -12,6 +12,9 @@ forst -- 3d survival type game demo
 
 整体设计
 1. 地图系统
+
+
+
 2. 角色系统
 3. 物品系统
 4. 输入系统
@@ -24,6 +27,88 @@ forst -- 3d survival type game demo
 11. 科技树系统
 12. 音效系统
 13. 存档系统
+
+
+
+----
+
+
+## 地图系统
+
+### 地图生成系统整体流程：
+
+先找到数据 → 初始化地图内容（碰撞体、AI导航网格、根据存档恢复地图对象、AI对象、更新可见地图块） → 初始化UI
+
+1. 找到地图存档：找到玩家设定的**地图初始化参数存档**和**地图数据存档**
+2. 确定地图对象和AI对象生成配置：根据地图/AI对象生成配置生成一个临时字典，字典Key为顶点类型, Value为配置id
+3. 初始化地图生成器：生成地图数据（GenerateMapData）
+    1. 生成网格顶点数据：设置地图真实长宽以及cell的大小，默认mapSize=20（chunk的个数），mapChunk=5（cell个数），cellSize=2（unity标准格子的个数）
+    2. 使用玩家设定的随机种子生成柏林噪声图
+    3.
+4. 初始化地面碰撞体网格
+5. 烘焙导航网格：后续AI巡逻
+6. 根据存档情况判断是否需要加载之前的地图（生成地图块数据）
+7. 更新目前可见的地图块
+8. 更新和关闭小地图UI（刷新一次）
+
+---
+
+### 地图块生成流程
+
+---
+
+### 地图生成器：MapGenerate
+
+1. 统一生成整张地图网格/顶点数据
+2. 使用随机种子生成随机柏林噪声图（Unity.Random.InitState）
+3. 确定各个顶点的类型以及计算周围网格贴图的索引数字
+4. 根据顶点类型实例化森林和沼泽材质
+
+---
+
+### 地图顶点/网格数据：MapGrid
+
+注意：MapGrid是构建整个地图的坐标关系，MapChunkIndex，MapCellIndex，WorldPosition是三种不同的坐标，他们之间有关联，目的是通过真实的世界坐标能够找到具体的chunk、cell即可
+
+主要功能：
+
+1. 添加地图顶点（Vertex）：`Dictionary<Vector2Int, MapVertex> vertexDict`
+    1. 其中Key是MapCell坐标体系中的具体坐标（该坐标应该可以通过MapChunk去索引到），Value中position真是世界坐标
+    2. 顶点坐标中包含
+2. 添加地图网格（Cell）：`Dictionary<Vector2Int, MapCell> cellDict`
+    1. 其中Key是MapCell坐标体系中的具体坐标（该坐标应该可以通过MapChunk去索引到），Value中position真是世界坐标左下角的一处坐标 `new MapCell() { position = new Vector3(x * cellSize - offset, 0, z * cellSize - offset) }` 这样做的是贴图算法具体执行逻辑导致的
+
+---
+
+### 地图系统数据结构
+
+玩家设定的地图初始化参数存档：
+
+1. `public class MapInitData`：
+    1. 地图大小(`mapSize`)
+    2. 地图种子(`mapSeed`)
+    3. 沼泽范围(`marshLimit`)
+    4. 生成种子(`spawnSeed`)
+
+地图数据存档：按照地图上包含对象的层级可以分成 MapData→MapChunkData→MapObjectData
+
+1. `public class MapData`地图数据
+    1. `public ulong currentId`管理整个地图上的id序列
+    2. `public List<Serialization_Vector2> MapChunkIndexList`当前地图包含哪些地图块，使用地图块顶点作为key来管理地图块
+2. `MapChunkData`地图块数据
+    1. `public Serialization_Dict<ulong, MapObjectData> mapObjectDataDict` 地图对象字典，用来检索地图对象
+    2. `public Serialization_Dict<ulong, MapObjectData> AIDataDict` AI对象字典，用来检索AI对象
+    3. `[NonSerialized]public List<MapVertex> forestVertexList` 用来记录当前森林顶点数量
+    4. `[NonSerialized]public List<MapVertex> marshVertexList` 用来记录当前沼泽顶点数量
+3. `MapObjectData`地图上的物体数据
+    1. `public ulong id` 地图对象id，唯一标识
+    2. `public int configId` 地图对象对应配置文件
+    3. `public int destoryDay` 地图对象销毁天数
+    4. `private Serialization_Vector3 sv_position` 地图对象位置
+
+配置信息:
+1. 地图对象配置
+2. AI对象配置
 
 
 ----
