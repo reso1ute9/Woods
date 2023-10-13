@@ -41,15 +41,23 @@ forst -- 3d survival type game demo
 
 1. 找到地图存档：找到玩家设定的**地图初始化参数存档**和**地图数据存档**
 2. 确定地图对象和AI对象生成配置：根据地图/AI对象生成配置生成一个临时字典，字典Key为顶点类型, Value为配置id
-3. 初始化地图生成器：生成地图数据（GenerateMapData）
-    1. 生成网格顶点数据：设置地图真实长宽以及cell的大小，默认mapSize=20（chunk的个数），mapChunk=5（cell个数），cellSize=2（unity标准格子的个数）
-    2. 使用玩家设定的随机种子生成柏林噪声图
-    3.
+3. 初始化地图生成器：生成地图数据（GenerateMapData） 
+   1. 生成网格顶点数据：设置地图真实长宽以及cell的大小，默认mapSize=20（chunk的个数），mapChunk=5（cell个数），cellSize=2（unity标准格子的个数） 
+   2. 使用玩家设定的随机种子生成柏林噪声图 
+   3. 确定各个顶点的类型以及计算周围网格贴图的索引数字 
+   4. 生成地面Mesh 
+   5. 设定地图物品生成随机种子 
+   6. 计算地图物品配置总权重和计算AI对象配置总权重
 4. 初始化地面碰撞体网格
 5. 烘焙导航网格：后续AI巡逻
 6. 根据存档情况判断是否需要加载之前的地图（生成地图块数据）
 7. 更新目前可见的地图块
 8. 更新和关闭小地图UI（刷新一次）
+
+
+管理层级：
+
+MapManager → MapChunkController
 
 ---
 
@@ -59,24 +67,48 @@ forst -- 3d survival type game demo
 
 ### 地图生成器：MapGenerate
 
+生成通用地图块数据`GenerateMapData()`
+
 1. 统一生成整张地图网格/顶点数据
 2. 使用随机种子生成随机柏林噪声图（Unity.Random.InitState）
 3. 确定各个顶点的类型以及计算周围网格贴图的索引数字
+    1. 通过魔兽争霸地形贴图拼接算法生成更合理的地形
 4. 根据顶点类型实例化森林和沼泽材质
+    1. 需要注意Material / Texture / Shader的关系
 
----
 
-### 地图顶点/网格数据：MapGrid
+在指定位置生成地图块数据`MapChunkController GenerateMapChunk`
 
-注意：MapGrid是构建整个地图的坐标关系，MapChunkIndex，MapCellIndex，WorldPosition是三种不同的坐标，他们之间有关联，目的是通过真实的世界坐标能够找到具体的chunk、cell即可
+1. 生成地图块GameObject并挂载MapChunkController、MeshFilter组件
 
-主要功能：
+    ```csharp
+    // 生成地图块物体
+    GameObject mapChunkObj = new GameObject("Chunk_" + chunkIndex.ToString());
+    MapChunkController mapChunk = mapChunkObj.AddComponent<MapChunkController>();
+    // 生成mesh
+    mapChunkObj.AddComponent<MeshFilter>().mesh = mapChunkMesh;
+    ```
 
-1. 添加地图顶点（Vertex）：`Dictionary<Vector2Int, MapVertex> vertexDict`
-    1. 其中Key是MapCell坐标体系中的具体坐标（该坐标应该可以通过MapChunk去索引到），Value中position真是世界坐标
-    2. 顶点坐标中包含
-2. 添加地图网格（Cell）：`Dictionary<Vector2Int, MapCell> cellDict`
-    1. 其中Key是MapCell坐标体系中的具体坐标（该坐标应该可以通过MapChunk去索引到），Value中position真是世界坐标左下角的一处坐标 `new MapCell() { position = new Vector3(x * cellSize - offset, 0, z * cellSize - offset) }` 这样做的是贴图算法具体执行逻辑导致的
+2. 生成地图块贴图，使用协程分帧执行提高效率
+    1. 计算当前地图块的偏移量, 找到这个地图块每块具体的格子位置并统计出所有格子是否都为森林
+    2. 如果都为森林则不对地面进行渲染
+    3. 如果包含沼泽则需要遍历MapChunk中包含的所有格子单独进行渲染
+        1. 计算整个MapChunk所需的Texture大小后创建MapChunkTexture
+
+            ```csharp
+            int textureCellSize = mapConfig.forestTexture.width;
+            int textureSize = mapConfig.mapChunkSize * textureCellSize;
+            mapTexture = new Texture2D(textureSize, textureSize, TextureFormat.RGB24, false);
+            ```
+
+        2. 从左下到右上依次绘制每个Cell中的像素，通过Texture2D中的SetPixel在指定位置设置像素点
+
+            ```csharp
+            Color color = mapConfig.forestTexture.GetPixel(x1, z1);
+            mapTexture.SetPixel(x1 + pixelOffsetX, z1 + pixelOffsetZ, color);
+            ```
+
+        3. 最后设置一下Texture2D的filterMode和wrapMode然后Apply修改后的Texture2D
 
 ---
 

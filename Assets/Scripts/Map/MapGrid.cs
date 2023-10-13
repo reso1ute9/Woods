@@ -129,6 +129,7 @@ public class MapGrid
 
     // 计算格子贴图的索引数字
     public void CalculateMapVertexType(float[,] noiseMap, float limit) {
+        // noiseMap大小与全部mapCell大小一致
         int width = noiseMap.GetLength(0);
         int height = noiseMap.GetLength(1);
         for (int x = 0; x < width; x++) {

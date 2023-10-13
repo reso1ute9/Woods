@@ -42,7 +42,6 @@ public class MapGenerator
         this.mapData = mapData;
         this.spawnMapObjectConfigDict = spawnMapObjectConfigDict;
         this.spawnAIObjectConfigDict = spawnAIObjectConfigDict;
-        this.GenerateMapData();
     }
     
     // 生成通用地图块数据
