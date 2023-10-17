@@ -7,7 +7,7 @@ using Unity.VisualScripting;
 using System.Linq;
 
 
-[UIElement(false, "UI/UI_MainInventoryWindow", 1)]
+[UIElement(true, "UI/UI_MainInventoryWindow", 1)]
 public class UI_MainInventoryWindow : UI_InventoryWindowBase
 {
     private MainInventoryData mainInventoryData;
@@ -163,7 +163,7 @@ public class UI_MainInventoryWindow : UI_InventoryWindowBase
         }
     }
 
-    // 玩家使用武器成功攻击
+    // 玩家使用武器成功攻击后更新武器栏状态
     private void OnPlayerWeaponAttackSucceed() {
         if (mainInventoryData.weaponSlotItemData == null) {
             return;

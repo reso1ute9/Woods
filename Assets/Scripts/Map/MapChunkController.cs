@@ -17,14 +17,12 @@ public class MapChunkController : MonoBehaviour
     private Dictionary<ulong, MapObjectData> wantDestoryMapObjectDict;          // 记录当前需要销毁的地图对象
     private static List<ulong> wantDestoryMapObjectId = new List<ulong>(20);    // 记录当前需要销毁的地图对象id
 
-    public Vector3 centrePosition { get; private set; }
     public Vector2Int chunkIndex { get; private set; }                          // 当前地图块索引
     public bool isAllForest { get; private set; }   
     private bool isActive = false;
     public bool isInitialized = false;                                          // 标记地图UI是否已经初始化
 
-    public void Init(Vector2Int chunkIndex, Vector3 centrePosition, bool isAllForest, MapChunkData mapChunkData) {
-        this.centrePosition = centrePosition;
+    public void Init(Vector2Int chunkIndex, bool isAllForest, MapChunkData mapChunkData) {
         this.chunkIndex = chunkIndex;
         // 初始化地图块数据
         this.mapChunkData = mapChunkData;

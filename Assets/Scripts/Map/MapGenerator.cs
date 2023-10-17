@@ -139,9 +139,7 @@ public class MapGenerator
                 RecoverMapChunkData(chunkIndex, mapChunkData);
             }
             mapChunk.Init(
-                chunkIndex,
-                position + new Vector3((mapConfig.mapChunkSize * mapConfig.cellSize) / 2, 0, (mapConfig.mapChunkSize * mapConfig.cellSize) / 2),
-                isAllForset, mapChunkData
+                chunkIndex, isAllForset, mapChunkData
             );
             // 如果目前游戏没有完成初始化需要告知GameSceneManager更新进度
             if (GameSceneManager.Instance.IsInitialized == false) {
