@@ -51,13 +51,13 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
         playerTransformData = ArchiveManager.Instance.playerTransformData;
         playerMainData = ArchiveManager.Instance.playerMainData;
 
-        // 初始化音效、位置、状态机
+        // 初始化模型使用的一些事件
         playerModel.Init(
             PlayAudioOnFootstep, OnStartHit, OnStopHit, OnAttackOver,
             OnHurtOver, OnDeadOver
         );
-        playerTransform = transform;
         
+        // 初始化状态机
         stateMachine = ResManager.Load<StateMachine>();
         // stateMachine = PoolManager.Instance.GetObject<StateMachine>();
         stateMachine.Init(this);
@@ -65,7 +65,8 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
         ChangeState(PlayerState.Idle);
         InitPositionScope(mapSizeOnWorld);
 
-        // 初始化角色位置相关数据
+        // 初始化角色位置相关数据: 玩家坐标、旋转、缩放
+        playerTransform = transform;
         playerTransform.localPosition = playerTransformData.position;
         playerTransform.localRotation = Quaternion.Euler(playerTransformData.rotation);
 
@@ -312,17 +313,6 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
         lastAttackMapObjectList.Clear();
         currentWeaponGameObject.transform.RemoveTriggerEnter(OnWeaponTriggerEnter);
     }
-    
-    // // 采摘动作开始
-    // private void OnStartPickUp() {
-    //     canMove = false;
-    // }
-    //
-    // // 采摘动作结束
-    // private void OnPickUpOver() {
-    //     // 可以移动
-    //     canMove = true;
-    // }
     
     // 攻击动作结束
     private void OnAttackOver() {
