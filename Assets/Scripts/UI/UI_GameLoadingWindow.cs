@@ -6,16 +6,16 @@ using JKFrame;
 public class UI_GameLoadingWindow : UI_WindowBase
 {
     [SerializeField]
-    private Text progress_Text;
+    private Text progressText;
     [SerializeField]
-    private Image fill_Image;
+    private Image fillImage;
     public override void OnShow() {
         base.OnShow();
         UpdateProgress(0);
     }
 
     public void UpdateProgress(float progressValue) {
-        progress_Text.text = (int)(progressValue) + "%";
-        fill_Image.fillAmount = (int)(progressValue);
+        progressText.text = (int)(progressValue) + "%";
+        fillImage.fillAmount = (int)(progressValue);
     }
 }

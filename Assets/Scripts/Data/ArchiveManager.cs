@@ -10,10 +10,10 @@ public class ArchiveManager : Singleton<ArchiveManager>
     public PlayerMainData playerMainData { get; private set; }                      // 当前存档玩家主要数据
     public MapInitData mapInitData { get; private set; }                            // 当前存档地图初始化参数
     public MapData mapData { get; private set; }                                    // 当前存档地图数据
-    public MainInventoryData mainInventoryData { get; private set; }                        // 当前存档物品快捷栏数据
+    public MainInventoryData mainInventoryData { get; private set; }                // 当前存档物品快捷栏数据
     public TimeData timeData { get; private set; }                                  // 当前存档时间数据
     public bool haveArchive { get; private set; }                                   // 判断当前情况是否有存档
-    public Serialization_Dict<ulong, IMapObjectTypeData> mapObjectTypeDataDict;
+    public Serialization_Dict<ulong, IMapObjectTypeData> mapObjectTypeDataDict;     // 当前地图特殊对象数据
     public ScienceData scienceData { get; private set; }
 
     public ArchiveManager() {
@@ -59,7 +59,8 @@ public class ArchiveManager : Singleton<ArchiveManager>
         SaveMapObjectTypeData();
         SaveManager.SaveObject(mapData);
     }
-
+    
+    // 保存科技数据
     public void SaveScienceData() {
         SaveManager.SaveObject(scienceData);
     }

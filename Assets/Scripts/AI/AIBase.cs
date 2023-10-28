@@ -24,7 +24,7 @@ public abstract class AIBase : SerializedMonoBehaviour, IStateMachineOwner
         get {
             if (stateMachine == null)
             {
-                stateMachine = PoolManager.Instance.GetObject<StateMachine>();
+                stateMachine = PoolManager.Instance.GetObject<StateMachine>();  
                 StateMachine.Init(this);
             }
             return stateMachine;
@@ -67,7 +67,8 @@ public abstract class AIBase : SerializedMonoBehaviour, IStateMachineOwner
     public virtual void InitOnTransfer(MapChunkController mapChunk) {
         this.mapChunk = mapChunk;
     }
-
+    
+    // 切换状态
     public virtual void ChangeState(AIState aiState) {
         currentAIState = aiState;
         switch (aiState) {
@@ -91,7 +92,8 @@ public abstract class AIBase : SerializedMonoBehaviour, IStateMachineOwner
                 break;
         }
     }
-
+    
+    // AI物体受伤方法
     public virtual void Hurt(float damage) {
         if (hp <= 0) {
             return;

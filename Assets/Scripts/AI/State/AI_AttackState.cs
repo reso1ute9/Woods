@@ -7,10 +7,10 @@ using JKFrame;
 public class AI_AttackState : AIStateBase
 {
     public override void Enter() {
+        AI.transform.LookAt(Player_Controller.Instance.transform);
         // 随机播放一个攻击动画
         int index = Random.Range(1, 3);
         AI.PlayAnimation("Attack_" + index.ToString());
-        AI.transform.LookAt(Player_Controller.Instance.transform);
         // 播放音效
         AI.PlayAudio("Attack");
 
@@ -35,18 +35,18 @@ public class AI_AttackState : AIStateBase
         }
     }
 
-    // 开启伤害
+    // 开始攻击: 开启伤害
     private void StartHit() {
         AI.Weapon.gameObject.SetActive(true);
     }
 
-    // 关闭伤害
+    // 停止攻击: 关闭伤害
     private void StopHit() {
         isAttacked = false;
         AI.Weapon.gameObject.SetActive(false);
     }
 
-    // 攻击结束
+    // 攻击结束: 后摇
     private void AttackOver() {
         AI.ChangeState(AIState.Pursue);
     }

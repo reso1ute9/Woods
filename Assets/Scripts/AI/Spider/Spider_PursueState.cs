@@ -1,8 +1,8 @@
 using UnityEngine;
 using JKFrame;
 
-public class 
-    Spider_PursueState : AI_PursueState 
+// 蜘蛛追击状态
+public class Spider_PursueState : AI_PursueState 
 {
     private Spider_Controller spider;
 

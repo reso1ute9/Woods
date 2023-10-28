@@ -48,19 +48,25 @@ public class GameSceneManager : LogicManagerBase<GameSceneManager>
             }
         }
     }
-
+    
+    // 暂停游戏
     private void PauseGame() {
         isPause = true;
         UIManager.Instance.Show<UI_PauseWindow>();
+        Time.timeScale = 0;
         TimeManager.Instance.timeScale = 0;
+        
     }
 
+    // 继续游戏
     public void UnPauseGame() {
         isPause = false;
         UIManager.Instance.Close<UI_PauseWindow>();
+        Time.timeScale = 1;
         TimeManager.Instance.timeScale = 1;
     }
-
+    
+    // 开始游戏
     private void StartGame() {
         // 如果运行到这里一定所有存档都准备好了
         IsInitialized = false;

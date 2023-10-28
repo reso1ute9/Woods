@@ -8,18 +8,18 @@ using System;
 [Serializable]
 public class MapInitData {
     public int mapSize;         // 地图大小(地图块数量)
-    public int mapSeed;
-    public int spawnSeed;
-    public float marshLimit;
+    public int mapSeed;         // 地图随机种子
+    public int spawnSeed;       // 地图对象随机种子
+    public float marshLimit;    // 沼泽生成变量
 }
 
 // 地图数据
 [Serializable]                                 
 public class MapData {
     // 当前地图对象id取值
-    public ulong currentId = 1;
+    public ulong currentId = 1;             // 整个地图当前生成对象Id
     // 地图块索引列表: 已经生成过的所有地图块
-    public List<Serialization_Vector2> MapChunkIndexList = new List<Serialization_Vector2>();
+    public List<Serialization_Vector2> MapChunkIndexList = new List<Serialization_Vector2>();   // 地图上包含的地图块索引
 }
 
 // 地图块对象数据
@@ -39,11 +39,11 @@ public class MapObjectData {
 [Serializable]
 public class MapChunkData {
     // 当前地图上的所有地图对象
-    public Serialization_Dict<ulong, MapObjectData> mapObjectDataDict;
-    public Serialization_Dict<ulong, MapObjectData> AIDataDict;
+    public Serialization_Dict<ulong, MapObjectData> mapObjectDataDict;  // 地图对象字典, 使用Id检索地图对象
+    public Serialization_Dict<ulong, MapObjectData> AIDataDict;         // AI对象字典, 使用Id检索AI对象
     // 记录当前地图块顶点数量
     [NonSerialized]
-    public List<MapVertex> forestVertexList; 
+    public List<MapVertex> forestVertexList;            // 记录当前森林顶点数量
     [NonSerialized]
-    public List<MapVertex> marshVertexList; 
+    public List<MapVertex> marshVertexList;             // 记录当前沼泽顶点数量
 }

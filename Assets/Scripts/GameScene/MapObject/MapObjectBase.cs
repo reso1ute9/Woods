@@ -24,6 +24,9 @@ public abstract class MapObjectBase : MonoBehaviour
 {
     [SerializeField] mapObjectType objectType;                  // 地图对象类型
     public mapObjectType ObjectType { get => objectType; } 
+    protected MapChunkController mapChunk;                      // 当前所在的地图块控制器
+    ulong mapObjectId;                                          // 当前地图物品id
+    
     [SerializeField] protected float touchDistance;             // 交互距离
     public float TouchDistance { get => touchDistance; }
     [SerializeField] protected bool canPickUp;                  // 能否采摘
@@ -31,8 +34,7 @@ public abstract class MapObjectBase : MonoBehaviour
     [SerializeField] protected int pickUpItemConfigId = -1;     // 捡取对象id, -1意味着无法获取
     public int PickUpItemConfigId { get => pickUpItemConfigId; }
 
-    protected MapChunkController mapChunk;                      // 当前所在的地图块控制器
-    ulong mapObjectId;                                          // 当前地图物品id
+    
 
     public virtual void Init(MapChunkController mapChunk, ulong mapObjectId, bool isFromBuild) {
         this.mapChunk = mapChunk;
@@ -52,7 +54,7 @@ public abstract class MapObjectBase : MonoBehaviour
 
     // 添加导航
     [Sirenix.OdinInspector.Button]
-    public void AddNavMeshObstacale() {
+    public void AddNavMeshObstacle() {
         NavMeshObstacle navMeshObstacle = transform.AddComponent<NavMeshObstacle>();
         BoxCollider boxCollider = GetComponent<BoxCollider>();
         CapsuleCollider capsuleCollider = GetComponent<CapsuleCollider>();

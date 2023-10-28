@@ -42,7 +42,7 @@ public class UI_MapWindow : UI_WindowBase
         }
     }
 
-    // 初始化地图
+    // 初始化地图UI
     // mapSize: 一行或者一列有多少个image/chunk
     // mapSizeOnWorld: 地图在世界中一行或者一列有多大
     // forestTexture: 森林贴图
@@ -61,11 +61,11 @@ public class UI_MapWindow : UI_WindowBase
         minScale = 1050f / contentSize;
     }
 
-    // 更新中心点, 保证鼠标缩放的时候中心点是玩家
+    // 更新地图UI中心点, 保证鼠标缩放的时候中心点是玩家
     public void UpdatePivot(Vector3 viewerPosition) {
         float x = viewerPosition.x / mapSizeOnWorld;
         float y = viewerPosition.z / mapSizeOnWorld;
-        // 修改content后会导致Scroll Rect组件的当值修改时间=>UpdatePlayerIconPosition
+        // 修改content后会导致Scroll Rect组件的onValueChanged=>UpdatePlayerIconPosition
         content.pivot = new Vector2(x, y);
     }
 

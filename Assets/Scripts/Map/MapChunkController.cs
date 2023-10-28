@@ -20,7 +20,7 @@ public class MapChunkController : MonoBehaviour
     public Vector2Int chunkIndex { get; private set; }                          // 当前地图块索引
     public bool isAllForest { get; private set; }   
     private bool isActive = false;
-    public bool isInitialized = false;                                          // 标记地图UI是否已经初始化
+    public bool isInitialized = false;                                          // 标记地图块UI是否已经初始化
 
     public void Init(Vector2Int chunkIndex, bool isAllForest, MapChunkData mapChunkData) {
         this.chunkIndex = chunkIndex;

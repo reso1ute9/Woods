@@ -44,7 +44,7 @@ public class MapGenerator
         this.spawnAIObjectConfigDict = spawnAIObjectConfigDict;
     }
     
-    // 生成通用地图块数据
+    // 生成通用地图数据
     public void GenerateMapData() {
         // 生成网格/顶点数据
         mapGrid = new MapGrid(
@@ -69,7 +69,7 @@ public class MapGenerator
         marshMaterial = new Material(mapConfig.mapMaterial);
         marshMaterial.SetTextureScale("_MainTex", Vector2.one);
         // 生成地图块mesh
-        mapChunkMesh = GenerateMapMesh(mapConfig.mapChunkSize, mapConfig.mapChunkSize, mapConfig.cellSize);
+        mapChunkMesh = GenerateMapChunkMesh(mapConfig.mapChunkSize, mapConfig.mapChunkSize, mapConfig.cellSize);
         // 设定地图物品随机种子
         UnityEngine.Random.InitState(mapInitData.spawnSeed);
         // 计算地图物品配置总权重
@@ -96,7 +96,7 @@ public class MapGenerator
         }
     }
 
-    // 在指定位置生成地图块
+    // 在指定位置生成地图块控制器
     public MapChunkController GenerateMapChunk(
         Vector2Int chunkIndex, Transform parent, MapChunkData mapChunkData, Action callBackForMapTexture
     ) {
@@ -108,7 +108,7 @@ public class MapGenerator
 
         // 生成地图块的贴图, 性能优化-分帧执行
         Texture2D mapTexture;
-        this.StartCoroutine(GenerateMapTexture(chunkIndex, (texture, isAllForset) => {
+        this.StartCoroutine(GenerateMapChunkTexture(chunkIndex, (texture, isAllForset) => {
             // 如果当前地图块全部是森林, 则不需要实例化一个材质球
             if (isAllForset == true) {
                 mapChunkObj.AddComponent<MeshRenderer>().sharedMaterial = mapConfig.mapMaterial;
@@ -149,7 +149,8 @@ public class MapGenerator
         return mapChunk;
     }
 
-    public Mesh GenerateMapMesh(int height, int width, float cellSize) {
+    // 生成地图Mesh: height/width = mapChunkSize, cellSize = cellSize
+    public Mesh GenerateMapChunkMesh(int height, int width, float cellSize) {
         Mesh mesh = new Mesh();
         // 确定顶点在哪里
         mesh.vertices = new Vector3[] {
@@ -194,9 +195,9 @@ public class MapGenerator
         return noiseMap;
     }
 
-    // 分帧生成地图块贴图
+    // 分帧生成地图块纹理
     // Returns: 如果贴图块全是森林则直接返回森林
-    private IEnumerator GenerateMapTexture(Vector2Int chunkIndex, System.Action<Texture2D, bool> callBack) {
+    private IEnumerator GenerateMapChunkTexture(Vector2Int chunkIndex, System.Action<Texture2D, bool> callBack) {
         // 当前地图块的偏移量, 找到这个地图块每块具体的格子位置
         int cellOffsetX = chunkIndex.x * mapConfig.mapChunkSize + 1;
         int cellOffsetZ = chunkIndex.y * mapConfig.mapChunkSize + 1;
@@ -215,6 +216,7 @@ public class MapGenerator
         Texture2D mapTexture = null;
         if (isAllForest == false) {
             // 约定好贴图都是矩形, 计算整个地图块texture的宽高
+            // 注意: mapConfig.mapChunkSize为当前chunk内cell的数量
             int textureCellSize = mapConfig.forestTexture.width;
             int textureSize = mapConfig.mapChunkSize * textureCellSize;
             mapTexture = new Texture2D(textureSize, textureSize, TextureFormat.RGB24, false);
@@ -303,7 +305,7 @@ public class MapGenerator
         return mapObjectData;
     }
     
-    // 生成一个地图对象的地图数据
+    // 生成一个地图对象数据
     public MapObjectData GenerateMapObjectData(int mapObjectConfigId, Vector3 position) {
         MapObjectData mapObjectData = null;
         MapObjectConfig mapObjectConfig = ConfigManager.Instance.GetConfig<MapObjectConfig>(ConfigName.MapObject, mapObjectConfigId);
@@ -313,7 +315,7 @@ public class MapGenerator
         return mapObjectData;
     }
 
-    // 生成各种地图对象, 需要根据配置和地图网格信息确定生成对象位置
+    // 生成地图块数据, 需要根据配置和地图网格信息确定生成对象位置
     private MapChunkData GenerateMapChunkDataOnMapChunkInit(Vector2Int chunkIndex) {
         MapChunkData mapChunkData = new MapChunkData();
         mapChunkData.mapObjectDataDict = new Serialization_Dict<ulong, MapObjectData>();
@@ -396,7 +398,7 @@ public class MapGenerator
         return mapObjectDataList;
     }
 
-    // 生成AI对象数据
+    // 生成一个AI对象数据列表
     public List<MapObjectData> GenerateAIObjectData(MapChunkData mapChunkData) {
         mapObjectDataList.Clear();
         // 生成AI对象数据: 一个地图块森林或沼泽的顶点数要超过配置的才能生成AI对象
@@ -421,7 +423,7 @@ public class MapGenerator
         return mapObjectDataList;
     }
 
-    // 生成地图块AI数据
+    // 生成一个AI数据
     public MapObjectData GenerateMapAIData(MapVertexType mapVertexType) {
         int configId = GetAIObjectConfigIdForWeight(mapVertexType);
         AIConfig aiConfig = ConfigManager.Instance.GetConfig<AIConfig>(ConfigName.AI, configId);

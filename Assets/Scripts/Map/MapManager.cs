@@ -252,6 +252,7 @@ public class MapManager : SingletonMono<MapManager>
         }
         // 控制地图块刷新时间, 当时间间隔>=UpdateVisibleChunkTime时才可进行刷新
         canUpdateChunk = false;
+        // 在过了指定时间后才执行ResetCanUpdateChunkFlag重置地图块刷新标记
         Invoke(nameof(ResetCanUpdateChunkFlag), UpdateVisibleChunkTime);
     }
     
@@ -267,6 +268,7 @@ public class MapManager : SingletonMono<MapManager>
         return mapChunkDict[GetMapChunkIndexByWorldPosition(worldIndex)];
     }
 
+    // 生成地图块控制器 
     private MapChunkController GenerateMapChunk(Vector2Int index, MapChunkData mapChunkData = null) {
         if (index.x > mapInitData.mapSize - 1 || index.y > mapInitData.mapSize - 1) return null;
         if (index.x < 0 || index.y < 0) return null;
@@ -303,7 +305,8 @@ public class MapManager : SingletonMono<MapManager>
         }
         UpdateMapUI();
     }
-
+    
+    // 更新地图UI
     private void UpdateMapUI() {
         for (int i = 0; i < mapUIUpdateChunkIndexList.Count; i++) {
             Vector2Int chunkIndex = mapUIUpdateChunkIndexList[i];
@@ -376,7 +379,7 @@ public class MapManager : SingletonMono<MapManager>
         ArchiveManager.Instance.SaveMapData();
     }
     
-    // 保留当前场景中的资源
+    // 游戏关闭时释放场景中的资源
     public void OnCloseGameScene() {
         // 地图UI
         mapUI.ResetWindow();

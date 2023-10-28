@@ -5,6 +5,29 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.VisualScripting;
 
+
+// 顶点类型
+public enum MapVertexType {
+    None,   // 默认类型
+    Forest, // 森林
+    Marsh,  // 沼泽 
+}
+
+// 地图顶点: 每个cell有一个顶点, 每个顶点上都有一个地图对象
+public class MapVertex
+{
+    public Vector3 position;
+    public MapVertexType vertexType;
+    public ulong mapObjectId;           // 当前地图cell上的物体对象, 0代表为空
+}
+
+// 地图格子
+public class MapCell
+{
+    public Vector3 position;
+    public int textureIndex;
+}
+
 // 网格: 主要包含顶点和格子
 public class MapGrid
 {
@@ -16,7 +39,8 @@ public class MapGrid
     public int mapHeight { get; private set; }          // 注意mapHeight指的是MapCell的坐标, 传入的是mapInitData.mapSize * mapConfig.mapChunkSize
     public int mapWidth { get; private set; }           // 注意mapWeight指的是MapCell的坐标, 传入的是mapInitData.mapSize * mapConfig.mapChunkSize
     public float cellSize { get; private set; }
-
+    
+    // 地图网格初始化
     public MapGrid(int mapHeight, int mapWidth, float cellSize) {
         this.mapHeight = mapHeight;
         this.mapWidth = mapWidth;
@@ -127,7 +151,7 @@ public class MapGrid
     }
     # endregion
 
-    // 计算格子贴图的索引数字
+    // 根据perlin噪声图结果设置全图的顶点类型和格子贴图索引数字
     public void CalculateMapVertexType(float[,] noiseMap, float limit) {
         // noiseMap大小与全部mapCell大小一致
         int width = noiseMap.GetLength(0);
@@ -144,26 +168,4 @@ public class MapGrid
             }
         }
     }
-}
-
-// 顶点类型
-public enum MapVertexType {
-    None,   // 默认类型
-    Forest, // 森林
-    Marsh,  // 沼泽 
-}
-
-// 地图顶点
-public class MapVertex
-{
-    public Vector3 position;
-    public MapVertexType vertexType;
-    public ulong mapObjectId;           // 当前地图顶点上的物体对象, 0代表为空
-}
-
-// 地图格子
-public class MapCell
-{
-    public Vector3 position;
-    public int textureIndex;
 }
