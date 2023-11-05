@@ -6,6 +6,7 @@ using UnityEngine;
 using JKFrame;
 using TMPro;
 using Unity.VisualScripting;
+using Debug = UnityEngine.Debug;
 using StateMachine = JKFrame.StateMachine;
 
 public enum PlayerState
@@ -104,8 +105,9 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
             }
             else {
                 playerMainData.hp = 0;
+                TriggerUpdateHPEvent();
                 ChangeState(PlayerState.Dead);
-                UIManager.Instance.AddTips("玩家死亡");
+                // UIManager.Instance.AddTips("玩家死亡");
             }
         }
     }
@@ -332,7 +334,7 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
     // 死亡动作结束
     private void OnDeadOver() {
         // 整个游戏结束
-        GameSceneManager.Instance.GameOver();
+        GameSceneManager.Instance.PlayerDeadGameOver();
     }
 
     // 武器触发器: 当武器碰到物体(地图对象/AI)时
@@ -442,7 +444,7 @@ public class Player_Controller : SingletonMono<Player_Controller>, IStateMachine
                 canAttack = false;
                 canUseItem = false;
                 canPickUpItem = false;
-                stateMachine.ChangeState<Player_Dead>((int)playerState);
+                stateMachine.ChangeState<Player_Dead>((int)playerState, false);
                 break;
         }
     }

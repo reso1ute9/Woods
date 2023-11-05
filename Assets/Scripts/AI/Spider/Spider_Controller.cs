@@ -30,7 +30,7 @@ public class Spider_Controller : AIBase
                 StateMachine.ChangeState<AI_AttackState>((int)aiState);
                 break;
             case AIState.Dead:
-                StateMachine.ChangeState<AI_DeadState>((int)aiState);
+                StateMachine.ChangeState<AI_DeadState>((int)aiState, false);
                 break;
         }
     }

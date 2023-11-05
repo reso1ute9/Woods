@@ -6,7 +6,7 @@ using JKFrame;
 using Sirenix.OdinInspector;
 
 // 储物箱UI窗口
-[UIElement(true, "UI/UI_StorageBoxInventoryWindow", 1)]
+[UIElement(false, "UI/UI_StorageBoxInventoryWindow", 1)]
 public class UI_StorageBoxInventoryWindow : UI_InventoryWindowBase
 {
     [SerializeField] Button closButton;

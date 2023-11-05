@@ -16,7 +16,6 @@ public static class UITool
 
     // arg1:
     private static void MouseEffect(PointerEventData arg1, object[] args) {
-        
         Component component = (Component)args[0];
         bool isNormal = (bool)args[1];              // 是否进行缩放
         Vector3 normalScale = (Vector3)args[2];     // button正常尺寸

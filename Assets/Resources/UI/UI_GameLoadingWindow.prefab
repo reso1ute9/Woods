@@ -323,8 +323,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe2c0a9be12b32547ada25bfdcbc7fdc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  progress_Text: {fileID: 2786686679491513554}
-  fill_Image: {fileID: 2786686678513357893}
+  progressText: {fileID: 2786686679491513554}
+  fillImage: {fileID: 2786686678513357893}
 --- !u!1 &2786686680152831567
 GameObject:
   m_ObjectHideFlags: 0

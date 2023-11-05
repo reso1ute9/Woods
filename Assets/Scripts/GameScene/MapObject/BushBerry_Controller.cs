@@ -7,7 +7,7 @@ using UnityEngine;
 // 浆果灌木丛控制器
 public class BushBerry_Controller : Bush_Controller, IBuilding
 {   
-    [SerializeField] MeshRenderer meshRenderer;
+    [SerializeField] MeshRenderer meshRenderer;             
     [SerializeField] new Collider collider;
     [SerializeField] List<Material> materials;              // 0: 有浆果的材质; 1. 没有浆果的材质
     [SerializeField] int bushBerryGrowDayNum;               // 浆果成长天数

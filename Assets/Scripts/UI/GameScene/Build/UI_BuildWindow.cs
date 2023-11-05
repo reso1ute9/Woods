@@ -13,7 +13,7 @@ public class UI_BuildWindow : UI_WindowBase
     [SerializeField] UI_BuildWindow_MainMenuItem[] mainMenuItems;   // 所有的一级菜单选项
     [SerializeField] UI_BuildWindow_SecondaryMenu  secondaryMenu;   // 二级菜单
     private UI_BuildWindow_MainMenuItem currentMenuItem;            // 当前被选中的菜单选项
-    private bool isTouch = false;                                   // 鼠标是否在
+    private bool isTouch = false;                                   // 检查鼠标是否在UI_BuildWindow内
 
     public override void Init() {
         base.Init();

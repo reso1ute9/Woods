@@ -7,7 +7,7 @@ using Unity.VisualScripting;
 using System.Linq;
 
 
-[UIElement(true, "UI/UI_MainInventoryWindow", 1)]
+[UIElement(false, "UI/UI_MainInventoryWindow", 1)]
 public class UI_MainInventoryWindow : UI_InventoryWindowBase
 {
     private MainInventoryData mainInventoryData;

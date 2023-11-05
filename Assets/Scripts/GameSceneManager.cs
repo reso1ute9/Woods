@@ -15,6 +15,7 @@ public class GameSceneManager : LogicManagerBase<GameSceneManager>
     
     private bool isGameOver = false;
     public bool IsGameOver { get => isGameOver; }
+    private bool isPlayerDead = false;
     private bool isPause = false;
     public bool IsInitialized { get; private set; }
     protected override void CancelEventListener() {}
@@ -70,6 +71,7 @@ public class GameSceneManager : LogicManagerBase<GameSceneManager>
     private void StartGame() {
         // 如果运行到这里一定所有存档都准备好了
         IsInitialized = false;
+        isPlayerDead = false;
         
         // 加载进度条
         loadingWindow = UIManager.Instance.Show<UI_GameLoadingWindow>();
@@ -142,6 +144,7 @@ public class GameSceneManager : LogicManagerBase<GameSceneManager>
     public void EnterMenuScene() {
         // 恢复时间
         TimeManager.Instance.timeScale = 1;
+        Time.timeScale = 1;
         // 回收场景资源
         MapManager.Instance.OnCloseGameScene();
         // 清空所有事件
@@ -150,17 +153,19 @@ public class GameSceneManager : LogicManagerBase<GameSceneManager>
         MonoManager.Instance.StopAllCoroutines();
         // 关闭所有UI
         UIManager.Instance.CloseAll();
+        // // 如果游戏结束并且玩家已经死亡则需要清空存档
+        if (isGameOver && isPlayerDead) {
+            ArchiveManager.Instance.CleanArchive();
+        }
         // 进入新场景
         GameManager.Instance.EnterMenu();
     }
     
-    // 游戏结束
-    public void GameOver() {
+    // 玩家死亡返回主菜单
+    public void PlayerDeadGameOver() {
         isGameOver = true;
-        // 删除存档
-        ArchiveManager.Instance.CleanArchive();
-        // 延迟进入菜单场景
-        Invoke(nameof(EnterMenuScene), 2.0f);
+        isPlayerDead = true;
+        UIManager.Instance.Show<UI_PlayerDeadWindow>();
     }
     
     // 关闭游戏场景并保存存档后进入菜单场景
@@ -173,8 +178,8 @@ public class GameSceneManager : LogicManagerBase<GameSceneManager>
     
     // 意外监听
     private void OnApplicationQuit() {
-        // 当玩家死亡需要紧急存档
-        if (isGameOver) {
+        // 当游戏退出但是玩家没有死亡时需要紧急存档
+        if (isGameOver && !isPlayerDead) {
             EventManager.EventTrigger(EventName.SaveGame);
         }
     }

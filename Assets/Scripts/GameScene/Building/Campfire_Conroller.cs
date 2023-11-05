@@ -7,12 +7,12 @@ using Unity.VisualScripting;
 
 public class Campfire_Conroller : BuildingBase
 {
-    [SerializeField] new Light light;
-    [SerializeField] GameObject fire;
-    [SerializeField] private AudioSource audioSource;
-    private CampfireConfig campfireConfig;
-    private CampfireData campfireData;
-    private bool isOnGround;
+    [SerializeField] new Light light;                       // 灯光组件:点光源
+    [SerializeField] GameObject fire;                       // 火焰组件
+    [SerializeField] private AudioSource audioSource;       // 火焰音效
+    private CampfireConfig campfireConfig;                  // 篝火配置
+    private CampfireData campfireData;                      // 篝火数据
+    private bool isOnGround;                                // 篝火是否已建造
 
     public override void Init(MapChunkController mapChunk, ulong mapObjectId, bool isFromBuild) {
         base.Init(mapChunk, mapObjectId, isFromBuild);
@@ -59,7 +59,7 @@ public class Campfire_Conroller : BuildingBase
         SetLight(0);
     }
 
-    // 设置火焰燃料
+    // 根据火焰燃料设置光照
     private void SetLight(float fuelValue) {
         light.gameObject.SetActive(fuelValue != 0);
         fire.gameObject.SetActive(fuelValue != 0);
