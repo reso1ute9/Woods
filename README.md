@@ -6,14 +6,14 @@ forst -- 3d survival type game demo
 
 
 
-视频演示:【Unity个人自学demo】 https://www.bilibili.com/video/BV1Qc411c7xu/?share_source=copy_web&vd_source=cf326a22ef42c23caf731f27146e385a
+**视频演示:** 待更新  https://www.bilibili.com/video/BV1Qc411c7xu/?share_source=copy_web&vd_source=cf326a22ef42c23caf731f27146e385a
 
 ----
 ### 游戏介绍
 这是一款生存冒险类游戏，游戏玩法参考自《饥荒》，女主角因不明原因被魔法传送到了一块神秘森林中，在迷雾缭绕的森林里她必须躲过危险的蜘蛛和野猪，不断搜集资源，利用资源建造建筑、制作武器和食物，以此来帮助自己渡过一轮又一轮难关，直到找到森林的出口
 
 ### 游戏Demo下载地址
-[待补充]
+百度网盘链接: https://pan.baidu.com/s/1CPPcKImnqbJu8POAv8jiBQ 提取码: gh24
 
 ### 游戏设计
 游戏中主要包含以下几类功能，其中配置模块、UI模块等非重点模块此处不一一列举，详细文档请见 **[forest/Document](./Document)**
@@ -313,6 +313,9 @@ forst -- 3d survival type game demo
 ---
 
 ### Bug修复记录
+2023.11.6 角色重复播放死亡动画
+- 原因: 当游戏角色血量为0时会出发角色死亡时间，由于该系统每帧都会检查角色状态所以导致会重复执行角色死亡方法
+- 修复：当切换角色死亡状态时会判断当前状态和前一个状态是否一致，如果一致则返回
 
 2023.9.26 游戏加载页面无法覆盖全整个游戏画面导致四周出现缝隙可以看到地图加载内容
 - 原因: 游戏加载页面尺寸设置小了
